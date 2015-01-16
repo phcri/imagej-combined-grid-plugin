@@ -1,2 +1,2 @@
-# imagej-combined-grid-plugin
-Combined Grid Plugin for ImageJ
+# imagej-combined-grids-plugin
+Combined Grids Plugin for ImageJ
