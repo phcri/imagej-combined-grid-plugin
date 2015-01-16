@@ -24,7 +24,7 @@ import java.util.Random;
 
 /**
  * <p>
- * The Combined Grid Plugin is based on the Grid Plugin (<a target="_blank"
+ * The Combined Grids Plugin is based on the Grid Plugin (<a target="_blank"
  * href="http://rsb.info.nih.gov/ij/plugins/grid.html"
  * >http://rsb.info.nih.gov/ij/plugins/grid.html</a>) originally written by Dr
  * Wayne Rasband and modified with his permission.
@@ -93,7 +93,7 @@ import java.util.Random;
  * @author Adrian Png
  * 
  */
-public class CombinedGridPlugin implements PlugIn, DialogListener {
+public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static String[] colors = { "Red", "Green", "Blue", "Magenta",
 			"Cyan", "Yellow", "Orange", "Black", "White" };
 	private static String color = "Blue";
