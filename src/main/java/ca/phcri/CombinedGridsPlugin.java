@@ -24,30 +24,24 @@ import java.util.Random;
 
 
 public class CombinedGridsPlugin implements PlugIn, DialogListener {
-	private final static String[] colors = { "Red", "Green", "Blue", "Magenta",
-			"Cyan", "Yellow", "Orange", "Black", "White" };
+	private final static String[] colors = { "Red", "Green", "Blue", "Magenta", "Cyan", "Yellow", "Orange", "Black", "White" };
 	private static String color = "Blue";
 	private final static int COMBINED = 0, DOUBLE_LATTICE = 1, LINES = 2,
 			HLINES = 3, CROSSES = 4, POINTS = 5;
-	private final static String[] types = { "Combined Point", "Double Lattice",
-			"Lines", "Horizontal Lines", "Crosses", "Points" };
+	private final static String[] types = { "Combined Point", "Double Lattice", "Lines", "Horizontal Lines", "Crosses", "Points" };
 	private static String type = types[COMBINED];
 	private static double areaPerPoint;
 
-	private final static int ONE_TO_FOUR = 0, ONE_TO_NINE = 1,
-			ONE_TO_SIXTEEN = 2, ONE_TO_TWENTYFIVE = 3, ONE_TO_THIRTYSIX = 4;
-	private final static String[] ratioChoices = { "1:4", "1:9", "1:16",
-			"1:25", "1:36" };
+	private final static int ONE_TO_FOUR = 0, ONE_TO_NINE = 1, ONE_TO_SIXTEEN = 2, ONE_TO_TWENTYFIVE = 3, ONE_TO_THIRTYSIX = 4;
+	private final static String[] ratioChoices = { "1:4", "1:9", "1:16", "1:25", "1:36" };
 	private static String gridRatio = ratioChoices[ONE_TO_FOUR];
 	private final static String[] radiobuttons = { "Random Offset", "Fixed Position", "Manual Input" };
 	private final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
 	private static String radiochoice = radiobuttons[RANDOM];
-	private static Component[] components; // this is to select components in
-											// the dialog box
+	private static Component[] components; // this is to select components in the dialog box
 	private final static int[] ratioField = { 4, 5 };
 	private final static int[] combinedGridFields = { 14, 15, 16, 17 };
-	private final static int[] parameterFieldsOff = { 10, 11, 12, 13, 14, 15,
-			16, 17 };
+	private final static int[] parameterFieldsOff = { 10, 11, 12, 13, 14, 15, 16, 17 };
 	private final static int[] xstartField = { 10, 11 };
 	private final static int[] ystartField = { 12, 13 };
 	private static boolean showGridSwitch = true;
@@ -72,15 +66,13 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	void showGrid(Shape shape) {
 		Overlay layer = imp.getOverlay();
 		if (shape == null) {
-			if (layer != null)
-				layer.remove(layer.getIndex("grid"));
+			if (layer != null) layer.remove(layer.getIndex("grid"));
 		} else {
 			Roi roi = new ShapeRoi(shape);
 			roi.setStrokeColor(getColor());
 			roi.setName("grid");
 			if (layer != null) {
-				if (layer.getIndex("grid") != -1)
-					layer.remove(layer.getIndex("grid"));
+				if (layer.getIndex("grid") != -1) layer.remove(layer.getIndex("grid"));
 				layer.add(roi);
 			} else
 				layer = new Overlay(roi);
@@ -97,14 +89,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			for (int v = 0; v < linesH; v++) {
 				float x = (float) (xstart + h * tileWidth);
 				float y = (float) (ystart + v * tileHeight);
-				path.moveTo(x - two, y - one);
-				path.lineTo(x - two, y + one);
-				path.moveTo(x + two, y - one);
-				path.lineTo(x + two, y + one);
-				path.moveTo(x - one, y - two);
-				path.lineTo(x + one, y - two);
-				path.moveTo(x - one, y + two);
-				path.lineTo(x + one, y + two);
+				path.moveTo(x - two, y - one); path.lineTo(x - two, y + one);
+				path.moveTo(x + two, y - one); path.lineTo(x + two, y + one);
+				path.moveTo(x - one, y - two); path.lineTo(x + one, y - two);
+				path.moveTo(x - one, y + two); path.lineTo(x + one, y + two);
 			}
 		}
 		showGrid(path);
@@ -117,10 +105,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			for (int v = 0; v < linesH; v++) {
 				float x = (float) (xstart + h * tileWidth);
 				float y = (float) (ystart + v * tileHeight);
-				path.moveTo(x - arm, y);
-				path.lineTo(x + arm, y);
-				path.moveTo(x, y - arm);
-				path.lineTo(x, y + arm);
+				path.moveTo(x - arm, y); path.lineTo(x + arm, y);
+				path.moveTo(x, y - arm); path.lineTo(x, y + arm);
 			}
 		}
 		showGrid(path);
@@ -136,16 +122,12 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			for (int v = 0; v < linesH; v++) {
 				float x = (float) (xstart + h * tileWidth);
 				float y = (float) (ystart + v * tileHeight);
-				path.moveTo(x - arm, y);
-				path.lineTo(x + arm, y);
-				path.moveTo(x, y - arm);
-				path.lineTo(x, y + arm);
+				path.moveTo(x - arm, y); path.lineTo(x + arm, y);
+				path.moveTo(x, y - arm); path.lineTo(x, y + arm);
 
 				if ((h % coarseGridX == 0) && (v % coarseGridY == 0)) {
-					float centerX = (float) (xstart + xstartCoarse * tileWidth + h
-							* tileWidth);
-					float centerY = (float) (ystart + ystartCoarse * tileHeight + v
-							* tileHeight);
+					float centerX = (float) (xstart + xstartCoarse * tileWidth  + h * tileWidth);
+					float centerY = (float) (ystart + ystartCoarse * tileHeight + v * tileHeight);
 
 					// drawing a coarse point by lines
 					path.moveTo(centerX - pointSizeCoarse, centerY - armCoarse);
@@ -153,7 +135,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					path.moveTo(centerX + pointSizeCoarse, centerY - 0);
 					path.lineTo(centerX + pointSizeCoarse, centerY + armCoarse);
 					path.moveTo(centerX - armCoarse, centerY - pointSizeCoarse);
-					path.lineTo(centerX + 0, centerY - pointSizeCoarse);
+					path.lineTo(centerX + 0,		 centerY - pointSizeCoarse);
 					path.moveTo(centerX - armCoarse, centerY + pointSizeCoarse);
 					path.lineTo(centerX + armCoarse, centerY + pointSizeCoarse);
 				}
@@ -172,30 +154,23 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 		for (int i = 0; i < linesV; i++) {
 			float xoff = (float) (xstart + i * tileWidth);
-			path.moveTo(xoff, 0f);
-			path.lineTo(xoff, height);
+			path.moveTo(xoff, 0f); path.lineTo(xoff, height);
 		}
 		for (int i = 0; i < linesH; i++) {
 			float yoff = (float) (ystart + i * tileHeight);
-			path.moveTo(0f, yoff);
-			path.lineTo(width, yoff);
+			path.moveTo(0f, yoff); path.lineTo(width, yoff);
 		}
 
 		for (int h = 0; h < linesV; h++) {
 			for (int v = 0; v < linesH; v++) {
 				if ((h % coarseGridX == 0) && (v % coarseGridY == 0)) {
-					float centerX = (float) (xstart + xstartCoarse * tileWidth + h
-							* tileWidth);
-					float centerY = (float) (ystart + ystartCoarse * tileHeight + v
-							* tileHeight);
+					float centerX = (float) (xstart + xstartCoarse * tileWidth + h * tileWidth);
+					float centerY = (float) (ystart + ystartCoarse * tileHeight + v * tileHeight);
 					// drawing curve for coarse grid
 					path.moveTo(centerX, centerY - rad);
-					path.curveTo(centerX - radkappa, centerY - rad, centerX
-							- rad, centerY - radkappa, centerX - rad, centerY);
-					path.curveTo(centerX - rad, centerY + radkappa, centerX
-							- radkappa, centerY + rad, centerX, centerY + rad);
-					path.curveTo(centerX + radkappa, centerY + rad, centerX
-							+ rad, centerY + radkappa, centerX + rad, centerY);
+					path.curveTo(centerX - radkappa, centerY - rad, centerX - rad, centerY - radkappa, centerX - rad, centerY);
+					path.curveTo(centerX - rad, centerY + radkappa, centerX - radkappa, centerY + rad, centerX, centerY + rad);
+					path.curveTo(centerX + radkappa, centerY + rad, centerX + rad, centerY + radkappa, centerX + rad, centerY);
 				}
 			}
 		}
@@ -267,12 +242,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 		// to switch enable/disable parameter input boxes
 		components = gd.getComponents();
-		for (int i : parameterFieldsOff)
-			components[i].setEnabled(false);
-		if (!(types[COMBINED].equals(type) || types[DOUBLE_LATTICE]
-				.equals(type)))
-			for (int i : ratioField)
-				components[i].setEnabled(false);
+		for (int i : parameterFieldsOff) components[i].setEnabled(false);
+		if (!(types[COMBINED].equals(type) || types[DOUBLE_LATTICE].equals(type)))
+			for (int i : ratioField) components[i].setEnabled(false);
 
 		gd.addDialogListener(this);
 		gd.showDialog();
@@ -326,41 +298,33 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		else if (minArea < 16)
 			minArea = 16.0;
 
-		if (Double.isNaN(areaPerPoint)
-				|| areaPerPoint / (pixelWidth * pixelHeight) < minArea) {
+		if (Double.isNaN(areaPerPoint) || areaPerPoint / (pixelWidth * pixelHeight) < minArea) {
 			err = "\"Area per Point\" too small. \n";
 			areaPerPoint = 0;
 		}
 
 		// choose gridRatio for Combined Points and Double Lattice
 		if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE])) {
-			for (int i : ratioField)
-				components[i].setEnabled(true);
+			for (int i : ratioField) components[i].setEnabled(true);
 		} else {
-			for (int i : ratioField)
-				components[i].setEnabled(false);
+			for (int i : ratioField) components[i].setEnabled(false);
 		}
 
 		if (gridRatio.equals(ratioChoices[ONE_TO_FOUR])) {
-			coarseGridX = 2;
-			coarseGridY = 2;
+			coarseGridX = 2; coarseGridY = 2;
 		} else if (gridRatio.equals(ratioChoices[ONE_TO_NINE])) {
-			coarseGridX = 3;
-			coarseGridY = 3;
+			coarseGridX = 3; coarseGridY = 3;
 		} else if (gridRatio.equals(ratioChoices[ONE_TO_SIXTEEN])) {
-			coarseGridX = 4;
-			coarseGridY = 4;
+			coarseGridX = 4; coarseGridY = 4;
 		} else if (gridRatio.equals(ratioChoices[ONE_TO_TWENTYFIVE])) {
-			coarseGridX = 5;
-			coarseGridY = 5;
+			coarseGridX = 5; coarseGridY = 5;
 		} else if (gridRatio.equals(ratioChoices[ONE_TO_THIRTYSIX])) {
-			coarseGridX = 6;
-			coarseGridY = 6;
+			coarseGridX = 6; coarseGridY = 6;
 		}
 
 		// calculation for tileWidth and tileLength
 		double tileSize = Math.sqrt(areaPerPoint);
-		tileWidth = tileSize / pixelWidth;
+		tileWidth  = tileSize / pixelWidth;
 		tileHeight = tileSize / pixelHeight;
 
 		// choose first point(s) depending on the way to place grid
@@ -373,52 +337,40 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			xstartCoarse = random.nextInt(coarseGridX);
 			ystartCoarse = random.nextInt(coarseGridY);
 		} else if (radiochoice.equals(radiobuttons[FIXED])) {
-			for (int i : parameterFieldsOff)
-				components[i].setEnabled(false);
+			for (int i : parameterFieldsOff) components[i].setEnabled(false);
 			xstart = (int) (tileWidth / 2.0 + 0.5);
 			ystart = (int) (tileHeight / 2.0 + 0.5);
 			xstartCoarse = 0;
 			ystartCoarse = 0;
 		} else if (radiochoice.equals(radiobuttons[MANUAL])) {
-			for (int i : ystartField)
-				components[i].setEnabled(true);
+			for (int i : ystartField) components[i].setEnabled(true);
 
 			if (type.equals(types[HLINES])) {
-				for (int i : xstartField)
-					components[i].setEnabled(false);
+				for (int i : xstartField) components[i].setEnabled(false);
 				xstart = 0; // just to prevent an error
 			} else {
-				for (int i : xstartField)
-					components[i].setEnabled(true);
+				for (int i : xstartField) components[i].setEnabled(true);
 			}
 
 			// check if both xstart and ystart are within proper ranges
-			if (areaPerPoint != 0
-					&& (xstart >= tileWidth || ystart >= tileHeight)) {
-				if (xstart >= tileWidth)
-					err = err + "\"xstart\" ";
-				if (ystart >= tileHeight)
-					err = err + "\"ystart\" ";
+			if (areaPerPoint != 0 && (xstart >= tileWidth || ystart >= tileHeight)) {
+				if (xstart >= tileWidth) err = err + "\"xstart\" ";
+				if (ystart >= tileHeight) err = err + "\"ystart\" ";
 				err = err + "too large. \n";
 			}
 
 			// input for the Combined grid
-			if (type.equals(types[COMBINED])
-					|| type.equals(types[DOUBLE_LATTICE])) {
-				for (int i : combinedGridFields)
-					components[i].setEnabled(true);
+			if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE])) {
+				for (int i : combinedGridFields) components[i].setEnabled(true);
 
 				// check if both xstartCoarse and ystartCoarse are within proper ranges
 				if (xstartCoarse >= coarseGridX || ystartCoarse >= coarseGridY) {
-					if (xstartCoarse >= coarseGridX)
-						err = err + "\"xstartCoarse\" ";
-					if (ystartCoarse >= coarseGridY)
-						err = err + "\"ystartCoarse\" ";
+					if (xstartCoarse >= coarseGridX) err = err + "\"xstartCoarse\" ";
+					if (ystartCoarse >= coarseGridY) err = err + "\"ystartCoarse\" ";
 					err = err + "too large.";
 				}
 			} else {
-				for (int i : combinedGridFields)
-					components[i].setEnabled(false);
+				for (int i : combinedGridFields) components[i].setEnabled(false);
 			}
 		}
 
@@ -428,7 +380,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 
 		// calculating number of vertical and horizontal lines in a selected image
-		linesV = (int) ((width - xstart) / tileWidth) + 1;
+		linesV = (int) ((width  - xstart) / tileWidth) + 1;
 		linesH = (int) ((height - ystart) / tileHeight) + 1;
 
 		// execution part
@@ -476,8 +428,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 	// output grid parameters
 	void showParameterList() {
-		TextWindow gridParameterWindow = (TextWindow) WindowManager
-				.getWindow("Grid Parameters");
+		TextWindow gridParameterWindow = (TextWindow) WindowManager.getWindow("Grid Parameters");
 		Integer xStartOutput = new Integer(xstart);
 		Integer xStartCoarseOutput = new Integer(xstartCoarse);
 		Integer yStartCoarseOutput = new Integer(ystartCoarse);
@@ -486,8 +437,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		if (type.equals(types[HLINES]))
 			xStartOutput = null;
 
-		if (!(type.equals(types[COMBINED]) || type
-				.equals(types[DOUBLE_LATTICE]))) {
+		if (!(type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE]))) {
 			xStartCoarseOutput = null;
 			yStartCoarseOutput = null;
 			singleQuart = "";
