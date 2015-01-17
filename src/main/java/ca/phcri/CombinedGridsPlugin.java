@@ -22,77 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
-/**
- * <p>
- * The Combined Grids Plugin is based on the Grid Plugin (<a target="_blank"
- * href="http://rsb.info.nih.gov/ij/plugins/grid.html"
- * >http://rsb.info.nih.gov/ij/plugins/grid.html</a>) originally written by Dr
- * Wayne Rasband and modified with his permission.
- * </p>
- * 
- * <p>
- * Implemented Functions:
- * <ol>
- * <li>Combined, or multi-purpose, point grid with several fine to coarse grid
- * ratios</li>
- * <li>Double lattice square grid with several fine to coarse grid ratios</li>
- * <li>Output of grid parameters</li>
- * <li>Manual specification of grid position</li>
- * <li>Overlay/remove a grid without destroying the other Overlay elements.</li>
- * <li>Check box to choose if you want to launch grid switch plugin
- * (installation of "Grid Switch" plugin is necessary).</li>
- * </ol>
- * </p>
- * 
- * <p>
- * Installation and Usage:
- * <ol>
- * <li>Put "CombinedGridPlugin.class" into the plugins folder of ImageJ (or
- * Fiji) and restart the software. Please note that this does
- * <strong>NOT</strong> overwrite or replace the existing Grid plugin installed
- * with ImageJ.</li>
- * <li>Open an image in ImageJ.</li>
- * <li>Choose "Grid with Combined_Grids" in the "Plugins" tab of ImageJ.</li>
- * <li>Specify your grid settings in the dialog box and click OK.</li>
- * </ol>
- * </p>
- * 
- * <p>
- * Notes:
- * <ol>
- * <li>For the Combined Point Grid and the Double Lattice Square grid,
- * "Area per Point" determines density of the fine grid.</li>
- * <li>Grid location by "Fixed Position" in this plugin is same as grid location
- * with "random-offset" unchecked in the original "Grid" plugin. For
- * "Combined Point" and "Double Lattice" grids, the first point of the coarse
- * grid is placed on the first point for the fine grid at the left upper corner.
- * </li>
- * </ol>
- * </p>
- * 
- * <p>
- * References:
- * <ol>
- * <li>Howard CV, Reed MG. Unbiased Stereology, 2nd ed. Oxon, UK: Garland
- * Science/BIOS Scientific Publishers; 2005.</li>
- * <li>Hsia CC, Hyde DM, Ochs M, Weibel ER; ATS/ERS Joint Task Force on
- * Quantitative Assessment of Lung Structure. An official research policy
- * statement of the American Thoracic Society/European Respiratory Society:
- * standards for quantitative assessment of lung structure. Am J Respir Crit
- * Care Med 2010;181:39-418.</li>
- * </ol>
- * </p>
- * 
- * <p>
- * Corresponding Author:<br/>
- * Please contact Daisuke Kinose (Daisuke.Kinose@hli.ubc.ca) for questions about
- * this plugin.
- * </p>
- * 
- * @author Daisuke Kinose
- * @author Adrian Png
- * 
- */
+
 public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static String[] colors = { "Red", "Green", "Blue", "Magenta",
 			"Cyan", "Yellow", "Orange", "Black", "White" };
@@ -109,8 +39,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static String[] ratioChoices = { "1:4", "1:9", "1:16",
 			"1:25", "1:36" };
 	private static String gridRatio = ratioChoices[ONE_TO_FOUR];
-	private final static String[] radiobuttons = { "Random Offset",
-			"Fixed Position", "Manual Input" };
+	private final static String[] radiobuttons = { "Random Offset", "Fixed Position", "Manual Input" };
 	private final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
 	private static String radiochoice = radiobuttons[RANDOM];
 	private static Component[] components; // this is to select components in
@@ -134,7 +63,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private String err = "";
 
 	public void run(String arg) {
-		if (IJ.versionLessThan("1.43u"))
+		if (IJ.versionLessThan("1.47"))
 			return;
 		imp = IJ.getImage();
 		showDialog();
@@ -237,7 +166,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		GeneralPath path = new GeneralPath();
 		int width = imp.getWidth();
 		int height = imp.getHeight();
-		float arm = 5;
 		float rad = 14;
 		float radkappa = (float) (rad * 0.5522847498); // ref
 														// https://www.java.net/node/660133
@@ -294,7 +222,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	void drawHorizontalLines() {
 		GeneralPath path = new GeneralPath();
 		int width = imp.getWidth();
-		int height = imp.getHeight();
+//		int height = imp.getHeight();
 		for (int i = 0; i < linesH; i++) {
 			float yoff = (float) (ystart + i * tileHeight);
 			path.moveTo(0f, yoff);
@@ -321,21 +249,16 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			units = "pixels";
 			places = 0;
 		}
-		if (areaPerPoint == 0.0)
-			areaPerPoint = (width * cal.pixelWidth * height * cal.pixelHeight) / 81.0; // default
-																						// to
-																						// 9x9
-																						// grid
+		if (areaPerPoint == 0.0) // default to 9x9 grid
+			areaPerPoint = (width * cal.pixelWidth * height * cal.pixelHeight) / 81.0;
 
 		// get values in a dialog box
 		GenericDialog gd = new GenericDialog("Grid...");
 		gd.addChoice("Grid Type:", types, type);
-		gd.addNumericField("Area per Point:", areaPerPoint, places, 6, units
-				+ "^2");
+		gd.addNumericField("Area per Point:", areaPerPoint, places, 6, units + "^2");
 		gd.addChoice("Ratio:", ratioChoices, gridRatio);
 		gd.addChoice("Color:", colors, color);
-		gd.addRadioButtonGroup("Grid Location", radiobuttons, 3, 1,
-				radiobuttons[RANDOM]);
+		gd.addRadioButtonGroup("Grid Location", radiobuttons, 3, 1, radiobuttons[RANDOM]);
 		gd.addNumericField("xstart:", 0, 0);
 		gd.addNumericField("ystart:", 0, 0);
 		gd.addNumericField("xstartCoarse:", 0, 0);
@@ -387,28 +310,17 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 		// if areaPerPoint is not too small, this shows error
 		double minArea = (width * height) / 50000.0;
-		if (type.equals(types[CROSSES]) && minArea < 144.0) // to avoid overlap
-															// of grid points.
-															// ((5 + 1) * 2) ^2
-															// = 12^2 = 144
+		if (type.equals(types[CROSSES]) && minArea < 144.0)
 			minArea = 144.0;
-		else if (type.equals(types[COMBINED]) && minArea < 484.0) // As
-																	// pointSizeCoarse
-																	// = 10, (10
-																	// + 1) *
-																	// 2)^2 =
-																	// 22^2 =
-																	// 484
+			// to avoid overlap of grid points.
+			// ((5 + 1) * 2) ^2 = 12^2 = 144
+		else if (type.equals(types[COMBINED]) && minArea < 484.0)
 			minArea = 484.0;
-		else if (type.equals(types[DOUBLE_LATTICE]) && minArea < 900.0) // As
-																		// rad =
-																		// 14,
-																		// ((14
-																		// + 1)
-																		// * 2)
-																		// ^2 =
-																		// 900
+			// As pointSizeCoarse = 10,
+			//(10 + 1) * 2)^2 = 22^2 = 484
+		else if (type.equals(types[DOUBLE_LATTICE]) && minArea < 900.0)
 			minArea = 900.0;
+		 	// As rad = 14, ((14 + 1) * 2) ^2 = 900
 		else if (minArea < 16)
 			minArea = 16.0;
 
@@ -494,8 +406,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				for (int i : combinedGridFields)
 					components[i].setEnabled(true);
 
-				// check if both xstartCoarse and ystartCoarse are within proper
-				// ranges
+				// check if both xstartCoarse and ystartCoarse are within proper ranges
 				if (xstartCoarse >= coarseGridX || ystartCoarse >= coarseGridY) {
 					if (xstartCoarse >= coarseGridX)
 						err = err + "\"xstartCoarse\" ";
@@ -514,8 +425,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			return true;
 		}
 
-		// calculating number of vertical and horizontal lines in a selected
-		// image
+		// calculating number of vertical and horizontal lines in a selected image
 		linesV = (int) ((width - xstart) / tileWidth) + 1;
 		linesH = (int) ((height - ystart) / tileHeight) + 1;
 
@@ -591,7 +501,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				+ "\t" + xStartOutput + "\t" + (int) ystart + "\t"
 				+ xStartCoarseOutput + "\t" + yStartCoarseOutput;
 		// singleQuart before gridRatio is to prevent conversion to date in
-		// excel.
+		// Excel.
 
 		if (gridParameterWindow == null) {
 			gridParameterWindow = new TextWindow(
