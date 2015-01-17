@@ -282,8 +282,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		if (gd.wasOKed()) {
 			if ("".equals(err)) {
 				showParameterList();
-				if (showGridSwitch)
-					IJ.runPlugIn("Grid_Switch", "");
+				if (showGridSwitch){
+					Grid_Switch gs = new Grid_Switch();
+					gs.gridSwitch();
+				}
 			} else {
 				IJ.error("Grid", err);
 				showGrid(null);
