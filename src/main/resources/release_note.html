@@ -1,0 +1,78 @@
+<p>
+The Combined Grids Plugin is based on the Grid Plugin (<a target="_blank"
+href="http://rsb.info.nih.gov/ij/plugins/grid.html"
+>http://rsb.info.nih.gov/ij/plugins/grid.html</a>) originally written by Dr
+Wayne Rasband and modified with his permission.<BR>
+This package also includes the Grid Switch Plugin to work with the Combined Grids Plugin
+</p>
+
+<p>
+Implemented Functions:
+<ol>
+<li>Combined, or multi-purpose, point grid with several fine to coarse grid
+ratios</li>
+<li>Double lattice square grid with several fine to coarse grid ratios</li>
+<li>Output of grid parameters</li>
+<li>Manual specification of grid position</li>
+<li>Overlay/remove a grid without destroying the other Overlay elements</li>
+<li>Check box to choose if you want to launch the Grid Switch Plugin</li>
+<li>Grid Switch to temporary hide an overlaid grid</li>
+</ol>
+</p>
+
+<p>
+Installation and Usage:
+<ol>
+<li>Put "CombinedGridPlugin.jar" into the plugins folder of ImageJ (or
+Fiji) and restart the software. Please note that this does
+<strong>NOT</strong> overwrite or replace the existing Grid plugin installed
+with ImageJ.</li>
+<li>Open an image in ImageJ.</li>
+<li>Choose "Plugins" > "Grids" > "Combined Grids" in ImageJ.</li>
+<li>Specify your grid settings in the dialog box and click OK.</li>
+</ol>
+</p>
+
+<p>
+Notes for the Combined Grids Plugin:
+<ol>
+<li>For the Combined Point Grid and the Double Lattice Square grid,
+"Area per Point" determines density of the fine grid.</li>
+<li>Grid location by "Fixed Position" in this plugin is same as grid location
+with "random-offset" unchecked in the original "Grid" plugin. For
+"Combined Point" and "Double Lattice" grids, the first point of the coarse
+grid is placed on the first point for the fine grid at the left upper corner.
+</li>
+</ol>
+</p>
+<p>
+Notes for the Grid Switch Plugin:
+<ol>
+<li>This plugin specifically hides/redraws a grid overlaid by the "Grid with Combined Grids" plugin.</li>
+<li>When it redraws a grid, the grid is placed on the top of all the other elements of the overlay.</li>
+<li>You can have multiple grid switches.</li>
+<li>It works for a currently active image. If you have multiple images with grids, you can change the target of the grid switch by activating another image.</li>
+<li>When the grid switch looses its window focus, the grid is redrawn.</li>
+</ol>
+</p>
+<p>
+References:
+<ol>
+<li>Howard CV, Reed MG. Unbiased Stereology, 2nd ed. Oxon, UK: Garland
+Science/BIOS Scientific Publishers; 2005.</li>
+<li>Hsia CC, Hyde DM, Ochs M, Weibel ER; ATS/ERS Joint Task Force on
+Quantitative Assessment of Lung Structure. An official research policy
+statement of the American Thoracic Society/European Respiratory Society:
+standards for quantitative assessment of lung structure. Am J Respir Crit
+Care Med 2010;181:39-418.</li>
+</ol>
+</p>
+
+<p>
+Corresponding Author:<br/>
+Please contact Daisuke Kinose (Daisuke.Kinose@hli.ubc.ca) for questions about
+this plugin.
+</p>
+
+@author Daisuke Kinose
+@author Adrian Png
