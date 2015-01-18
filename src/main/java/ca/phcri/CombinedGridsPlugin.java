@@ -450,7 +450,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		String GridParameters = df.format(date) + "\t" + imp.getTitle() + "\t"
 				+ type + "\t" + areaPerPoint + "\t" + units + "^2" + "\t"
 				+ singleQuart + gridRatio + "\t" + color + "\t" + radiochoice
-				+ "\t" + xStartOutput + "\t" + (int) ystart + "\t"
+				+ "\t" + xStartOutput + "\t" + ystart + "\t"
 				+ xStartCoarseOutput + "\t" + yStartCoarseOutput;
 		// singleQuart before gridRatio is to prevent conversion to date in
 		// Excel.
