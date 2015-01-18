@@ -11,10 +11,10 @@ import ij.plugin.frame.PlugInFrame;
 
 
 public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
-	private ImagePlus imp;
-	private boolean gridOn = false;
-	private static Button b1 new Button(gridStatus);
+	private static ImagePlus imp;
+	private static boolean gridOn = false;
 	private static String gridStatus = "Grid On";
+	private static Button b1 = new Button(gridStatus);
 	private static Overlay layer;
 	private static Roi gridRoi;
 	
