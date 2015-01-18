@@ -13,7 +13,7 @@ import ij.plugin.frame.PlugInFrame;
 public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 	private ImagePlus imp;
 	private boolean gridOn = false;
-	private Button b1;
+	private static Button b1 new Button(gridStatus);
 	private static String gridStatus = "Grid On";
 	private static Overlay layer;
 	private static Roi gridRoi;
@@ -27,9 +27,9 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 		PlugInFrame gs = new PlugInFrame("Grid Switch");
 		gs.setSize(200, 100);
 		gs.addWindowListener(this);
-		b1 = new Button(gridStatus);
-		b1.addActionListener(this);
-		gs.add(b1);
+		Button b2 = b1;
+		b2.addActionListener(this);
+		gs.add(b2);
 
 		gs.setVisible(true);
 	}
