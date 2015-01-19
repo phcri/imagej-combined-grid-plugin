@@ -45,7 +45,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static int[] parameterFieldsOff = { 10, 11, 12, 13, 14, 15, 16, 17 };
 	private final static int[] xstartField = { 10, 11 };
 	private final static int[] ystartField = { 12, 13 };
-	private boolean showGridSwitch;
+	private static boolean showGridSwitch = true;
 
 	private Random random = new Random(System.currentTimeMillis());
 	private ImagePlus imp;
@@ -227,8 +227,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 		if (areaPerPoint == 0.0) // default to 9x9 grid
 			areaPerPoint = (width * cal.pixelWidth * height * cal.pixelHeight) / 81.0;
-		
-		showGridSwitch = !gridSwitchExist();
 
 		// get values in a dialog box
 		GenericDialog gd = new GenericDialog("Grid...");
@@ -241,7 +239,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		gd.addNumericField("ystart:", 0, 0);
 		gd.addNumericField("xstartCoarse:", 0, 0);
 		gd.addNumericField("ystartCoarse:", 0, 0);
-		gd.addCheckbox("Show Grid Switch", showGridSwitch);
+		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
 
 		// to switch enable/disable parameter input boxes
 		components = gd.getComponents();
@@ -257,7 +255,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		if (gd.wasOKed()) {
 			if ("".equals(err)) {
 				showParameterList();
-				if (showGridSwitch){
+				if (showGridSwitch && !gridSwitchExist()){
 					Grid_Switch gs = new Grid_Switch();
 					gs.gridSwitch();
 				}
