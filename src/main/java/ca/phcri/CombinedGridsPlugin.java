@@ -15,6 +15,7 @@ import ij.text.TextWindow;
 import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Frame;
 import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.text.DateFormat;
@@ -44,7 +45,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static int[] parameterFieldsOff = { 10, 11, 12, 13, 14, 15, 16, 17 };
 	private final static int[] xstartField = { 10, 11 };
 	private final static int[] ystartField = { 12, 13 };
-	private static boolean showGridSwitch = true;
+	private boolean showGridSwitch;
 
 	private Random random = new Random(System.currentTimeMillis());
 	private ImagePlus imp;
@@ -226,6 +227,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 		if (areaPerPoint == 0.0) // default to 9x9 grid
 			areaPerPoint = (width * cal.pixelWidth * height * cal.pixelHeight) / 81.0;
+		
+		showGridSwitch = !gridSwitchExist();
 
 		// get values in a dialog box
 		GenericDialog gd = new GenericDialog("Grid...");
@@ -463,5 +466,14 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		} else {
 			gridParameterWindow.append(GridParameters);
 		}
+	}
+	
+	boolean gridSwitchExist(){
+		Frame[] frames = Frame.getFrames();
+		for (Frame frame : frames){
+			if("Grid Switch".equals(frame.getTitle()) && frame.isVisible())
+					return true;
+		}
+		return false;
 	}
 }
