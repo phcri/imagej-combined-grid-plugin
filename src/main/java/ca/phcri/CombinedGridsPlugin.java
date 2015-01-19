@@ -354,9 +354,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 			// check if both xstart and ystart are within proper ranges
 			if (areaPerPoint != 0 && (xstart >= tileWidth || ystart >= tileHeight)) {
-				if (xstart >= tileWidth) err = err + "\"xstart\" ";
-				if (ystart >= tileHeight) err = err + "\"ystart\" ";
-				err = err + "too large. \n";
+				if (xstart >= tileWidth) err +=  "\"xstart\" ";
+				if (ystart >= tileHeight) err +=  "\"ystart\" ";
+				err +=  "too large. \n";
 			}
 
 			// input for the Combined grid
@@ -365,9 +365,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 				// check if both xstartCoarse and ystartCoarse are within proper ranges
 				if (xstartCoarse >= coarseGridX || ystartCoarse >= coarseGridY) {
-					if (xstartCoarse >= coarseGridX) err = err + "\"xstartCoarse\" ";
-					if (ystartCoarse >= coarseGridY) err = err + "\"ystartCoarse\" ";
-					err = err + "too large.";
+					if (xstartCoarse >= coarseGridX) err +=  "\"xstartCoarse\" ";
+					if (ystartCoarse >= coarseGridY) err +=  "\"ystartCoarse\" ";
+					err +=  "too large.";
 				}
 			} else {
 				for (int i : combinedGridFields) components[i].setEnabled(false);
