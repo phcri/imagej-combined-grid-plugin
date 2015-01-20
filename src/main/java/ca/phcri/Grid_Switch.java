@@ -11,10 +11,9 @@ import ij.plugin.frame.PlugInFrame;
 
 
 public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
-	private static ImagePlus imp;
-	private static boolean gridOn = false;
-	private static String gridStatus = "Grid On";
-	private static Button b1 = new Button(gridStatus);
+	private ImagePlus imp;
+	private boolean gridOn = false;
+	private Button b1;
 	private static Overlay layer;
 	private static Roi gridRoi;
 	
@@ -27,9 +26,9 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 		PlugInFrame gs = new PlugInFrame("Grid Switch");
 		gs.setSize(200, 100);
 		gs.addWindowListener(this);
-		Button b2 = b1;
-		b2.addActionListener(this);
-		gs.add(b2);
+		b1 = new Button("Grid On");
+		b1.addActionListener(this);
+		gs.add(b1);
 
 		gs.setVisible(true);
 	}
@@ -46,7 +45,7 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 	public void windowClosing(WindowEvent e) {}
 	public void windowDeactivated(WindowEvent e) {
 		enableGrid();
-		gridStatus = "Grid On";
+		b1.setLabel("Grid On");
 		gridOn = false;
 	}
 	public void windowDeiconified(WindowEvent e) {}
@@ -56,18 +55,17 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 	public void actionPerformed(ActionEvent e) {
 		if(gridOn) {
 			enableGrid();
-			gridStatus = "Grid On";
+			b1.setLabel("Grid On");
 		} else {
 			layer.remove(layer.getIndex("grid"));
 			imp.setOverlay(layer);
-			gridStatus = "Grid Off";
+			b1.setLabel("Grid Off");
 		}
 		gridOn = !gridOn;
 	}
 	
 	void enableGrid() {
-		if(layer.getIndex("grid") != -1)
-				layer.remove(layer.getIndex("grid"));
+		if(layer.getIndex("grid") != -1) layer.remove(layer.getIndex("grid"));
 		layer.add(gridRoi);
 		imp.setOverlay(layer);
 	}
