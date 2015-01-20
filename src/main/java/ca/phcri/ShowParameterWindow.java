@@ -4,6 +4,6 @@ import ij.plugin.PlugIn;
 
 public class ShowParameterWindow implements PlugIn {
 	public void run(String arg) {
-		CombinedGridsPlugin.showParameterWindow(null);
+		CombinedGridsPlugin.showHistory(null);
 	}
 }

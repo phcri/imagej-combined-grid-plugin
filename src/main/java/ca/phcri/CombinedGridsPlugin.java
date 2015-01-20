@@ -259,7 +259,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			showGrid(null);
 		if (gd.wasOKed()) {
 			if ("".equals(err)) {
-				showParameterList();
+				showGridParameters();
 				if (showGridSwitch && !gridSwitchExist()){
 					Grid_Switch gs = new Grid_Switch();
 					gs.gridSwitch();
@@ -433,7 +433,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	}
 
 	// output grid parameters
-	void showParameterList(){
+	void showGridParameters(){
 		Integer xStartOutput = new Integer(xstart);
 		Integer xStartCoarseOutput = new Integer(xstartCoarse);
 		Integer yStartCoarseOutput = new Integer(ystartCoarse);
@@ -459,39 +459,42 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				+ xStartCoarseOutput + "\t" + yStartCoarseOutput;
 		// singleQuart before gridRatio is to prevent conversion to date in
 		// Excel.
-		showParameterWindow(gridParameters);
+		showHistory(gridParameters);
 	}
 	
-	static void showParameterWindow(String str) {
-		TextWindow gridParameterWindow = (TextWindow) WindowManager.getWindow("Grid Parameters");
+	static void showHistory(String str) {
+		String title = "Grid History";
+		TextWindow gridHistoryWindow = (TextWindow) WindowManager.getWindow(title);
 		
-		if (gridParameterWindow == null) {
-			//make a new empty TextWindow titled "Grid Parameters" with headings
-			gridParameterWindow = new TextWindow(
-					"Grid Parameters",
+		if (gridHistoryWindow == null) {
+			//make a new empty TextWindow with String title with headings
+			gridHistoryWindow = new TextWindow(
+					title,
 					"Date \t Image \t Grid Type \t Area per Point \t Unit \t Ratio \t Color \t Location Setting \t xstart \t ystart \t xstartCoarse \t ystartCoarse",
 					"", 1028, 250);
 			
-			//If "Grid Parameters.txt" exists in the plugin folder, read it into the "Grid Parameters" window
+			//If "CombinedGridsHistory.txt" exists in the plugin folder, read it into the list.
 			try {
-				BufferedReader br = new BufferedReader(new FileReader(IJ.getDirectory("plugins") + "Grid Parameters.txt"));
-				int count = -1;
+				BufferedReader br = new BufferedReader(new FileReader(IJ.getDirectory("plugins") + "CombinedGridsHistory.txt"));
+				boolean isTitleLine = true;
 				while (true) {
-					count++;
 		            String s = br.readLine();
 		            if (s == null) break;
-		            if(count == 0) continue;
-		            gridParameterWindow.append(s);
+		            if(isTitleLine) {
+		            	isTitleLine = false;
+		            	continue;
+		            }
+		            gridHistoryWindow.append(s);
 				}
 			} catch (IOException e) {}
 		}
 		
 		if(str != null){
-			gridParameterWindow.append(str);
+			gridHistoryWindow.append(str);
 			
-			//auto save the parameters into "Grid Parameters.txt"
-			TextPanel tp = gridParameterWindow.getTextPanel();
-			tp.saveAs(IJ.getDirectory("plugins") + "Grid Parameters.txt");	
+			//auto save the parameters into "CombinedGridsHistory.txt"
+			TextPanel tp = gridHistoryWindow.getTextPanel();
+			tp.saveAs(IJ.getDirectory("plugins") + "CombinedGridsHistory.txt");	
 		}
 	}
 	

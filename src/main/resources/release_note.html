@@ -23,11 +23,10 @@ Released on January 20th, 2015
 		<li>Combined, or multi-purpose, point grid with several fine to coarse grid
 			ratios</li>
 		<li>Double lattice square grid with several fine to coarse grid ratios</li>
-		<li>Output of grid parameters</li>
+		<li>Output and autosave of grid parameters</li>
 		<li>Manual specification of grid position</li>
 		<li>Overlay/remove a grid without destroying the other Overlay elements</li>
 		<li>Grid Switch to temporary hide an overlaid grid</li>
-		<li>Autosave of the grid parameters
 	</ol>
 </p>
 
@@ -53,13 +52,13 @@ Released on January 20th, 2015
 			with "random-offset" unchecked in the original "Grid" plugin. For
 			"Combined Point" and "Double Lattice" grids, the first point of the coarse
 			grid is placed on the first point for the fine grid at the left upper corner.</li>
-		<li>When you overlay a new grid, the parameters for the grid are automatically added to the list of the previous grid parameters.
-			This list is automatically saved as "Grid Parameters.txt" in the plugin folder.</li>
-		<li>If you want to delete grid information from the list of "Grid Parameters",<BR>
-			1. select lines you want to delete in the "Grid Parameters" window,<BR>
+		<li>When you overlay a new grid, the parameters for the grid are automatically added to the history of previousely overlaid grids.
+			This list is automatically saved as "CombinedGridsHistory.txt" in the plugin folder.</li>
+		<li>If you want to delete grid information from the list of "Grid History",<BR>
+			1. select lines you want to delete in the "Grid History" window,<BR>
 			2. choose "cut" or "clear" in the right click menue or in the "Edit" tab<BR>
-			3. choose "save as..." in the "File" tab and overwrite "Grid Parameters.txt".<BR>
-			You can also delete "Grid Parameters.txt" itself from the folder. This plugin will create a new one.
+			3. choose "save as..." in the "File" tab and overwrite "CombinedGridsHistory.txt".<BR>
+			You can completely clean the list by removing "CombinedGridsHistory.txt" from the folder. This plugin will create a new one.
 			</li>
 	</ul>
 </p>
