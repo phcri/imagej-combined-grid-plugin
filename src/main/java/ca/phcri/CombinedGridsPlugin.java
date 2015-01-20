@@ -10,6 +10,7 @@ import ij.gui.Roi;
 import ij.gui.ShapeRoi;
 import ij.measure.Calibration;
 import ij.plugin.PlugIn;
+import ij.text.TextPanel;
 import ij.text.TextWindow;
 
 import java.awt.AWTEvent;
@@ -22,6 +23,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 
 public class CombinedGridsPlugin implements PlugIn, DialogListener {
@@ -241,7 +246,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		gd.addNumericField("ystartCoarse:", 0, 0);
 		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
 
-		// to switch enable/disable parameter input boxes
+		// to switch enable/disable for parameter input boxes
 		components = gd.getComponents();
 		for (int i : parameterFieldsOff) components[i].setEnabled(false);
 		if (!(types[COMBINED].equals(type) || types[DOUBLE_LATTICE].equals(type)))
@@ -254,7 +259,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			showGrid(null);
 		if (gd.wasOKed()) {
 			if ("".equals(err)) {
-				showParameterList();
+				showGridParameters();
 				if (showGridSwitch && !gridSwitchExist()){
 					Grid_Switch gs = new Grid_Switch();
 					gs.gridSwitch();
@@ -266,7 +271,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 	}
 
-	// event control for dialog box
+	// event control for the dialog box
 	public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
 		int width = imp.getWidth();
 		int height = imp.getHeight();
@@ -283,7 +288,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		err = "";
 		IJ.showStatus(err);
 
-		// if areaPerPoint is not too small, this shows error
+		// if areaPerPoint is not too small, show an error
 		double minArea = (width * height) / 50000.0;
 		if (type.equals(types[CROSSES]) && minArea < 144.0)
 			minArea = 144.0;
@@ -304,7 +309,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			areaPerPoint = 0;
 		}
 
-		// choose gridRatio for Combined Points and Double Lattice
+		// enables gridRatio choice for Combined Points and Double Lattice
 		if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE])) {
 			for (int i : ratioField) components[i].setEnabled(true);
 		} else {
@@ -328,13 +333,13 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		tileWidth  = tileSize / pixelWidth;
 		tileHeight = tileSize / pixelHeight;
 
-		// choose first point(s) depending on the way to place grid
+		// decide the first point(s) depending on the way to place a grid
 		if (radiochoice.equals(radiobuttons[RANDOM])) {
 			for (int i : parameterFieldsOff)
 				components[i].setEnabled(false);
 			xstart = (int) (random.nextDouble() * tileWidth);
 			ystart = (int) (random.nextDouble() * tileHeight);
-			// 0 <= random.nextDouble() < 1
+					// 0 <= random.nextDouble() < 1
 			xstartCoarse = random.nextInt(coarseGridX);
 			ystartCoarse = random.nextInt(coarseGridY);
 		} else if (radiochoice.equals(radiobuttons[FIXED])) {
@@ -348,6 +353,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 			if (type.equals(types[HLINES])) {
 				for (int i : xstartField) components[i].setEnabled(false);
+					//disable xstartField because
+					//Horizontal lines needs just ystart and does not need xstart
 				xstart = 0; // just to prevent an error
 			} else {
 				for (int i : xstartField) components[i].setEnabled(true);
@@ -360,7 +367,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				err +=  "too large. \n";
 			}
 
-			// input for the Combined grid
+			// input for the Combined grids
 			if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE])) {
 				for (int i : combinedGridFields) components[i].setEnabled(true);
 
@@ -428,8 +435,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	}
 
 	// output grid parameters
-	void showParameterList() {
-		TextWindow gridParameterWindow = (TextWindow) WindowManager.getWindow("Grid Parameters");
+	void showGridParameters(){
 		Integer xStartOutput = new Integer(xstart);
 		Integer xStartCoarseOutput = new Integer(xstartCoarse);
 		Integer yStartCoarseOutput = new Integer(ystartCoarse);
@@ -448,21 +454,51 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date date = new Date();
 
-		String GridParameters = df.format(date) + "\t" + imp.getTitle() + "\t"
+		String gridParameters = df.format(date) + "\t" + imp.getTitle() + "\t"
 				+ type + "\t" + areaPerPoint + "\t" + units + "^2" + "\t"
 				+ singleQuart + gridRatio + "\t" + color + "\t" + radiochoice
 				+ "\t" + xStartOutput + "\t" + ystart + "\t"
 				+ xStartCoarseOutput + "\t" + yStartCoarseOutput;
 		// singleQuart before gridRatio is to prevent conversion to date in
 		// Excel.
-
-		if (gridParameterWindow == null) {
-			gridParameterWindow = new TextWindow(
-					"Grid Parameters",
+		showHistory(gridParameters);
+	}
+	
+	static void showHistory(String str) {
+		String windowTitle = "Grid History";
+		String fileName = "CombinedGridsHistory.txt";
+		
+		TextWindow gridHistoryWindow = (TextWindow) WindowManager.getWindow(windowTitle);
+		
+		if (gridHistoryWindow == null) {
+			//make a new empty TextWindow with String windowTitle with headings
+			gridHistoryWindow = new TextWindow(
+					windowTitle,
 					"Date \t Image \t Grid Type \t Area per Point \t Unit \t Ratio \t Color \t Location Setting \t xstart \t ystart \t xstartCoarse \t ystartCoarse",
-					GridParameters, 1028, 250);
-		} else {
-			gridParameterWindow.append(GridParameters);
+					"", 1028, 250);
+			
+			//If a file whose name is String fileName exists in the plugin folder, read it into the list.
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(IJ.getDirectory("plugins") + fileName));
+				boolean isHeadings = true;
+				while (true) {
+		            String s = br.readLine();
+		            if (s == null) break;
+		            if(isHeadings) {
+		            	isHeadings = false;
+		            	continue;
+		            }
+		            gridHistoryWindow.append(s);
+				}
+			} catch (IOException e) {}
+		}
+		
+		if(str != null){
+			gridHistoryWindow.append(str);
+			
+			//auto save the parameters into a file whose name is String fileName
+			TextPanel tp = gridHistoryWindow.getTextPanel();
+			tp.saveAs(IJ.getDirectory("plugins") + fileName);	
 		}
 	}
 	
