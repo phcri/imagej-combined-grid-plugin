@@ -8,9 +8,9 @@ import ij.gui.GenericDialog;
 import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.ShapeRoi;
-import ij.io.OpenDialog;
 import ij.measure.Calibration;
 import ij.plugin.PlugIn;
+import ij.text.TextPanel;
 import ij.text.TextWindow;
 
 import java.awt.AWTEvent;
@@ -23,6 +23,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 
 public class CombinedGridsPlugin implements PlugIn, DialogListener {
@@ -256,7 +260,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		if (gd.wasOKed()) {
 			if ("".equals(err)) {
 				showParameterList();
-				IJ.log(OpenDialog.getDefaultDirectory());
 				if (showGridSwitch && !gridSwitchExist()){
 					Grid_Switch gs = new Grid_Switch();
 					gs.gridSwitch();
@@ -431,7 +434,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 	// output grid parameters
 	void showParameterList() {
-		TextWindow gridParameterWindow = (TextWindow) WindowManager.getWindow("Grid Parameters");
 		Integer xStartOutput = new Integer(xstart);
 		Integer xStartCoarseOutput = new Integer(xstartCoarse);
 		Integer yStartCoarseOutput = new Integer(ystartCoarse);
@@ -457,15 +459,35 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				+ xStartCoarseOutput + "\t" + yStartCoarseOutput;
 		// singleQuart before gridRatio is to prevent conversion to date in
 		// Excel.
-
+		
+		TextWindow gridParameterWindow = (TextWindow) WindowManager.getWindow("Grid Parameters");
+		
 		if (gridParameterWindow == null) {
+			//make a new empty TextWindow titled "Grid Parameters" with headings
 			gridParameterWindow = new TextWindow(
 					"Grid Parameters",
 					"Date \t Image \t Grid Type \t Area per Point \t Unit \t Ratio \t Color \t Location Setting \t xstart \t ystart \t xstartCoarse \t ystartCoarse",
-					GridParameters, 1028, 250);
-		} else {
-			gridParameterWindow.append(GridParameters);
+					"", 1028, 250);
+			
+			//If "Grid Parameters.txt" exists in the plugin folder, read it into the "Grid Parameters" window
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(IJ.getDirectory("plugins") + "Grid Parameters.txt"));
+				int count = -1;
+				while (true) {
+					count++;
+		            String s = br.readLine();
+		            if (s == null) break;
+		            if(count == 0) continue;
+		            gridParameterWindow.append(s);
+				}
+			} catch (IOException e) {}
 		}
+		
+		gridParameterWindow.append(GridParameters);
+		
+		//auto save the parameters into "Grid Parameters.txt"
+		TextPanel tp = gridParameterWindow.getTextPanel();
+		tp.saveAs(IJ.getDirectory("plugins") + "Grid Parameters.txt");
 	}
 	
 	boolean gridSwitchExist(){
