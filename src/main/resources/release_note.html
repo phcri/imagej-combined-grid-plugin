@@ -15,7 +15,7 @@ Wayne Rasband and modified with his permission.
 Authors; Daisuke Kinose<SUP>[1]</SUP> and Adrian Png<SUP>[2]</SUP><BR>
 <SUP>[1]</SUP> Dr. James Hogg's Lab, the Centre for Heart Lung Innovation in St. Paul's Hospital, University of British Columbia, Canada<BR>
 <SUP>[2]</SUP> IT department, the Centre for Heart Lung Innovation in St. Paul's Hospital, University of British Columbia, Canada<BR>
-Released on January 19th, 2015
+Released on January 20th, 2015
 </p>
 <p>
 	<H2>Implemented Functions:</H2>
@@ -27,6 +27,7 @@ Released on January 19th, 2015
 		<li>Manual specification of grid position</li>
 		<li>Overlay/remove a grid without destroying the other Overlay elements</li>
 		<li>Grid Switch to temporary hide an overlaid grid</li>
+		<li>Autosave of the grid parameters
 	</ol>
 </p>
 
@@ -44,7 +45,7 @@ Released on January 19th, 2015
 </p>
 
 <p>
-	<H2>Notes for the Combined Grids Plugin:</H2>
+	<H2>Notes for the Combined Grids Plugin and Grid History:</H2>
 	<ul>
 		<li>For the Combined Point Grid and the Double Lattice Square grid,
 			"Area per Point" determines density of the fine grid.</li>
@@ -52,9 +53,16 @@ Released on January 19th, 2015
 			with "random-offset" unchecked in the original "Grid" plugin. For
 			"Combined Point" and "Double Lattice" grids, the first point of the coarse
 			grid is placed on the first point for the fine grid at the left upper corner.</li>
+		<li>When you overlay a new grid, the parameters for the grid are automatically added to the list of the previous grid parameters.
+			This list is automatically saved as "Grid Parameters.txt" in the plugin folder.</li>
+		<li>If you want to delete grid information from the list of "Grid Parameters",<BR>
+			1. select lines you want to delete in the "Grid Parameters" window,<BR>
+			2. choose "cut" or "clear" in the right click menue or in the "Edit" tab<BR>
+			3. choose "save as..." in the "File" tab and overwrite "Grid Parameters.txt".<BR>
+			You can also delete "Grid Parameters.txt" itself from the folder. This plugin will create a new one.
+			</li>
 	</ul>
 </p>
-<p>
 <H2>Notes for the Grid Switch:</H2>
 	<ul>
 		<li>The Grid Switch specifically hides/redraws a grid overlaid by 
