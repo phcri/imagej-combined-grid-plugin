@@ -8,6 +8,7 @@ import ij.gui.GenericDialog;
 import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.ShapeRoi;
+import ij.io.OpenDialog;
 import ij.measure.Calibration;
 import ij.plugin.PlugIn;
 import ij.text.TextWindow;
@@ -255,6 +256,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		if (gd.wasOKed()) {
 			if ("".equals(err)) {
 				showParameterList();
+				IJ.log(OpenDialog.getDefaultDirectory());
 				if (showGridSwitch && !gridSwitchExist()){
 					Grid_Switch gs = new Grid_Switch();
 					gs.gridSwitch();
