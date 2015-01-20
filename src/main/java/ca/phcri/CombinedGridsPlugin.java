@@ -433,7 +433,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	}
 
 	// output grid parameters
-	void showParameterList() {
+	void showParameterList(){
 		Integer xStartOutput = new Integer(xstart);
 		Integer xStartCoarseOutput = new Integer(xstartCoarse);
 		Integer yStartCoarseOutput = new Integer(ystartCoarse);
@@ -452,14 +452,17 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date date = new Date();
 
-		String GridParameters = df.format(date) + "\t" + imp.getTitle() + "\t"
+		String gridParameters = df.format(date) + "\t" + imp.getTitle() + "\t"
 				+ type + "\t" + areaPerPoint + "\t" + units + "^2" + "\t"
 				+ singleQuart + gridRatio + "\t" + color + "\t" + radiochoice
 				+ "\t" + xStartOutput + "\t" + ystart + "\t"
 				+ xStartCoarseOutput + "\t" + yStartCoarseOutput;
 		// singleQuart before gridRatio is to prevent conversion to date in
 		// Excel.
-		
+		showParameterWindow(gridParameters);
+	}
+	
+	static void showParameterWindow(String str) {
 		TextWindow gridParameterWindow = (TextWindow) WindowManager.getWindow("Grid Parameters");
 		
 		if (gridParameterWindow == null) {
@@ -483,11 +486,13 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			} catch (IOException e) {}
 		}
 		
-		gridParameterWindow.append(GridParameters);
-		
-		//auto save the parameters into "Grid Parameters.txt"
-		TextPanel tp = gridParameterWindow.getTextPanel();
-		tp.saveAs(IJ.getDirectory("plugins") + "Grid Parameters.txt");
+		if(str != null){
+			gridParameterWindow.append(str);
+			
+			//auto save the parameters into "Grid Parameters.txt"
+			TextPanel tp = gridParameterWindow.getTextPanel();
+			tp.saveAs(IJ.getDirectory("plugins") + "Grid Parameters.txt");	
+		}
 	}
 	
 	boolean gridSwitchExist(){
