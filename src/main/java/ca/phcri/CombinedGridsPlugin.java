@@ -466,6 +466,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	
 	static void showHistory(String str) {
 		String windowTitle = "Grid History";
+			//ShowParameterWindow.java uses String "Grid History" without referring to this windowTitle variable,
+			//so be careful to change the title this window. 
 		String fileName = "CombinedGridsHistory.txt";
 		
 		TextWindow gridHistoryWindow = (TextWindow) WindowManager.getWindow(windowTitle);
