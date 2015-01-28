@@ -6,11 +6,11 @@ import ij.WindowManager;
 import ij.plugin.PlugIn;
 import ij.text.TextWindow;
 
-public class ShowParameterWindow implements PlugIn {
+public class ShowHistoryWindow implements PlugIn {
 	public void run(String arg) {
 		CombinedGridsPlugin.showHistory(null);
 		
-		TextWindow gridHistoryWindow = (TextWindow) WindowManager.getWindow("Grid History");
+		TextWindow gridHistoryWindow = (TextWindow) WindowManager.getWindow(CombinedGridsPlugin.historyWindowTitle);
 		gridHistoryWindow.setState(Frame.NORMAL);
 		gridHistoryWindow.toFront();
 	}

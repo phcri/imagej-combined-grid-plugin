@@ -51,6 +51,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static int[] xstartField = { 10, 11 };
 	private final static int[] ystartField = { 12, 13 };
 	private static boolean showGridSwitch = true;
+	final static String historyWindowTitle = "Grid History"; 
+	final static String fileName = "CombinedGridsHistory.txt";
 
 	private Random random = new Random(System.currentTimeMillis());
 	private ImagePlus imp;
@@ -465,17 +467,12 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	}
 	
 	static void showHistory(String str) {
-		String windowTitle = "Grid History";
-			//ShowParameterWindow.java uses String "Grid History" without referring to this windowTitle variable,
-			//so be careful to change the title this window. 
-		String fileName = "CombinedGridsHistory.txt";
-		
-		TextWindow gridHistoryWindow = (TextWindow) WindowManager.getWindow(windowTitle);
+		TextWindow gridHistoryWindow = (TextWindow) WindowManager.getWindow(historyWindowTitle);
 		
 		if (gridHistoryWindow == null) {
-			//make a new empty TextWindow with String windowTitle with headings
+			//make a new empty TextWindow with String historyWindowTitle with headings
 			gridHistoryWindow = new TextWindow(
-					windowTitle,
+					historyWindowTitle,
 					"Date \t Image \t Grid Type \t Area per Point \t Unit \t Ratio \t Color \t Location Setting \t xstart \t ystart \t xstartCoarse \t ystartCoarse",
 					"", 1028, 250);
 			
