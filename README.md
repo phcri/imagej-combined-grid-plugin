@@ -92,4 +92,8 @@ Released on January 27th, 2015
 Please contact Daisuke Kinose (<a href="mailto:Daisuke.Kinose@hli.ubc.ca">Daisuke.Kinose@hli.ubc.ca</a>) for questions about
 this plugin.
 </p>
-</BODY>
+
+<p>
+<H2>Source Code:</H2>
+The source code of this plugin is avaliable at https://github.com/phcri/imagej-combined-grids-plugin on GitHub.
+</p>
