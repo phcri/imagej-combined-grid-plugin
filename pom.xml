@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ca.phcri</groupId>
 	<artifactId>CombinedGrids</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<name>ImageJ Combined Grid Plugin</name>
 	<url>https://github.com/phcri/imagej-combined-grid-plugin/</url>
 	<organization>
