@@ -44,6 +44,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static String[] radiobuttons = { "Random Offset", "Fixed Position", "Manual Input" };
 	private final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
 	private static String radiochoice = radiobuttons[RANDOM];
+	private final static String[] applyChoices = { "All Slices", "Current Slice"};
+	private final static int ALL = 0, CURRENT = 1;
+	private static String applyTo = applyChoices[ALL];
 	private static Component[] components; // this is to select components in the dialog box
 	private final static int[] ratioField = { 4, 5 };
 	private final static int[] combinedGridFields = { 14, 15, 16, 17 };
@@ -257,6 +260,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		gd.addNumericField("xstartCoarse:", 0, 0);
 		gd.addNumericField("ystartCoarse:", 0, 0);
 		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
+		gd.addRadioButtonGroup("Apply Grid to", applyChoices, 2, 1, applyTo);
 
 		// to switch enable/disable for parameter input boxes
 		components = gd.getComponents();
@@ -295,6 +299,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		xstartCoarse = (int) gd.getNextNumber();
 		ystartCoarse = (int) gd.getNextNumber();
 		showGridSwitch = gd.getNextBoolean();
+		applyTo = gd.getNextRadioButton();
 		err = "";
 		IJ.showStatus(err);
 
