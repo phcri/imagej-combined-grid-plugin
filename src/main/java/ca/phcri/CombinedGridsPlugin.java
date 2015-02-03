@@ -98,7 +98,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	}
 
 	// methods to form grids
-	void drawPoints() {
+	GeneralPath drawPoints() {
 		int one = 1;
 		int two = 2;
 		GeneralPath path = new GeneralPath();
@@ -112,10 +112,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				path.moveTo(x - one, y + two); path.lineTo(x + one, y + two);
 			}
 		}
-		showGrid(path);
+		return path;
 	}
 
-	void drawCrosses() {
+	GeneralPath drawCrosses() {
 		GeneralPath path = new GeneralPath();
 		float arm = 5;
 		for (int h = 0; h < linesV; h++) {
@@ -126,10 +126,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				path.moveTo(x, y - arm); path.lineTo(x, y + arm);
 			}
 		}
-		showGrid(path);
+		return path;
 	}
 
-	void drawCombined() {
+	GeneralPath drawCombined() {
 		GeneralPath path = new GeneralPath();
 		float arm = 5;
 		float pointSizeCoarse = 10;
@@ -158,10 +158,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				}
 			}
 		}
-		showGrid(path);
+		return path;
 	}
 
-	void drawDoubleLattice() {
+	GeneralPath drawDoubleLattice() {
 		GeneralPath path = new GeneralPath();
 		int width = imp.getWidth();
 		int height = imp.getHeight();
@@ -191,10 +191,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				}
 			}
 		}
-		showGrid(path);
+		return path;
 	}
 
-	void drawLines() {
+	GeneralPath drawLines() {
 		GeneralPath path = new GeneralPath();
 		int width = imp.getWidth();
 		int height = imp.getHeight();
@@ -208,10 +208,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			path.moveTo(0f, yoff);
 			path.lineTo(width, yoff);
 		}
-		showGrid(path);
+		return path;
 	}
 
-	void drawHorizontalLines() {
+	GeneralPath drawHorizontalLines() {
 		GeneralPath path = new GeneralPath();
 		int width = imp.getWidth();
 //		int height = imp.getHeight();
@@ -220,7 +220,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			path.moveTo(0f, yoff);
 			path.lineTo(width, yoff);
 		}
-		showGrid(path);
+		return path;
 	}
 
 	// end of methods for drawing grids
