@@ -68,22 +68,33 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		imp = IJ.getImage();
 		showDialog();
 	}
-
-	void showGrid(Shape shape) {
+	
+	void removeGrid(){
 		Overlay layer = imp.getOverlay();
-		if (shape == null) {
-			if (layer != null) layer.remove(layer.getIndex("grid"));
-		} else {
-			Roi roi = new ShapeRoi(shape);
-			roi.setStrokeColor(getColor());
-			roi.setName("grid");
-			if (layer != null) {
-				if (layer.getIndex("grid") != -1) layer.remove(layer.getIndex("grid"));
-				layer.add(roi);
-			} else
-				layer = new Overlay(roi);
+		
+		if(layer != null){
+			Roi[] elements = layer.toArray();
+			
+			for(Roi element : elements){
+				if(element.getName().startsWith("grid")){
+				layer.remove(element);
+				}
+			}
 		}
+	}
+	
+	void showGrid(Roi[] rois) {
+		if(rois == null) {
+			removeGrid();
+		} else {
+			removeGrid();
+			Overlay layer = imp.getOverlay();
+			
+			for(Roi roi : rois)
+				layer.add(roi);
+
 		imp.setOverlay(layer);
+		}
 	}
 
 	// methods to form grids
