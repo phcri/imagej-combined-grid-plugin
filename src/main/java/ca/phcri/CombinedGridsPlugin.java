@@ -300,43 +300,118 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		applyTo = gd.getNextRadioButton();
 		err = "";
 		IJ.showStatus(err);
+		
+		minAreaCheck();
+		enableFields();
+		setCoarseGrids();
+		calculateTile();
+		calculateFirstGrid();
+		
+		if (!"".equals(err)) {
+			IJ.showStatus(err);
+			return true;
+		}
+		
+		// calculating number of vertical and horizontal lines in a selected image
+		linesV = (int) ((width  - xstart) / tileWidth) + 1;
+		linesH = (int) ((height - ystart) / tileHeight) + 1;
 
-		// if areaPerPoint is not too small, show an error
+		// execution part
+		if (gd.invalidNumber())
+			return true;
+		
+		Roi gridRoi = getGridRoi();
+		
+		
+		return true;
+	}
+	
+	
+	// if areaPerPoint is not too small, show an error
+	void minAreaCheck(){
 		double minArea = (width * height) / 50000.0;
 		if (type.equals(types[CROSSES]) && minArea < 144.0)
 			minArea = 144.0;
 			// to avoid overlap of grid points.
 			// ((5 + 1) * 2) ^2 = 12^2 = 144
-		else if (type.equals(types[COMBINED]) && minArea < 484.0)
+		else if (type.equals(types[COMBINED]) && 
+				minArea < 484.0)
 			minArea = 484.0;
 			// As pointSizeCoarse = 10,
 			//(10 + 1) * 2)^2 = 22^2 = 484
-		else if (type.equals(types[DOUBLE_LATTICE]) && minArea < 900.0)
+		else if (type.equals(types[DOUBLE_LATTICE]) && 
+				minArea < 900.0)
 			minArea = 900.0;
 		 	// As rad = 14, ((14 + 1) * 2) ^2 = 900
 		else if (minArea < 16)
 			minArea = 16.0;
 
-		if (Double.isNaN(areaPerPoint) || areaPerPoint / (pixelWidth * pixelHeight) < minArea) {
+		if (Double.isNaN(areaPerPoint) || 
+				areaPerPoint / (pixelWidth * pixelHeight) < minArea) {
 			err = "\"Area per Point\" too small. \n";
 			areaPerPoint = 0;
 		}
+	}
+	
+	void enableFields(){
+		if (type.equals(types[COMBINED]) || 
+				type.equals(types[DOUBLE_LATTICE]))
+			for (int i : ratioField) components[i].setEnabled(true);
+		else
+			for (int i : ratioField) components[i].setEnabled(false);
 		
-		enableFields();
 		
-		// enables gridRatio choice for Combined Points and Double Lattice
-		
-		setCoarseGrids();
+		if (radiochoice.equals(radiobuttons[MANUAL])) {
+			for (int i : ystartField) components[i].setEnabled(true);
 
+			if (type.equals(types[HLINES]))
+				for (int i : xstartField) components[i].setEnabled(false);
+			else
+				 for (int i : xstartField) components[i].setEnabled(true);
+			
+			
+			if (type.equals(types[COMBINED]) || 
+					type.equals(types[DOUBLE_LATTICE]))
+				for (int i : combinedGridFields) components[i].setEnabled(true);
+		} else {
+			for (int i : parameterFieldsOff)
+				components[i].setEnabled(false);
+		}
 
-		// calculation for tileWidth and tileLength
+	}
+	
+	// enables gridRatio choice for Combined Points and Double Lattice
+	void setCoarseGrids(){
+		if (gridRatio.equals(ratioChoices[ONE_TO_FOUR])) {
+			coarseGridX = 2;
+			coarseGridY = 2;
+		} else if (gridRatio.equals(ratioChoices[ONE_TO_NINE])) {
+			coarseGridX = 3;
+			coarseGridY = 3;
+		} else if (gridRatio.equals(ratioChoices[ONE_TO_SIXTEEN])) {
+			coarseGridX = 4;
+			coarseGridY = 4;
+		} else if (gridRatio.equals(ratioChoices[ONE_TO_TWENTYFIVE])) {
+			coarseGridX = 5;
+			coarseGridY = 5;
+		} else if (gridRatio.equals(ratioChoices[ONE_TO_THIRTYSIX])) {
+			coarseGridX = 6;
+			coarseGridY = 6;
+		}
+	}
+	
+	
+	// calculation for tileWidth and tileLength
+	void calculateTile() {
 		double tileSize = Math.sqrt(areaPerPoint);
 		tileWidth  = tileSize / pixelWidth;
 		tileHeight = tileSize / pixelHeight;
-
-		// decide the first point(s) depending on the way to place a grid
+	}
+	
+	
+	// decide the first point(s) depending on the way to place a grid
+	void calculateFirstGrid(){
 		if (radiochoice.equals(radiobuttons[RANDOM])) {
-			
 			xstart = (int) (random.nextDouble() * tileWidth);
 			ystart = (int) (random.nextDouble() * tileHeight);
 					// 0 <= random.nextDouble() < 1
@@ -375,75 +450,33 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				for (int i : combinedGridFields) components[i].setEnabled(false);
 			}
 		}
-
-		if (!"".equals(err)) {
-			IJ.showStatus(err);
-			return true;
-		}
-
-		// calculating number of vertical and horizontal lines in a selected image
-		linesV = (int) ((width  - xstart) / tileWidth) + 1;
-		linesH = (int) ((height - ystart) / tileHeight) + 1;
-
-		// execution part
-		if (gd.invalidNumber())
-			return true;
+	}
+	
+	
+	Roi getGridRoi() {
+		GeneralPath path; 
+		
 		if (type.equals(types[LINES]))
-			drawLines();
+			 path = drawLines();
 		else if (type.equals(types[HLINES]))
-			drawHorizontalLines();
+			path = drawHorizontalLines();
 		else if (type.equals(types[CROSSES]))
-			drawCrosses();
+			path =  drawCrosses();
 		else if (type.equals(types[POINTS]))
-			drawPoints();
+			path =  drawPoints();
 		else if (type.equals(types[COMBINED]))
-			drawCombined();
+			path =  drawCombined();
 		else if (type.equals(types[DOUBLE_LATTICE]))
-			drawDoubleLattice();
+			path =  drawDoubleLattice();
 		else
-			showGrid(null);
-		return true;
-	}
-	
-	
-	void enableFields(){
-		if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE]))
-			for (int i : ratioField) components[i].setEnabled(true);
-		else
-			for (int i : ratioField) components[i].setEnabled(false);
+			path =  null;
 		
-		
-		if (radiochoice.equals(radiobuttons[MANUAL])) {
-			for (int i : ystartField) components[i].setEnabled(true);
-
-			if (type.equals(types[HLINES]))
-				for (int i : xstartField) components[i].setEnabled(false);
-			else
-				 for (int i : xstartField) components[i].setEnabled(true);
-			
-			
-			if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE]))
-				for (int i : combinedGridFields) components[i].setEnabled(true);
-		} else {
-			for (int i : parameterFieldsOff)
-				components[i].setEnabled(false);
-		}
-
+		Roi roi = new ShapeRoi(path);
+		roi.setStrokeColor(getColor());
+		//roi.setName("grid");
+		return roi;
 	}
 	
-	void setCoarseGrids(){
-		if (gridRatio.equals(ratioChoices[ONE_TO_FOUR])) {
-			coarseGridX = 2; coarseGridY = 2;
-		} else if (gridRatio.equals(ratioChoices[ONE_TO_NINE])) {
-			coarseGridX = 3; coarseGridY = 3;
-		} else if (gridRatio.equals(ratioChoices[ONE_TO_SIXTEEN])) {
-			coarseGridX = 4; coarseGridY = 4;
-		} else if (gridRatio.equals(ratioChoices[ONE_TO_TWENTYFIVE])) {
-			coarseGridX = 5; coarseGridY = 5;
-		} else if (gridRatio.equals(ratioChoices[ONE_TO_THIRTYSIX])) {
-			coarseGridX = 6; coarseGridY = 6;
-		}
-	}
 	
 	
 	Color getColor() {
