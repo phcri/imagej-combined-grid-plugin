@@ -43,7 +43,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private static String gridRatio = ratioChoices[ONE_TO_FOUR];
 	private final static String[] radiobuttons = { "Random Offset", "Fixed Position", "Manual Input" };
 	private final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
-	private static String radiochoice = radiobuttons[RANDOM];
+	private String radiochoice = radiobuttons[RANDOM];
 	private final static String[] applyChoices = { "All Slices", "Current Slice"};
 	private final static int ALL = 0, CURRENT = 1;
 	private static String applyTo = applyChoices[ALL];
@@ -254,7 +254,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		gd.addNumericField("Area per Point:", areaPerPoint, places, 6, units + "^2");
 		gd.addChoice("Ratio:", ratioChoices, gridRatio);
 		gd.addChoice("Color:", colors, color);
-		gd.addRadioButtonGroup("Grid Location", radiobuttons, 3, 1, radiobuttons[RANDOM]);
+		gd.addRadioButtonGroup("Grid Location", radiobuttons, 3, 1, radiochoice);
 		gd.addNumericField("xstart:", 0, 0);
 		gd.addNumericField("ystart:", 0, 0);
 		gd.addNumericField("xstartCoarse:", 0, 0);
@@ -264,9 +264,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 		// to switch enable/disable for parameter input boxes
 		components = gd.getComponents();
-		for (int i : parameterFieldsOff) components[i].setEnabled(false);
-		if (!(types[COMBINED].equals(type) || types[DOUBLE_LATTICE].equals(type)))
-			for (int i : ratioField) components[i].setEnabled(false);
+		enableFields();
 
 		gd.addDialogListener(this);
 		gd.showDialog();
@@ -323,25 +321,13 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			err = "\"Area per Point\" too small. \n";
 			areaPerPoint = 0;
 		}
-
+		
+		enableFields();
+		
 		// enables gridRatio choice for Combined Points and Double Lattice
-		if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE])) {
-			for (int i : ratioField) components[i].setEnabled(true);
-		} else {
-			for (int i : ratioField) components[i].setEnabled(false);
-		}
+		
+		setCoarseGrids();
 
-		if (gridRatio.equals(ratioChoices[ONE_TO_FOUR])) {
-			coarseGridX = 2; coarseGridY = 2;
-		} else if (gridRatio.equals(ratioChoices[ONE_TO_NINE])) {
-			coarseGridX = 3; coarseGridY = 3;
-		} else if (gridRatio.equals(ratioChoices[ONE_TO_SIXTEEN])) {
-			coarseGridX = 4; coarseGridY = 4;
-		} else if (gridRatio.equals(ratioChoices[ONE_TO_TWENTYFIVE])) {
-			coarseGridX = 5; coarseGridY = 5;
-		} else if (gridRatio.equals(ratioChoices[ONE_TO_THIRTYSIX])) {
-			coarseGridX = 6; coarseGridY = 6;
-		}
 
 		// calculation for tileWidth and tileLength
 		double tileSize = Math.sqrt(areaPerPoint);
@@ -350,29 +336,23 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 		// decide the first point(s) depending on the way to place a grid
 		if (radiochoice.equals(radiobuttons[RANDOM])) {
-			for (int i : parameterFieldsOff)
-				components[i].setEnabled(false);
+			
 			xstart = (int) (random.nextDouble() * tileWidth);
 			ystart = (int) (random.nextDouble() * tileHeight);
 					// 0 <= random.nextDouble() < 1
 			xstartCoarse = random.nextInt(coarseGridX);
 			ystartCoarse = random.nextInt(coarseGridY);
 		} else if (radiochoice.equals(radiobuttons[FIXED])) {
-			for (int i : parameterFieldsOff) components[i].setEnabled(false);
 			xstart = (int) (tileWidth / 2.0 + 0.5);
 			ystart = (int) (tileHeight / 2.0 + 0.5);
 			xstartCoarse = 0;
 			ystartCoarse = 0;
 		} else if (radiochoice.equals(radiobuttons[MANUAL])) {
-			for (int i : ystartField) components[i].setEnabled(true);
 
 			if (type.equals(types[HLINES])) {
-				for (int i : xstartField) components[i].setEnabled(false);
 					//disable xstartField because
 					//Horizontal lines needs just ystart and does not need xstart
 				xstart = 0; // just to prevent an error
-			} else {
-				for (int i : xstartField) components[i].setEnabled(true);
 			}
 
 			// check if both xstart and ystart are within proper ranges
@@ -384,7 +364,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 			// input for the Combined grids
 			if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE])) {
-				for (int i : combinedGridFields) components[i].setEnabled(true);
 
 				// check if both xstartCoarse and ystartCoarse are within proper ranges
 				if (xstartCoarse >= coarseGridX || ystartCoarse >= coarseGridY) {
@@ -425,7 +404,48 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			showGrid(null);
 		return true;
 	}
+	
+	
+	void enableFields(){
+		if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE]))
+			for (int i : ratioField) components[i].setEnabled(true);
+		else
+			for (int i : ratioField) components[i].setEnabled(false);
+		
+		
+		if (radiochoice.equals(radiobuttons[MANUAL])) {
+			for (int i : ystartField) components[i].setEnabled(true);
 
+			if (type.equals(types[HLINES]))
+				for (int i : xstartField) components[i].setEnabled(false);
+			else
+				 for (int i : xstartField) components[i].setEnabled(true);
+			
+			
+			if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE]))
+				for (int i : combinedGridFields) components[i].setEnabled(true);
+		} else {
+			for (int i : parameterFieldsOff)
+				components[i].setEnabled(false);
+		}
+
+	}
+	
+	void setCoarseGrids(){
+		if (gridRatio.equals(ratioChoices[ONE_TO_FOUR])) {
+			coarseGridX = 2; coarseGridY = 2;
+		} else if (gridRatio.equals(ratioChoices[ONE_TO_NINE])) {
+			coarseGridX = 3; coarseGridY = 3;
+		} else if (gridRatio.equals(ratioChoices[ONE_TO_SIXTEEN])) {
+			coarseGridX = 4; coarseGridY = 4;
+		} else if (gridRatio.equals(ratioChoices[ONE_TO_TWENTYFIVE])) {
+			coarseGridX = 5; coarseGridY = 5;
+		} else if (gridRatio.equals(ratioChoices[ONE_TO_THIRTYSIX])) {
+			coarseGridX = 6; coarseGridY = 6;
+		}
+	}
+	
+	
 	Color getColor() {
 		Color c = Color.black;
 		if (color.equals(colors[0]))
@@ -478,6 +498,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		// Excel.
 		showHistory(gridParameters);
 	}
+	
+
 	
 	static void showHistory(String str) {
 		String windowTitle = "Grid History";
