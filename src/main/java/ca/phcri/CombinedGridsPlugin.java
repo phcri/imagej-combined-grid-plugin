@@ -55,6 +55,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private Random random = new Random(System.currentTimeMillis());
 	private ImagePlus imp;
 	private double tileWidth, tileHeight;
+	private int width, height;
 	private int xstart, ystart;
 	private int xstartCoarse, ystartCoarse, coarseGridX, coarseGridY;
 	private int linesV, linesH;
@@ -163,8 +164,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 	GeneralPath drawDoubleLattice() {
 		GeneralPath path = new GeneralPath();
-		int width = imp.getWidth();
-		int height = imp.getHeight();
+
+		
 		float rad = 14;
 		float radkappa = (float) (rad * 0.5522847498); // ref
 														// https://www.java.net/node/660133
@@ -196,8 +197,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 	GeneralPath drawLines() {
 		GeneralPath path = new GeneralPath();
-		int width = imp.getWidth();
-		int height = imp.getHeight();
+
+		
 		for (int i = 0; i < linesV; i++) {
 			float xoff = (float) (xstart + i * tileWidth);
 			path.moveTo(xoff, 0f);
@@ -213,8 +214,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 	GeneralPath drawHorizontalLines() {
 		GeneralPath path = new GeneralPath();
-		int width = imp.getWidth();
-//		int height = imp.getHeight();
+
+//		
 		for (int i = 0; i < linesH; i++) {
 			float yoff = (float) (ystart + i * tileHeight);
 			path.moveTo(0f, yoff);
@@ -226,8 +227,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	// end of methods for drawing grids
 
 	void showDialog() {
-		int width = imp.getWidth();
-		int height = imp.getHeight();
+		width = imp.getWidth();
+		height = imp.getHeight();
 		Calibration cal = imp.getCalibration();
 		int places;
 		if (cal.scaled()) {
@@ -284,8 +285,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 	// event control for the dialog box
 	public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
-		int width = imp.getWidth();
-		int height = imp.getHeight();
 		type = gd.getNextChoice();
 		areaPerPoint = gd.getNextNumber();
 		gridRatio = gd.getNextChoice();
