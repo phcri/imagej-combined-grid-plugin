@@ -4,8 +4,11 @@ package ca.phcri;
 
 import ij.*;
 import ij.gui.*;
+
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+
 import ij.plugin.*;
 import ij.plugin.frame.PlugInFrame;
 
@@ -15,7 +18,7 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 	private boolean gridOn = false;
 	private Button b1;
 	private static Overlay layer;
-	private static Roi gridRoi;
+	private static Roi[] gridRois;
 	
 	public void run(String arg) {
 		if (IJ.versionLessThan("1.47"))	 		return;
@@ -37,10 +40,32 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 		imp = WindowManager.getCurrentImage();
 		if(imp != null){
 			layer = imp.getOverlay();
-			if(layer == null || layer.getIndex("grid") == -1) IJ.showStatus("Grid Switch \"" + imp.getTitle() + "\" does not have a grid.");
-			else gridRoi = layer.get(layer.getIndex("grid"));
+			if(layer != null){
+				Roi[] elements = layer.toArray();
+				
+				ArrayList<Roi> gridRoisList = new ArrayList<Roi>();
+				
+				for(Roi element : elements){
+					if(element.getName() != null &&
+							element.getName().startsWith("grid")){
+						gridRoisList.add(element);
+					}
+				}
+				
+				gridRois = (Roi[]) gridRoisList.toArray();
+				
+			}
 		}
 	}
+		
+		/*
+		 * 				}
+			if(layer == null || 
+					layer.getIndex("grid") == -1)
+				IJ.showStatus("Grid Switch \"" + imp.getTitle() + "\" does not have a grid.");
+			else gridRois = layer.get(layer.getIndex("grid"));
+
+		 * */
 	public void windowClosed(WindowEvent e) {}
 	public void windowClosing(WindowEvent e) {}
 	public void windowDeactivated(WindowEvent e) {
@@ -52,21 +77,38 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 	public void windowIconified(WindowEvent e) {}
 	public void windowOpened(WindowEvent e) {}
 	
+	
 	public void actionPerformed(ActionEvent e) {
 		if(gridOn) {
 			enableGrid();
 			b1.setLabel("Grid On");
 		} else {
-			layer.remove(layer.getIndex("grid"));
-			imp.setOverlay(layer);
+			removeGrid();
 			b1.setLabel("Grid Off");
 		}
 		gridOn = !gridOn;
 	}
 	
 	void enableGrid() {
-		if(layer.getIndex("grid") != -1) layer.remove(layer.getIndex("grid"));
-		layer.add(gridRoi);
+		removeGrid();
+		for(Roi gridRoi : gridRois)
+			layer.add(gridRoi);
 		imp.setOverlay(layer);
 	}
+	
+	void removeGrid(){
+		Overlay layer = imp.getOverlay();
+		
+		if(layer != null){
+			Roi[] elements = layer.toArray();
+			
+			for(Roi element : elements){
+				if(element.getName() != null &&
+						element.getName().startsWith("grid")){
+				layer.remove(element);
+				}
+			}
+		}
+	}
+	
 }

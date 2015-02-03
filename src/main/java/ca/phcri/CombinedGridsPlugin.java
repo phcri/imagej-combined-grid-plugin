@@ -73,6 +73,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		showDialog();
 	}
 	
+	
 	void removeGrid(){
 		Overlay layer = imp.getOverlay();
 		
@@ -80,7 +81,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			Roi[] elements = layer.toArray();
 			
 			for(Roi element : elements){
-				if(element.getName().startsWith("grid")){
+				if(element.getName() != null &&
+						element.getName().startsWith("grid")){
 				layer.remove(element);
 				}
 			}
@@ -305,26 +307,57 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		enableFields();
 		setCoarseGrids();
 		calculateTile();
-		calculateFirstGrid();
 		
-		if (!"".equals(err)) {
-			IJ.showStatus(err);
-			return true;
+		if(applyChoices[ALL].equals(applyTo)){
+			calculateFirstGrid();
+			
+			if (!"".equals(err)) {
+				IJ.showStatus(err);
+				return true;
+			}
+			
+			if (gd.invalidNumber())
+				return true;
+			
+			Roi gridRoi = getGridRoi();
+			gridRoi.setName("grid");
+			
+			Roi[] gridRois = {gridRoi};
+			
+			showGrid(gridRois);
 		}
 		
-		// calculating number of vertical and horizontal lines in a selected image
-		linesV = (int) ((width  - xstart) / tileWidth) + 1;
-		linesH = (int) ((height - ystart) / tileHeight) + 1;
-
-		// execution part
-		if (gd.invalidNumber())
-			return true;
-		
-		Roi gridRoi = getGridRoi();
-		
+		if(applyChoices[CURRENT].equals(applyTo)){
+			int currentSlice = imp.getCurrentSlice();
+			Overlay ol = imp.getOverlay();
+			Roi[] gridRois = ol.toArray();
+			
+			calculateFirstGrid();
+			
+			if (!"".equals(err)) {
+				IJ.showStatus(err);
+				return true;
+			}
+			
+			if (gd.invalidNumber())
+				return true;
+			
+			Roi gridRoi = getGridRoi();
+			String roiName = "grid" + currentSlice;
+			gridRoi.setName(roiName);
+			
+			for (Roi roi : gridRois){
+				if(currentSlice == roi.getZPosition() &&
+						roiName.equals(roi.getName()))
+					roi = gridRoi;
+			}
+			
+			showGrid(gridRois);
+		}
 		
 		return true;
 	}
+	
 	
 	
 	// if areaPerPoint is not too small, show an error
@@ -353,6 +386,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 	}
 	
+	
 	void enableFields(){
 		if (type.equals(types[COMBINED]) || 
 				type.equals(types[DOUBLE_LATTICE]))
@@ -379,6 +413,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 
 	}
+	
 	
 	// enables gridRatio choice for Combined Points and Double Lattice
 	void setCoarseGrids(){
@@ -450,6 +485,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				for (int i : combinedGridFields) components[i].setEnabled(false);
 			}
 		}
+		
+		// calculating number of vertical and horizontal lines in a selected image
+		linesV = (int) ((width  - xstart) / tileWidth) + 1;
+		linesH = (int) ((height - ystart) / tileHeight) + 1;
 	}
 	
 	
@@ -501,7 +540,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			c = Color.white;
 		return c;
 	}
-
+	
+	
 	// output grid parameters
 	void showGridParameters(){
 		Integer xStartOutput = new Integer(xstart);
@@ -546,7 +586,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			//make a new empty TextWindow with String windowTitle with headings
 			gridHistoryWindow = new TextWindow(
 					windowTitle,
-					"Date \t Image \t Grid Type \t Area per Point \t Unit \t Ratio \t Color \t Location Setting \t xstart \t ystart \t xstartCoarse \t ystartCoarse",
+					"Date \t Image \t Grid Type \t Area per Point \t Unit "
+					+ "\t Ratio \t Color \t Location Setting "
+					+ "\t xstart \t ystart \t xstartCoarse \t ystartCoarse",
 					"", 1028, 250);
 			
 			//If a file whose name is String fileName exists in the plugin folder, read it into the list.
@@ -573,6 +615,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			tp.saveAs(IJ.getDirectory("plugins") + fileName);	
 		}
 	}
+	
 	
 	boolean gridSwitchExist(){
 		Frame[] frames = Frame.getFrames();
