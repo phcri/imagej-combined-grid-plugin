@@ -175,11 +175,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	GeneralPath drawDoubleLattice() {
 		GeneralPath path = new GeneralPath();
 
-		
 		float rad = 14;
 		float radkappa = (float) (rad * 0.5522847498); // ref
 														// https://www.java.net/node/660133
-
 		for (int i = 0; i < linesV; i++) {
 			float xoff = (float) (xstart + i * tileWidth);
 			path.moveTo(xoff, 0f); path.lineTo(xoff, height);
@@ -196,9 +194,15 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					float centerY = (float) (ystart + ystartCoarse * tileHeight + v * tileHeight);
 					// drawing curve for coarse grid
 					path.moveTo(centerX, centerY - rad);
-					path.curveTo(centerX - radkappa, centerY - rad, centerX - rad, centerY - radkappa, centerX - rad, centerY);
-					path.curveTo(centerX - rad, centerY + radkappa, centerX - radkappa, centerY + rad, centerX, centerY + rad);
-					path.curveTo(centerX + radkappa, centerY + rad, centerX + rad, centerY + radkappa, centerX + rad, centerY);
+					path.curveTo(centerX - radkappa, centerY - rad, 
+							centerX - rad, centerY - radkappa, 
+							centerX - rad, centerY);
+					path.curveTo(centerX - rad, centerY + radkappa, 
+							centerX - radkappa, centerY + rad, 
+							centerX, centerY + rad);
+					path.curveTo(centerX + radkappa, centerY + rad, 
+							centerX + rad, centerY + radkappa, 
+							centerX + rad, centerY);
 				}
 			}
 		}
@@ -422,30 +426,32 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	void enableFields(){
 		if (type.equals(types[COMBINED]) || 
 				type.equals(types[DOUBLE_LATTICE]))
-			for (int i : ratioField) components[i].setEnabled(true);
+			fieldEnabler(ratioField, true);
 		else
-			for (int i : ratioField) components[i].setEnabled(false);
+			fieldEnabler(ratioField, false);
 		
 		
 		if (radiochoice.equals(radiobuttons[MANUAL])) {
-			for (int i : ystartField) components[i].setEnabled(true);
+			fieldEnabler(ystartField, true);
 
 			if (type.equals(types[HLINES]))
-				for (int i : xstartField) components[i].setEnabled(false);
+				fieldEnabler(xstartField, false);
 			else
-				 for (int i : xstartField) components[i].setEnabled(true);
-			
+				fieldEnabler(xstartField, true);
 			
 			if (type.equals(types[COMBINED]) || 
 					type.equals(types[DOUBLE_LATTICE]))
-				for (int i : combinedGridFields) components[i].setEnabled(true);
+				fieldEnabler(combinedGridFields, true);
+			
 		} else {
-			for (int i : parameterFieldsOff)
-				components[i].setEnabled(false);
+			fieldEnabler(parameterFieldsOff, false);
 		}
-
 	}
 	
+	void fieldEnabler(int[] fields, boolean show){
+		for(int i : fields)
+			components[i].setEnabled(show);
+	}
 	
 	// enables gridRatio choice for Combined Points and Double Lattice
 	void setCoarseGrids(){
