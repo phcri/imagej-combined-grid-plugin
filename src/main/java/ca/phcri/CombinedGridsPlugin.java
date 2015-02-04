@@ -77,7 +77,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private String units;
 	private String err = "";
 	private ArrayList<Roi> gridRoisList;
-	private ArrayList<String> gridParametersList = new ArrayList<String>();
+	private ArrayList<String> gridParametersList;
 
 	@Override
 	public void run(String arg) {
@@ -112,8 +112,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			if(ol == null)
 				ol = new Overlay();
 			
-			for(Roi roi : rois)
+			for(Roi roi : rois){
 				ol.add(roi);
+			}
 			
 		imp.setOverlay(ol);
 		}
@@ -273,7 +274,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 		if (areaPerPoint == 0.0) // default to 9x9 grid
 			areaPerPoint = (width * cal.pixelWidth * height * cal.pixelHeight) / 81.0;
-
+		
+		
 		// get values in a dialog box
 		GenericDialog gd = new GenericDialog("Grid...");
 		gd.addChoice("Grid Type:", types, type);
@@ -331,23 +333,14 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		applyTo = gd.getNextRadioButton();
 		err = "";
 		IJ.showStatus(err);
+		gridParametersList = new ArrayList<String>();
+		
+		gridRoisListReset();
 		
 		minAreaCheck();
 		enableFields();
 		setCoarseGrids();
 		calculateTile();
-		
-		gridRoisList = new ArrayList<Roi>();
-		
-		Overlay ol = imp.getOverlay();
-		if(ol == null)
-			ol = new Overlay();
-		
-		for(Roi roi : ol.toArray()){
-			String roiName = roi.getName();
-			if(roiName != null && roiName.startsWith("grid"))
-				gridRoisList.add(roi);
-		}
 		
 
 		if(applyChoices[DIFFERENTforEACH].equals(applyTo)){
@@ -415,6 +408,19 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 		
 		gridRoisList.add(sliceGridRoi);
+	}
+	
+	
+	void gridRoisListReset() {
+		gridRoisList = new ArrayList<Roi>();
+		Overlay ol = imp.getOverlay();
+		if(ol == null)
+			ol = new Overlay();
+		for(Roi roi : ol.toArray()){
+			String roiName = roi.getName();
+			if(roiName != null && roiName.startsWith("grid"))
+				gridRoisList.add(roi);
+		}
 	}
 	
 	
