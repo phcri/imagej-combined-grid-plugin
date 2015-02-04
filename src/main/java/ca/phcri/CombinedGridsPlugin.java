@@ -103,7 +103,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			
 			for(Roi roi : rois)
 				layer.add(roi);
-
+			
 		imp.setOverlay(layer);
 		}
 	}
