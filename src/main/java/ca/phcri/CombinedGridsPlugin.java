@@ -20,9 +20,7 @@ import java.awt.Frame;
 import java.awt.geom.GeneralPath;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Random;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -34,19 +32,12 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		{ "Red", "Green", "Blue", "Magenta", "Cyan", "Yellow", "Orange", 
 		"Black", "White" };
 	private static String color = "Blue";
-	/*
+	
 	private final static int COMBINED = 0, DOUBLE_LATTICE = 1, LINES = 2,
 			HLINES = 3, CROSSES = 4, POINTS = 5;
 	private final static String[] types = 
 		{ "Combined Point", "Double Lattice", "Lines", "Horizontal Lines", 
 		"Crosses", "Points" };
-	*/
-	private final static int COMBINED = 0, LINES = 1,
-			HLINES = 2, CROSSES = 3, POINTS = 4;
-	private final static String[] types = 
-		{ "Combined Point", "Lines", "Horizontal Lines", 
-		"Crosses", "Points" };
-	
 	
 	private static String type = types[COMBINED];
 	private static double areaPerPoint;
@@ -84,8 +75,11 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private double pixelWidth = 1.0, pixelHeight = 1.0;
 	private String units;
 	private String err = "";
-	private ArrayList<Roi> gridRoisList;
-	private ArrayList<String> gridParametersList;
+	//private ArrayList<Roi> gridRoisList;
+	//private ArrayList<String> gridParametersList;
+	private Roi[] gridRoiArray;
+	private String[] gridParameterArray;
+	private int totalSlice;
 
 	@Override
 	public void run(String arg) {
@@ -124,7 +118,14 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				ol.add(roi);
 			}
 			
+			Roi[] olElements = ol.toArray();
+			for (Roi roi : olElements)
+				IJ.log(type + " " + roi.getName() + ": " + roi.getTypeAsString() + " at slice " + roi.getPosition());
+			
+			
 		imp.setOverlay(ol);
+		
+		IJ.log("Grid Overlaid");
 		}
 	}
 
@@ -200,6 +201,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		float rad = 14;
 		float radkappa = (float) (rad * 0.5522847498); 
 		// ref https://www.java.net/node/660133
+		/*
 		for (int i = 0; i < linesV; i++) {
 			float xoff = (float) (xstart + i * tileWidth);
 			path.moveTo(xoff, 0f); path.lineTo(xoff, height);
@@ -208,9 +210,16 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			float yoff = (float) (ystart + i * tileHeight);
 			path.moveTo(0f, yoff); path.lineTo(width, yoff);
 		}
-
-		for (int h = 0; h < linesV; h++) {
-			for (int v = 0; v < linesH; v++) {
+		*/
+		/*
+		for (int h = 0; h < linesV; h++) {  //linesV for vertical lines
+			for (int v = 0; v < linesH; v++) { //linesH for horizontal lines
+			*/
+		
+		for (int h = 0; h < 1; h++) {  //linesV for vertical lines
+			for (int v = 0; v < 1; v++) { //linesH for horizontal lines
+				
+				
 				if ((h % coarseGridX == 0) && (v % coarseGridY == 0)) {
 					float centerX = 
 							(float) (xstart + xstartCoarse * tileWidth + h * tileWidth);
@@ -224,6 +233,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				}
 			}
 		}
+		
 		return path;
 	}
 
@@ -277,6 +287,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		if (areaPerPoint == 0.0) // default to 9x9 grid
 			areaPerPoint = (width * cal.pixelWidth * height * cal.pixelHeight) / 81.0;
 		
+		totalSlice = imp.getStackSize();
 		
 		// get values in a dialog box
 		GenericDialog gd = new GenericDialog("Grid...");
@@ -334,9 +345,11 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			applyTo = gd.getNextRadioButton();
 		err = "";
 		IJ.showStatus(err);
-		gridParametersList = new ArrayList<String>();
 		
-		gridRoisListReset();
+		gridParameterArray = new String[totalSlice];
+		gridRoiArray = new Roi[totalSlice];
+		
+		//gridRoisListReset();
 		
 		minAreaCheck();
 		enableFields();
@@ -358,9 +371,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				}
 				
 				
-				Roi gridRoi = getGridRoi();
+				ShapeRoi gridRoi = getGridRoi();
 				addGridOnSlice(gridRoi, i);
-				saveGridParameters("" + i);
+				saveGridParameters(i);
 			}
 		} else {
 			calculateFirstGrid();
@@ -370,51 +383,41 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				return true;
 			}
 			
-			Roi gridRoi = getGridRoi();
+			ShapeRoi gridRoi = getGridRoi();
 			
 			if(applyChoices[ONEforALL].equals(applyTo)){
 				int totalSlices = imp.getStackSize();
 				for(int i = 1; i <= totalSlices; i++){
 					addGridOnSlice(gridRoi, i);
+					saveGridParameters(i);
 				}
 
-				saveGridParameters("All");
+
 			}
 			
 			if(applyChoices[CURRENT].equals(applyTo)){
 				int currentSlice = imp.getCurrentSlice();
 				addGridOnSlice(gridRoi, currentSlice);
-				saveGridParameters("" + currentSlice);
+				saveGridParameters(currentSlice);
 			}
 		}
+
+		showGrid(gridRoiArray);
 		
-		
-		Roi[] gridRois = new Roi[gridRoisList.size()];
-		gridRois = gridRoisList.toArray(gridRois);
-		
-		showGrid(gridRois);
-		
+		IJ.log("showGrid Done");
 		return true;
 	}
 	
 	
-	void addGridOnSlice(Roi gridRoi, int sliceIndex){
-		Roi sliceGridRoi = (Roi) gridRoi.clone();
-		String sliceRoiName = "grid" + sliceIndex;
-		sliceGridRoi.setName(sliceRoiName);
+	void addGridOnSlice(ShapeRoi gridRoi, int sliceIndex){
+		ShapeRoi sliceGridRoi = (ShapeRoi) gridRoi.clone();
+		sliceGridRoi.setName("grid" + sliceIndex);
 		sliceGridRoi.setPosition(sliceIndex);
 		
-		//remove a roi with the same name as sliceRoiName from the list
-		for(Iterator<Roi> i = gridRoisList.iterator(); i.hasNext(); ){
-			Roi roi = i.next();
-			if(sliceRoiName.equals(roi.getName()))
-				i.remove();				
-		}
-		
-		gridRoisList.add(sliceGridRoi);
+		gridRoiArray[sliceIndex - 1] = sliceGridRoi;
 	}
 	
-	
+	/*
 	void gridRoisListReset() {
 		gridRoisList = new ArrayList<Roi>();
 		Overlay ol = imp.getOverlay();
@@ -426,7 +429,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				}
 		}
 	}
-	
+	*/
 	
 	// if areaPerPoint is not too small, show an error
 	void minAreaCheck(){
@@ -439,11 +442,11 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			minArea = 484.0;
 			// As pointSizeCoarse = 10,
 			//(10 + 1) * 2)^2 = 22^2 = 484
-		/*
+		
 		else if (type.equals(types[DOUBLE_LATTICE]) && minArea < 900.0)
 			minArea = 900.0;
 		 	// As rad = 14, ((14 + 1) * 2) ^2 = 900
-		*/
+		
 		else if (minArea < 16)
 			minArea = 16.0;
 
@@ -456,7 +459,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	
 	
 	void enableFields(){
-		if (type.equals(types[COMBINED]) /*|| type.equals(types[DOUBLE_LATTICE])*/)
+		if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE]))
 			fieldEnabler(ratioField, true);
 		else
 			fieldEnabler(ratioField, false);
@@ -472,7 +475,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			else
 				fieldEnabler(xstartField, true);
 			
-			if (type.equals(types[COMBINED]) /*|| type.equals(types[DOUBLE_LATTICE])*/)
+			if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE]))
 				fieldEnabler(combinedGridFields, true);
 			else
 				fieldEnabler(combinedGridFields, false);
@@ -542,7 +545,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			}
 
 			// input for the Combined grids
-			if (type.equals(types[COMBINED]) /*|| type.equals(types[DOUBLE_LATTICE])*/) {
+			if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE])) {
 
 				// check if both xstartCoarse and ystartCoarse are within proper ranges
 				if (xstartCoarse >= coarseGridX || ystartCoarse >= coarseGridY) {
@@ -559,7 +562,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	}
 	
 	
-	Roi getGridRoi() {
+	ShapeRoi getGridRoi() {
 		GeneralPath path; 
 		
 		if (type.equals(types[LINES]))
@@ -572,14 +575,14 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			path =  drawPoints();
 		else if (type.equals(types[COMBINED]))
 			path =  drawCombined();
-		/*
+		
 		else if (type.equals(types[DOUBLE_LATTICE]))
 			path =  drawDoubleLattice();
-		*/
+		
 		else
 			path =  null;
 		
-		Roi roi = new ShapeRoi(path);
+		ShapeRoi roi = new ShapeRoi(path);
 		roi.setStrokeColor(getColor());
 		return roi;
 	}
@@ -611,7 +614,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	
 	
 	// output grid parameters
-	void saveGridParameters(String sliceNumber){
+	void saveGridParameters(int sliceNumber){
 		Integer xStartOutput = new Integer(xstart);
 		Integer xStartCoarseOutput = new Integer(xstartCoarse);
 		Integer yStartCoarseOutput = new Integer(ystartCoarse);
@@ -620,7 +623,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		if (type.equals(types[HLINES]))
 			xStartOutput = null;
 
-		if (!(type.equals(types[COMBINED]) /*|| type.equals(types[DOUBLE_LATTICE])*/)) {
+		if (!(type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE]))) {
 			xStartCoarseOutput = null;
 			yStartCoarseOutput = null;
 			singleQuart = "";
@@ -638,13 +641,11 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		// singleQuart before gridRatio is to prevent conversion to date in
 		// Excel.
 		
-		gridParametersList.add(gridParameters);
+		gridParameterArray[sliceNumber - 1] = gridParameters;
 	}
 	
 	void showGridParameters(){
-		String[] gridParametersArray = new String[gridParametersList.size()];
-		gridParametersArray = gridParametersList.toArray(gridParametersArray);
-		showHistory(gridParametersArray);
+		showHistory(gridParameterArray);
 	}
 	
 	
