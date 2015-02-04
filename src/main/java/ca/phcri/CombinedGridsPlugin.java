@@ -123,9 +123,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				IJ.log(type + " " + roi.getName() + ": " + roi.getTypeAsString() + " at slice " + roi.getPosition());
 			
 			
-		imp.setOverlay(ol);
+			imp.setOverlay(ol);
 		
-		IJ.log("Grid Overlaid");
+			IJ.log("Grid Overlaid");
 		}
 	}
 
@@ -194,7 +194,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 		return path;
 	}
-
+	
+	
+	//Drawing curve in this method is the potential problem.	
 	GeneralPath drawDoubleLattice() {
 		GeneralPath path = new GeneralPath();
 
@@ -215,21 +217,28 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		for (int h = 0; h < linesV; h++) {  //linesV for vertical lines
 			for (int v = 0; v < linesH; v++) { //linesH for horizontal lines
 			*/
+		IJ.log("drow DoubleLattice");
 		
 		for (int h = 0; h < 1; h++) {  //linesV for vertical lines
 			for (int v = 0; v < 1; v++) { //linesH for horizontal lines
-				
 				
 				if ((h % coarseGridX == 0) && (v % coarseGridY == 0)) {
 					float centerX = 
 							(float) (xstart + xstartCoarse * tileWidth + h * tileWidth);
 					float centerY = 
 							(float) (ystart + ystartCoarse * tileHeight + v * tileHeight);
+					
 					// drawing curve for coarse grid
 					path.moveTo(centerX, centerY - rad);
+					
+					IJ.log("center " + centerX);
+					IJ.log("centerY " + centerY);
+					IJ.log("rad " + rad);
+					IJ.log("radkappa " + radkappa +"\n");
+					
 					path.curveTo(centerX - radkappa, centerY - rad, centerX - rad, centerY - radkappa, centerX - rad, centerY);
-					path.curveTo(centerX - rad, centerY + radkappa, centerX - radkappa, centerY + rad, centerX, centerY + rad);
-					path.curveTo(centerX + radkappa, centerY + rad, centerX + rad, centerY + radkappa, centerX + rad, centerY);
+					//path.curveTo(centerX - rad, centerY + radkappa, centerX - radkappa, centerY + rad, centerX, centerY + rad);
+					//path.curveTo(centerX + radkappa, centerY + rad, centerX + rad, centerY + radkappa, centerX + rad, centerY);
 				}
 			}
 		}
