@@ -34,11 +34,20 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		{ "Red", "Green", "Blue", "Magenta", "Cyan", "Yellow", "Orange", 
 		"Black", "White" };
 	private static String color = "Blue";
+	/*
 	private final static int COMBINED = 0, DOUBLE_LATTICE = 1, LINES = 2,
 			HLINES = 3, CROSSES = 4, POINTS = 5;
 	private final static String[] types = 
 		{ "Combined Point", "Double Lattice", "Lines", "Horizontal Lines", 
 		"Crosses", "Points" };
+	*/
+	private final static int COMBINED = 0, LINES = 1,
+			HLINES = 2, CROSSES = 3, POINTS = 4;
+	private final static String[] types = 
+		{ "Combined Point", "Lines", "Horizontal Lines", 
+		"Crosses", "Points" };
+	
+	
 	private static String type = types[COMBINED];
 	private static double areaPerPoint;
 
@@ -63,7 +72,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static int[] parameterFieldsOff = { 10, 11, 12, 13, 14, 15, 16, 17 };
 	private final static int[] xstartField = { 10, 11 };
 	private final static int[] ystartField = { 12, 13 };
-	private final static int[] stackField = {19, 20};
 	private static boolean showGridSwitch = true;
 
 	private Random random = new Random(System.currentTimeMillis());
@@ -431,9 +439,11 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			minArea = 484.0;
 			// As pointSizeCoarse = 10,
 			//(10 + 1) * 2)^2 = 22^2 = 484
+		/*
 		else if (type.equals(types[DOUBLE_LATTICE]) && minArea < 900.0)
 			minArea = 900.0;
 		 	// As rad = 14, ((14 + 1) * 2) ^2 = 900
+		*/
 		else if (minArea < 16)
 			minArea = 16.0;
 
@@ -446,7 +456,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	
 	
 	void enableFields(){
-		if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE]))
+		if (type.equals(types[COMBINED]) /*|| type.equals(types[DOUBLE_LATTICE])*/)
 			fieldEnabler(ratioField, true);
 		else
 			fieldEnabler(ratioField, false);
@@ -462,7 +472,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			else
 				fieldEnabler(xstartField, true);
 			
-			if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE]))
+			if (type.equals(types[COMBINED]) /*|| type.equals(types[DOUBLE_LATTICE])*/)
 				fieldEnabler(combinedGridFields, true);
 			else
 				fieldEnabler(combinedGridFields, false);
@@ -532,7 +542,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			}
 
 			// input for the Combined grids
-			if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE])) {
+			if (type.equals(types[COMBINED]) /*|| type.equals(types[DOUBLE_LATTICE])*/) {
 
 				// check if both xstartCoarse and ystartCoarse are within proper ranges
 				if (xstartCoarse >= coarseGridX || ystartCoarse >= coarseGridY) {
@@ -562,8 +572,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			path =  drawPoints();
 		else if (type.equals(types[COMBINED]))
 			path =  drawCombined();
+		/*
 		else if (type.equals(types[DOUBLE_LATTICE]))
 			path =  drawDoubleLattice();
+		*/
 		else
 			path =  null;
 		
@@ -608,7 +620,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		if (type.equals(types[HLINES]))
 			xStartOutput = null;
 
-		if (!(type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE]))) {
+		if (!(type.equals(types[COMBINED]) /*|| type.equals(types[DOUBLE_LATTICE])*/)) {
 			xStartCoarseOutput = null;
 			yStartCoarseOutput = null;
 			singleQuart = "";
