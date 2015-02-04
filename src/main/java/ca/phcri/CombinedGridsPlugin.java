@@ -288,8 +288,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		gd.addNumericField("xstartCoarse:", 0, 0);
 		gd.addNumericField("ystartCoarse:", 0, 0);
 		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
-		gd.addRadioButtonGroup("The way to apply grid(s) to a Stack",
-				applyChoices, 3, 1, applyTo);
+		if(imp.getStackSize() > 1)
+			gd.addRadioButtonGroup("The way to apply grid(s) to a Stack",
+					applyChoices, 3, 1, applyTo);
 
 		// to switch enable/disable for parameter input boxes
 		components = gd.getComponents();
@@ -330,7 +331,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		xstartCoarse = (int) gd.getNextNumber();
 		ystartCoarse = (int) gd.getNextNumber();
 		showGridSwitch = gd.getNextBoolean();
-		applyTo = gd.getNextRadioButton();
+		if(imp.getStackSize() > 1)
+			applyTo = gd.getNextRadioButton();
 		err = "";
 		IJ.showStatus(err);
 		gridParametersList = new ArrayList<String>();
@@ -414,12 +416,12 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	void gridRoisListReset() {
 		gridRoisList = new ArrayList<Roi>();
 		Overlay ol = imp.getOverlay();
-		if(ol == null)
-			ol = new Overlay();
-		for(Roi roi : ol.toArray()){
-			String roiName = roi.getName();
-			if(roiName != null && roiName.startsWith("grid"))
-				gridRoisList.add(roi);
+		if(ol != null){
+			for(Roi roi : ol.toArray()){
+				String roiName = roi.getName();
+				if(roiName != null && roiName.startsWith("grid"))
+					gridRoisList.add(roi);
+				}
 		}
 	}
 	

@@ -17,7 +17,7 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 	private ImagePlus imp;
 	private boolean gridOn = false;
 	private Button b1;
-	private static Overlay layer;
+	private static Overlay ol;
 	private static Roi[] gridRois;
 	
 	@Override
@@ -41,9 +41,9 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 	public void windowActivated(WindowEvent e) {
 		imp = WindowManager.getCurrentImage();
 		if(imp != null){
-			layer = imp.getOverlay();
-			if(layer != null){
-				Roi[] elements = layer.toArray();
+			ol = imp.getOverlay();
+			if(ol != null){
+				Roi[] elements = ol.toArray();
 				
 				ArrayList<Roi> gridRoisList = new ArrayList<Roi>();
 				
@@ -91,18 +91,17 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 	}
 	
 	void enableGrid() {
+		removeGrid();
 		for(Roi gridRoi : gridRois)
-			layer.add(gridRoi);
-		imp.setOverlay(layer);
+			ol.add(gridRoi);
+		imp.setOverlay(ol);
 	}
 	
 	void removeGrid(){
-		if(layer != null){
-			for(Roi roi : gridRois){
-				layer.remove(roi);
-			}
-		}
-		imp.setOverlay(layer);
+		if(ol != null)
+			for(Roi roi : gridRois)
+				ol.remove(roi);
+		imp.setOverlay(ol);
 	}
 	
 }
