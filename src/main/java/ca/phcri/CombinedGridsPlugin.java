@@ -21,7 +21,10 @@ import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Random;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -65,6 +68,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private double pixelWidth = 1.0, pixelHeight = 1.0;
 	private String units;
 	private String err = "";
+	private ArrayList<Roi> gridRoisList;
 
 	public void run(String arg) {
 		if (IJ.versionLessThan("1.47"))
@@ -90,11 +94,13 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	}
 	
 	void showGrid(Roi[] rois) {
-		if(rois == null) {
-			removeGrid();
-		} else {
-			removeGrid();
+		removeGrid();
+
+		if(rois != null) {
 			Overlay layer = imp.getOverlay();
+			
+			if(layer == null)
+				layer = new Overlay();
 			
 			for(Roi roi : rois)
 				layer.add(roi);
@@ -306,58 +312,71 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		minAreaCheck();
 		enableFields();
 		setCoarseGrids();
-		calculateTile();
+		calculateTile();		
+
+		calculateFirstGrid();
+			
+		if (!"".equals(err)) {
+			IJ.showStatus(err);
+			return true;
+		}
+			
+		if (gd.invalidNumber())
+			return true;
 		
+		
+		gridRoisList = new ArrayList<Roi>();
+		
+		Overlay ol = imp.getOverlay();
+		if(ol == null)
+			ol = new Overlay();
+		
+		for(Roi roi : ol.toArray()){
+			String roiName = roi.getName();
+			if(roiName != null &&
+					roiName.startsWith("grid"))
+				gridRoisList.add(roi);
+		}
+		
+		Roi gridRoi = getGridRoi();
+			
 		if(applyChoices[ALL].equals(applyTo)){
-			calculateFirstGrid();
+			int totalSlices = imp.getStackSize();
 			
-			if (!"".equals(err)) {
-				IJ.showStatus(err);
-				return true;
+			for(int i = 1; i <= totalSlices; i++){
+				addGridOnSlice(gridRoi, i);
 			}
-			
-			if (gd.invalidNumber())
-				return true;
-			
-			Roi gridRoi = getGridRoi();
-			gridRoi.setName("grid");
-			
-			Roi[] gridRois = {gridRoi};
-			
-			showGrid(gridRois);
 		}
 		
 		if(applyChoices[CURRENT].equals(applyTo)){
 			int currentSlice = imp.getCurrentSlice();
-			Overlay ol = imp.getOverlay();
-			Roi[] gridRois = ol.toArray();
-			
-			calculateFirstGrid();
-			
-			if (!"".equals(err)) {
-				IJ.showStatus(err);
-				return true;
-			}
-			
-			if (gd.invalidNumber())
-				return true;
-			
-			Roi gridRoi = getGridRoi();
-			String roiName = "grid" + currentSlice;
-			gridRoi.setName(roiName);
-			
-			for (Roi roi : gridRois){
-				if(currentSlice == roi.getZPosition() &&
-						roiName.equals(roi.getName()))
-					roi = gridRoi;
-			}
-			
-			showGrid(gridRois);
+			addGridOnSlice(gridRoi, currentSlice);
 		}
+
+		Roi[] gridRois = new Roi[gridRoisList.size()];
+		gridRois = gridRoisList.toArray(gridRois);
+		
+		showGrid(gridRois);
 		
 		return true;
 	}
 	
+	
+	void addGridOnSlice(Roi gridRoi, int sliceIndex){
+		Roi sliceGridRoi = (Roi) gridRoi.clone();
+		String sliceRoiName = "grid" + sliceIndex;
+		sliceGridRoi.setName(sliceRoiName);
+		sliceGridRoi.setPosition(sliceIndex);
+		
+		//remove a roi with the same name as sliceRoiName from the list
+		for(Iterator<Roi> i = gridRoisList.iterator(); i.hasNext(); ){
+			Roi roi = (Roi) i.next();
+			if(sliceRoiName.equals(roi.getName()))
+				i.remove();				
+		}
+		
+		gridRoisList.add(sliceGridRoi);
+	}
 	
 	
 	// if areaPerPoint is not too small, show an error
