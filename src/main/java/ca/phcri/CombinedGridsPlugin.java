@@ -167,7 +167,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 				if ((h % coarseGridX == 0) && (v % coarseGridY == 0)) {
 					float centerX = 
-							(float) (xstart + xstartCoarse * tileWidth  +h * tileWidth);
+							(float) (xstart + xstartCoarse * tileWidth  + h * tileWidth);
 					float centerY = 
 							(float) (ystart + ystartCoarse * tileHeight + v * tileHeight);
 
@@ -210,15 +210,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 							(float) (ystart + ystartCoarse * tileHeight + v * tileHeight);
 					// drawing curve for coarse grid
 					path.moveTo(centerX, centerY - rad);
-					path.curveTo(centerX - radkappa, centerY - rad, 
-							centerX - rad, centerY - radkappa, 
-							centerX - rad, centerY);
-					path.curveTo(centerX - rad, centerY + radkappa, 
-							centerX - radkappa, centerY + rad, 
-							centerX, centerY + rad);
-					path.curveTo(centerX + radkappa, centerY + rad, 
-							centerX + rad, centerY + radkappa, 
-							centerX + rad, centerY);
+					path.curveTo(centerX - radkappa, centerY - rad, centerX - rad, centerY - radkappa, centerX - rad, centerY);
+					path.curveTo(centerX - rad, centerY + radkappa, centerX - radkappa, centerY + rad, centerX, centerY + rad);
+					path.curveTo(centerX + radkappa, centerY + rad, centerX + rad, centerY + radkappa, centerX + rad, centerY);
 				}
 			}
 		}
@@ -296,9 +290,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		components = gd.getComponents();
 		enableFields();
 		
-		if(imp.getStackSize() == 1)
-			for (int i : stackField) components[i].setVisible(false);
-		
 		gd.addDialogListener(this);
 		gd.showDialog();
 
@@ -351,10 +342,13 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			for (int i = 1; i <= totalSlices; i++){
 				calculateFirstGrid();
 				
+				if(gd.invalidNumber()) return true;
+				
 				if (!"".equals(err) || gd.invalidNumber()) {
 					IJ.showStatus(err);
 					return true;
 				}
+				
 				
 				Roi gridRoi = getGridRoi();
 				addGridOnSlice(gridRoi, i);
