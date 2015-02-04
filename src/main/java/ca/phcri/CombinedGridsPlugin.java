@@ -30,30 +30,40 @@ import java.io.IOException;
 
 
 public class CombinedGridsPlugin implements PlugIn, DialogListener {
-	private final static String[] colors = { "Red", "Green", "Blue", "Magenta", "Cyan", "Yellow", "Orange", "Black", "White" };
+	private final static String[] colors = 
+		{ "Red", "Green", "Blue", "Magenta", "Cyan", "Yellow", "Orange", 
+		"Black", "White" };
 	private static String color = "Blue";
 	private final static int COMBINED = 0, DOUBLE_LATTICE = 1, LINES = 2,
 			HLINES = 3, CROSSES = 4, POINTS = 5;
-	private final static String[] types = { "Combined Point", "Double Lattice", "Lines", "Horizontal Lines", "Crosses", "Points" };
+	private final static String[] types = 
+		{ "Combined Point", "Double Lattice", "Lines", "Horizontal Lines", 
+		"Crosses", "Points" };
 	private static String type = types[COMBINED];
 	private static double areaPerPoint;
 
-	private final static int ONE_TO_FOUR = 0, ONE_TO_NINE = 1, ONE_TO_SIXTEEN = 2, ONE_TO_TWENTYFIVE = 3, ONE_TO_THIRTYSIX = 4;
+	private final static int ONE_TO_FOUR = 0, ONE_TO_NINE = 1, ONE_TO_SIXTEEN = 2, 
+			ONE_TO_TWENTYFIVE = 3, ONE_TO_THIRTYSIX = 4;
 	private final static String[] ratioChoices = { "1:4", "1:9", "1:16", "1:25", "1:36" };
 	private static String gridRatio = ratioChoices[ONE_TO_FOUR];
-	private final static String[] radiobuttons = { "Random Offset", "Fixed Position", "Manual Input" };
+	private final static String[] radiobuttons = 
+		{ "Random Offset", "Fixed Position", "Manual Input" };
 	private final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
 	private String radiochoice = radiobuttons[RANDOM];
 	private final static String[] applyChoices = 
-		{ "One Grid for All Slices", "Different Grids for Each Slice", "One Grid for Current Slice"};
+		{ "One Grid for All Slices", "Different Grids for Each Slice", 
+		"One Grid for Current Slice"};
 	private final static int ONEforALL = 0, DIFFERENTforEACH = 1, CURRENT = 2;
 	private static String applyTo = applyChoices[DIFFERENTforEACH];
-	private static Component[] components; // this is to select components in the dialog box
+	
+	private static Component[] components; 
+	// this is to select components in the dialog box
 	private final static int[] ratioField = { 4, 5 };
 	private final static int[] combinedGridFields = { 14, 15, 16, 17 };
 	private final static int[] parameterFieldsOff = { 10, 11, 12, 13, 14, 15, 16, 17 };
 	private final static int[] xstartField = { 10, 11 };
 	private final static int[] ystartField = { 12, 13 };
+	private final static int[] stackField = {19, 20};
 	private static boolean showGridSwitch = true;
 
 	private Random random = new Random(System.currentTimeMillis());
@@ -69,6 +79,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private ArrayList<Roi> gridRoisList;
 	private ArrayList<String> gridParametersList = new ArrayList<String>();
 
+	@Override
 	public void run(String arg) {
 		if (IJ.versionLessThan("1.47"))
 			return;
@@ -78,15 +89,15 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	
 	
 	void removeGrid(){
-		Overlay layer = imp.getOverlay();
+		Overlay ol = imp.getOverlay();
 		
-		if(layer != null){
-			Roi[] elements = layer.toArray();
+		if(ol != null){
+			Roi[] elements = ol.toArray();
 			
 			for(Roi element : elements){
 				if(element.getName() != null &&
 						element.getName().startsWith("grid")){
-				layer.remove(element);
+				ol.remove(element);
 				}
 			}
 		}
@@ -96,15 +107,15 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		removeGrid();
 
 		if(rois != null) {
-			Overlay layer = imp.getOverlay();
+			Overlay ol = imp.getOverlay();
 			
-			if(layer == null)
-				layer = new Overlay();
+			if(ol == null)
+				ol = new Overlay();
 			
 			for(Roi roi : rois)
-				layer.add(roi);
+				ol.add(roi);
 			
-		imp.setOverlay(layer);
+		imp.setOverlay(ol);
 		}
 	}
 
@@ -154,8 +165,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				path.moveTo(x, y - arm); path.lineTo(x, y + arm);
 
 				if ((h % coarseGridX == 0) && (v % coarseGridY == 0)) {
-					float centerX = (float) (xstart + xstartCoarse * tileWidth  + h * tileWidth);
-					float centerY = (float) (ystart + ystartCoarse * tileHeight + v * tileHeight);
+					float centerX = 
+							(float) (xstart + xstartCoarse * tileWidth  +h * tileWidth);
+					float centerY = 
+							(float) (ystart + ystartCoarse * tileHeight + v * tileHeight);
 
 					// drawing a coarse point by lines
 					path.moveTo(centerX - pointSizeCoarse, centerY - armCoarse);
@@ -176,8 +189,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		GeneralPath path = new GeneralPath();
 
 		float rad = 14;
-		float radkappa = (float) (rad * 0.5522847498); // ref
-														// https://www.java.net/node/660133
+		float radkappa = (float) (rad * 0.5522847498); 
+		// ref https://www.java.net/node/660133
 		for (int i = 0; i < linesV; i++) {
 			float xoff = (float) (xstart + i * tileWidth);
 			path.moveTo(xoff, 0f); path.lineTo(xoff, height);
@@ -190,8 +203,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		for (int h = 0; h < linesV; h++) {
 			for (int v = 0; v < linesH; v++) {
 				if ((h % coarseGridX == 0) && (v % coarseGridY == 0)) {
-					float centerX = (float) (xstart + xstartCoarse * tileWidth + h * tileWidth);
-					float centerY = (float) (ystart + ystartCoarse * tileHeight + v * tileHeight);
+					float centerX = 
+							(float) (xstart + xstartCoarse * tileWidth + h * tileWidth);
+					float centerY = 
+							(float) (ystart + ystartCoarse * tileHeight + v * tileHeight);
 					// drawing curve for coarse grid
 					path.moveTo(centerX, centerY - rad);
 					path.curveTo(centerX - radkappa, centerY - rad, 
@@ -271,12 +286,16 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		gd.addNumericField("xstartCoarse:", 0, 0);
 		gd.addNumericField("ystartCoarse:", 0, 0);
 		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
-		gd.addRadioButtonGroup("The way to apply grid(s) to a Stack", applyChoices, 3, 1, applyTo);
+		gd.addRadioButtonGroup("The way to apply grid(s) to a Stack",
+				applyChoices, 3, 1, applyTo);
 
 		// to switch enable/disable for parameter input boxes
 		components = gd.getComponents();
 		enableFields();
-
+		
+		if(imp.getStackSize() == 1)
+			for (int i : stackField) components[i].setVisible(false);
+		
 		gd.addDialogListener(this);
 		gd.showDialog();
 
@@ -297,6 +316,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	}
 
 	// event control for the dialog box
+	@Override
 	public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
 		type = gd.getNextChoice();
 		areaPerPoint = gd.getNextNumber();
@@ -325,8 +345,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 		for(Roi roi : ol.toArray()){
 			String roiName = roi.getName();
-			if(roiName != null &&
-					roiName.startsWith("grid"))
+			if(roiName != null && roiName.startsWith("grid"))
 				gridRoisList.add(roi);
 		}
 		
@@ -344,6 +363,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				
 				Roi gridRoi = getGridRoi();
 				addGridOnSlice(gridRoi, i);
+				saveGridParameters("" + i);
 			}
 		} else {
 			calculateFirstGrid();
@@ -360,11 +380,14 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				for(int i = 1; i <= totalSlices; i++){
 					addGridOnSlice(gridRoi, i);
 				}
+
+				saveGridParameters("All");
 			}
 			
 			if(applyChoices[CURRENT].equals(applyTo)){
 				int currentSlice = imp.getCurrentSlice();
 				addGridOnSlice(gridRoi, currentSlice);
+				saveGridParameters("" + currentSlice);
 			}
 		}
 		
@@ -386,13 +409,12 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 		//remove a roi with the same name as sliceRoiName from the list
 		for(Iterator<Roi> i = gridRoisList.iterator(); i.hasNext(); ){
-			Roi roi = (Roi) i.next();
+			Roi roi = i.next();
 			if(sliceRoiName.equals(roi.getName()))
 				i.remove();				
 		}
 		
 		gridRoisList.add(sliceGridRoi);
-		saveGridParameters(sliceIndex);
 	}
 	
 	
@@ -403,13 +425,11 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			minArea = 144.0;
 			// to avoid overlap of grid points.
 			// ((5 + 1) * 2) ^2 = 12^2 = 144
-		else if (type.equals(types[COMBINED]) && 
-				minArea < 484.0)
+		else if (type.equals(types[COMBINED]) && minArea < 484.0)
 			minArea = 484.0;
 			// As pointSizeCoarse = 10,
 			//(10 + 1) * 2)^2 = 22^2 = 484
-		else if (type.equals(types[DOUBLE_LATTICE]) && 
-				minArea < 900.0)
+		else if (type.equals(types[DOUBLE_LATTICE]) && minArea < 900.0)
 			minArea = 900.0;
 		 	// As rad = 14, ((14 + 1) * 2) ^2 = 900
 		else if (minArea < 16)
@@ -424,8 +444,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	
 	
 	void enableFields(){
-		if (type.equals(types[COMBINED]) || 
-				type.equals(types[DOUBLE_LATTICE]))
+		if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE]))
 			fieldEnabler(ratioField, true);
 		else
 			fieldEnabler(ratioField, false);
@@ -436,16 +455,18 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 			if (type.equals(types[HLINES]))
 				fieldEnabler(xstartField, false);
+				//disable xstartField because
+				//Horizontal lines needs just ystart and does not need xstart
 			else
 				fieldEnabler(xstartField, true);
 			
-			if (type.equals(types[COMBINED]) || 
-					type.equals(types[DOUBLE_LATTICE]))
+			if (type.equals(types[COMBINED]) || type.equals(types[DOUBLE_LATTICE]))
 				fieldEnabler(combinedGridFields, true);
+			else
+				fieldEnabler(combinedGridFields, false);
 			
-		} else {
+		} else 
 			fieldEnabler(parameterFieldsOff, false);
-		}
 	}
 	
 	void fieldEnabler(int[] fields, boolean show){
@@ -498,8 +519,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		} else if (radiochoice.equals(radiobuttons[MANUAL])) {
 
 			if (type.equals(types[HLINES])) {
-					//disable xstartField because
-					//Horizontal lines needs just ystart and does not need xstart
 				xstart = 0; // just to prevent an error
 			}
 
@@ -519,9 +538,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					if (ystartCoarse >= coarseGridY) err +=  "\"ystartCoarse\" ";
 					err +=  "too large.";
 				}
-			} else {
-				for (int i : combinedGridFields) components[i].setEnabled(false);
-			}
+			} 
 		}
 		
 		// calculating number of vertical and horizontal lines in a selected image
@@ -580,7 +597,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	
 	
 	// output grid parameters
-	void saveGridParameters(int sliceNumber){
+	void saveGridParameters(String sliceNumber){
 		Integer xStartOutput = new Integer(xstart);
 		Integer xStartCoarseOutput = new Integer(xstartCoarse);
 		Integer yStartCoarseOutput = new Integer(ystartCoarse);
@@ -599,9 +616,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date date = new Date();
 
-		String gridParameters = df.format(date) + "\t" + imp.getTitle() + "\t" + sliceNumber + "\t"
-				+ type + "\t" + areaPerPoint + "\t" + units + "^2" + "\t"
-				+ singleQuart + gridRatio + "\t" + color + "\t" + radiochoice
+		String gridParameters = df.format(date) + "\t" + imp.getTitle() + "\t" + 
+				sliceNumber + "\t" + type + "\t" + areaPerPoint + "\t" + units + "^2" +
+				"\t" + singleQuart + gridRatio + "\t" + color + "\t" + radiochoice
 				+ "\t" + xStartOutput + "\t" + ystart + "\t"
 				+ xStartCoarseOutput + "\t" + yStartCoarseOutput;
 		// singleQuart before gridRatio is to prevent conversion to date in
@@ -619,7 +636,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	
 	static void showHistory(String[] parameters) {
 		String windowTitle = "Grid History";
-			//ShowParameterWindow.java uses String "Grid History" without referring to this windowTitle variable,
+			//ShowParameterWindow.java uses String "Grid History" without 
+			//referring to this windowTitle variable,
 			//so be careful to change the title this window. 
 		String fileName = "CombinedGridsHistory.txt";
 		
@@ -634,9 +652,12 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					+ "\t xstart \t ystart \t xstartCoarse \t ystartCoarse",
 					"", 1028, 250);
 			
-			//If a file whose name is String fileName exists in the plugin folder, read it into the list.
+			//If a file whose name is String fileName exists in the plugin folder, 
+			//read it into the list.
 			try {
-				BufferedReader br = new BufferedReader(new FileReader(IJ.getDirectory("plugins") + fileName));
+				BufferedReader br = new BufferedReader(
+						new FileReader(IJ.getDirectory("plugins") + fileName)
+						);
 				boolean isHeadings = true;
 				while (true) {
 		            String s = br.readLine();
@@ -647,6 +668,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		            }
 		            gridHistoryWindow.append(s);
 				}
+				br.close();
 			} catch (IOException e) {}
 		}
 		

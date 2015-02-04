@@ -20,6 +20,7 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 	private static Overlay layer;
 	private static Roi[] gridRois;
 	
+	@Override
 	public void run(String arg) {
 		if (IJ.versionLessThan("1.47"))	 		return;
 		gridSwitch();
@@ -36,6 +37,7 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 		gs.setVisible(true);
 	}
 	
+	@Override
 	public void windowActivated(WindowEvent e) {
 		imp = WindowManager.getCurrentImage();
 		if(imp != null){
@@ -58,18 +60,25 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 		}
 	}
 
+	@Override
 	public void windowClosed(WindowEvent e) {}
+	@Override
 	public void windowClosing(WindowEvent e) {}
+	@Override
 	public void windowDeactivated(WindowEvent e) {
 		enableGrid();
 		b1.setLabel("Grid On");
 		gridOn = false;
 	}
+	@Override
 	public void windowDeiconified(WindowEvent e) {}
+	@Override
 	public void windowIconified(WindowEvent e) {}
+	@Override
 	public void windowOpened(WindowEvent e) {}
 	
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(gridOn) {
 			enableGrid();

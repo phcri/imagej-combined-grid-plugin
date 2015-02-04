@@ -7,6 +7,7 @@ import ij.plugin.PlugIn;
 import ij.text.TextWindow;
 
 public class ShowParameterWindow implements PlugIn {
+	@Override
 	public void run(String arg) {
 		CombinedGridsPlugin.showHistory(null);
 		
