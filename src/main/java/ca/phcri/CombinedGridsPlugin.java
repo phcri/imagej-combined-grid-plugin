@@ -17,17 +17,14 @@ import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
-import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -47,9 +44,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static String[] radiobuttons = { "Random Offset", "Fixed Position", "Manual Input" };
 	private final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
 	private String radiochoice = radiobuttons[RANDOM];
-	private final static String[] applyChoices = { "All Slices", "Current Slice"};
-	private final static int ALL = 0, CURRENT = 1;
-	private static String applyTo = applyChoices[ALL];
+	private final static String[] applyChoices = 
+		{ "One Grid for All Slices", "Different Grids for Each Slice", "One Grid for Current Slice"};
+	private final static int ONEforALL = 0, DIFFERENTforEACH = 1, CURRENT = 2;
+	private static String applyTo = applyChoices[DIFFERENTforEACH];
 	private static Component[] components; // this is to select components in the dialog box
 	private final static int[] ratioField = { 4, 5 };
 	private final static int[] combinedGridFields = { 14, 15, 16, 17 };
@@ -69,6 +67,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private String units;
 	private String err = "";
 	private ArrayList<Roi> gridRoisList;
+	private ArrayList<String> gridParametersList = new ArrayList<String>();
 
 	public void run(String arg) {
 		if (IJ.versionLessThan("1.47"))
@@ -268,7 +267,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		gd.addNumericField("xstartCoarse:", 0, 0);
 		gd.addNumericField("ystartCoarse:", 0, 0);
 		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
-		gd.addRadioButtonGroup("Apply Grid to", applyChoices, 2, 1, applyTo);
+		gd.addRadioButtonGroup("The way to apply grid(s) to a Stack", applyChoices, 3, 1, applyTo);
 
 		// to switch enable/disable for parameter input boxes
 		components = gd.getComponents();
@@ -312,18 +311,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		minAreaCheck();
 		enableFields();
 		setCoarseGrids();
-		calculateTile();		
-
-		calculateFirstGrid();
-			
-		if (!"".equals(err)) {
-			IJ.showStatus(err);
-			return true;
-		}
-			
-		if (gd.invalidNumber())
-			return true;
-		
+		calculateTile();
 		
 		gridRoisList = new ArrayList<Roi>();
 		
@@ -338,21 +326,45 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				gridRoisList.add(roi);
 		}
 		
-		Roi gridRoi = getGridRoi();
-			
-		if(applyChoices[ALL].equals(applyTo)){
+
+		if(applyChoices[DIFFERENTforEACH].equals(applyTo)){
 			int totalSlices = imp.getStackSize();
 			
-			for(int i = 1; i <= totalSlices; i++){
+			for (int i = 1; i <= totalSlices; i++){
+				calculateFirstGrid();
+				
+				if (!"".equals(err) || gd.invalidNumber()) {
+					IJ.showStatus(err);
+					return true;
+				}
+				
+				Roi gridRoi = getGridRoi();
 				addGridOnSlice(gridRoi, i);
+			}
+		} else {
+			calculateFirstGrid();
+		
+			if (!"".equals(err) || gd.invalidNumber()) {
+				IJ.showStatus(err);
+				return true;
+			}
+			
+			Roi gridRoi = getGridRoi();
+			
+			if(applyChoices[ONEforALL].equals(applyTo)){
+				int totalSlices = imp.getStackSize();
+				for(int i = 1; i <= totalSlices; i++){
+					addGridOnSlice(gridRoi, i);
+				}
+			}
+			
+			if(applyChoices[CURRENT].equals(applyTo)){
+				int currentSlice = imp.getCurrentSlice();
+				addGridOnSlice(gridRoi, currentSlice);
 			}
 		}
 		
-		if(applyChoices[CURRENT].equals(applyTo)){
-			int currentSlice = imp.getCurrentSlice();
-			addGridOnSlice(gridRoi, currentSlice);
-		}
-
+		
 		Roi[] gridRois = new Roi[gridRoisList.size()];
 		gridRois = gridRoisList.toArray(gridRois);
 		
@@ -376,6 +388,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 		
 		gridRoisList.add(sliceGridRoi);
+		saveGridParameters(sliceIndex);
 	}
 	
 	
@@ -531,7 +544,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 		Roi roi = new ShapeRoi(path);
 		roi.setStrokeColor(getColor());
-		//roi.setName("grid");
 		return roi;
 	}
 	
@@ -562,7 +574,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	
 	
 	// output grid parameters
-	void showGridParameters(){
+	void saveGridParameters(int sliceNumber){
 		Integer xStartOutput = new Integer(xstart);
 		Integer xStartCoarseOutput = new Integer(xstartCoarse);
 		Integer yStartCoarseOutput = new Integer(ystartCoarse);
@@ -581,19 +593,25 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date date = new Date();
 
-		String gridParameters = df.format(date) + "\t" + imp.getTitle() + "\t"
+		String gridParameters = df.format(date) + "\t" + imp.getTitle() + "\t" + sliceNumber + "\t"
 				+ type + "\t" + areaPerPoint + "\t" + units + "^2" + "\t"
 				+ singleQuart + gridRatio + "\t" + color + "\t" + radiochoice
 				+ "\t" + xStartOutput + "\t" + ystart + "\t"
 				+ xStartCoarseOutput + "\t" + yStartCoarseOutput;
 		// singleQuart before gridRatio is to prevent conversion to date in
 		// Excel.
-		showHistory(gridParameters);
+		
+		gridParametersList.add(gridParameters);
 	}
 	
-
+	void showGridParameters(){
+		String[] gridParametersArray = new String[gridParametersList.size()];
+		gridParametersArray = gridParametersList.toArray(gridParametersArray);
+		showHistory(gridParametersArray);
+	}
 	
-	static void showHistory(String str) {
+	
+	static void showHistory(String[] parameters) {
 		String windowTitle = "Grid History";
 			//ShowParameterWindow.java uses String "Grid History" without referring to this windowTitle variable,
 			//so be careful to change the title this window. 
@@ -605,7 +623,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			//make a new empty TextWindow with String windowTitle with headings
 			gridHistoryWindow = new TextWindow(
 					windowTitle,
-					"Date \t Image \t Grid Type \t Area per Point \t Unit "
+					"Date \t Image \t Slice \t Grid Type \t Area per Point \t Unit "
 					+ "\t Ratio \t Color \t Location Setting "
 					+ "\t xstart \t ystart \t xstartCoarse \t ystartCoarse",
 					"", 1028, 250);
@@ -626,8 +644,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			} catch (IOException e) {}
 		}
 		
-		if(str != null){
-			gridHistoryWindow.append(str);
+		if(parameters != null){
+			for(String str : parameters)
+				gridHistoryWindow.append(str);
 			
 			//auto save the parameters into a file whose name is String fileName
 			TextPanel tp = gridHistoryWindow.getTextPanel();

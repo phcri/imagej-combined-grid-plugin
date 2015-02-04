@@ -52,20 +52,12 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 					}
 				}
 				
-				gridRois = (Roi[]) gridRoisList.toArray();
-				
+				gridRois = new Roi[gridRoisList.size()];
+				gridRois = gridRoisList.toArray(gridRois);
 			}
 		}
 	}
-		
-		/*
-		 * 				}
-			if(layer == null || 
-					layer.getIndex("grid") == -1)
-				IJ.showStatus("Grid Switch \"" + imp.getTitle() + "\" does not have a grid.");
-			else gridRois = layer.get(layer.getIndex("grid"));
 
-		 * */
 	public void windowClosed(WindowEvent e) {}
 	public void windowClosing(WindowEvent e) {}
 	public void windowDeactivated(WindowEvent e) {
@@ -90,25 +82,18 @@ public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
 	}
 	
 	void enableGrid() {
-		removeGrid();
 		for(Roi gridRoi : gridRois)
 			layer.add(gridRoi);
 		imp.setOverlay(layer);
 	}
 	
 	void removeGrid(){
-		Overlay layer = imp.getOverlay();
-		
 		if(layer != null){
-			Roi[] elements = layer.toArray();
-			
-			for(Roi element : elements){
-				if(element.getName() != null &&
-						element.getName().startsWith("grid")){
-				layer.remove(element);
-				}
+			for(Roi roi : gridRois){
+				layer.remove(roi);
 			}
 		}
+		imp.setOverlay(layer);
 	}
 	
 }
