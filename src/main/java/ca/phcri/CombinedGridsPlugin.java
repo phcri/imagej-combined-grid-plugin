@@ -77,7 +77,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private String err = "";
 	private Roi[] gridRoiArray;
 	private String[] gridParameterArray;
-	private int totalSlice;
+	private int totalSlices;
 
 	@Override
 	public void run(String arg) {
@@ -282,7 +282,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		if (areaPerPoint == 0.0) // default to 9x9 grid
 			areaPerPoint = (width * cal.pixelWidth * height * cal.pixelHeight) / 81.0;
 		
-		totalSlice = imp.getStackSize();
+		totalSlices = imp.getStackSize();
 		
 		// get values in a dialog box
 		GenericDialog gd = new GenericDialog("Grid...");
@@ -341,8 +341,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		err = "";
 		IJ.showStatus(err);
 		
-		gridParameterArray = new String[totalSlice];
-		gridRoiArray = new Roi[totalSlice];
+		gridParameterArray = new String[totalSlices];
+		gridRoiArray = new Roi[totalSlices];
 				
 		minAreaCheck();
 		enableFields();
@@ -351,8 +351,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 
 		if(applyChoices[DIFFERENTforEACH].equals(applyTo)){
-			int totalSlices = imp.getStackSize();
-			
 			for (int i = 1; i <= totalSlices; i++){
 				calculateFirstGrid();
 				
@@ -378,11 +376,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			ShapeRoi gridRoi = getGridRoi();
 			
 			if(applyChoices[ONEforALL].equals(applyTo)){
-				int totalSlices = imp.getStackSize();
-				for(int i = 1; i <= totalSlices; i++){
-					addGridOnArray(gridRoi, i);
-					saveGridParameters(i);
-				}
+				addGridOnArray(gridRoi, 0);
+				saveGridParameters(0);
 			}
 			
 			if(applyChoices[CURRENT].equals(applyTo)){
@@ -400,10 +395,15 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	
 	void addGridOnArray(ShapeRoi gridRoi, int sliceIndex){
 		ShapeRoi sliceGridRoi = (ShapeRoi) gridRoi.clone();
-		sliceGridRoi.setName("grid" + sliceIndex);
-		sliceGridRoi.setPosition(sliceIndex);
 		
-		gridRoiArray[sliceIndex - 1] = sliceGridRoi;
+		if(sliceIndex == 0){
+			sliceGridRoi.setName("grid");
+			gridRoiArray[0] = sliceGridRoi;
+		}else {
+			sliceGridRoi.setName("grid" + sliceIndex);
+			sliceGridRoi.setPosition(sliceIndex);
+			gridRoiArray[sliceIndex - 1] = sliceGridRoi;
+		}
 	}
 	
 	
@@ -589,6 +589,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	}
 	
 	
+	
 	// output grid parameters
 	void saveGridParameters(int sliceNumber){
 		Integer xStartOutput = new Integer(xstart);
@@ -608,9 +609,17 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 		DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date date = new Date();
-
+		
+		String sliceStr;
+		
+		if(sliceNumber == 0){
+			sliceStr = "All";
+			sliceNumber = 1; // to input parameters into gridParameterArray
+		} else
+			sliceStr = "" + sliceNumber;
+		
 		String gridParameters = df.format(date) + "\t" + imp.getTitle() + "\t" + 
-				sliceNumber + "\t" + type + "\t" + areaPerPoint + "\t" + units + "^2" +
+				sliceStr + "\t" + type + "\t" + areaPerPoint + "\t" + units + "^2" +
 				"\t" + singleQuart + gridRatio + "\t" + color + "\t" + radiochoice
 				+ "\t" + xStartOutput + "\t" + ystart + "\t"
 				+ xStartCoarseOutput + "\t" + yStartCoarseOutput;
