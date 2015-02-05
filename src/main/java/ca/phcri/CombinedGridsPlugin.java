@@ -295,11 +295,12 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		gd.addNumericField("ystart:", 0, 0);
 		gd.addNumericField("xstartCoarse:", 0, 0);
 		gd.addNumericField("ystartCoarse:", 0, 0);
-		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
+		
 		if(imp.getStackSize() > 1)
 			gd.addRadioButtonGroup("The way to apply grid(s) to a Stack",
 					applyChoices, 3, 1, applyTo);
-
+		
+		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
 		// to switch enable/disable for parameter input boxes
 		components = gd.getComponents();
 		enableFields();
@@ -335,9 +336,12 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		ystart = (int) gd.getNextNumber();
 		xstartCoarse = (int) gd.getNextNumber();
 		ystartCoarse = (int) gd.getNextNumber();
-		showGridSwitch = gd.getNextBoolean();
+
 		if(imp.getStackSize() > 1)
 			applyTo = gd.getNextRadioButton();
+		
+		showGridSwitch = gd.getNextBoolean();
+		
 		err = "";
 		IJ.showStatus(err);
 		
