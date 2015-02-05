@@ -94,13 +94,11 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		Overlay ol = imp.getOverlay();
 		
 		if(ol != null){
-			Roi[] elements = ol.toArray();
-			
-			for(Roi element : elements){
-				if(element.getName() != null &&
-						element.getName().startsWith("grid")){
-				ol.remove(element);
-				}
+			for(Roi element : ol.toArray()){
+				if(element != null && 
+						element.getName() != null &&
+						element.getName().startsWith("grid"))
+							ol.remove(element);
 			}
 		}
 	}
@@ -114,21 +112,13 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			if(ol == null)
 				ol = new Overlay();
 			
-			for(Roi roi : rois){
-				ol.add(roi);
-			}
-			
-			
-			//just for debugging
-			Roi[] olElements = ol.toArray();
-			for (Roi roi : olElements)
-				IJ.log(type + " " + roi.getName() + ": " + roi.getTypeAsString() + " at slice " + roi.getPosition());
-			/////////////////////
-			
+			for(Roi roi : rois)
+				if(roi != null)
+					ol.add(roi);
 			
 			imp.setOverlay(ol);
 		
-			IJ.log("Grid Overlaid");
+			//IJ.log("Grid Overlaid");
 		}
 	}
 
@@ -202,20 +192,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	//Drawing curve in this method is the potential problem.	
 	GeneralPath drawDoubleLattice() {
 		GeneralPath path = new GeneralPath();
-		
-		
-		IJ.log("xstart " + xstart);
-		IJ.log("ystart " + ystart);
-		IJ.log("xstartCoarse " + xstartCoarse);
-		IJ.log("ystartCoarse " + ystartCoarse);
-		IJ.log("tileWidth " + tileWidth);
-		IJ.log("tileHeight " + tileHeight);
-		
-		
-		float rad = 14;
-		float radkappa = (float) (rad * 0.5522847498); 
-		// ref https://www.java.net/node/660133
-		/*
+				
 		for (int i = 0; i < linesV; i++) {
 			float xoff = (float) (xstart + i * tileWidth);
 			path.moveTo(xoff, 0f); path.lineTo(xoff, height);
@@ -224,15 +201,23 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			float yoff = (float) (ystart + i * tileHeight);
 			path.moveTo(0f, yoff); path.lineTo(width, yoff);
 		}
-		*/
-		/*
+		
+		
+		float rad = 14;
+		int paiDivision = 12;  //to divide seme-circle into segment
+		int nPoints = paiDivision/2 * 3 + 1;
+		
+		Double radSeg = Math.PI /paiDivision;
+		Double[] circleX = new Double[nPoints];
+		Double[] circleY = new Double[nPoints];
+		
+		for(int i = 0; i < 19; i++){
+			circleX[i] = Math.cos(radSeg * (i + paiDivision/2));
+			circleY[i] = Math.sin(radSeg * (i + paiDivision/2));
+		}
+		
 		for (int h = 0; h < linesV; h++) {  //linesV for vertical lines
 			for (int v = 0; v < linesH; v++) { //linesH for horizontal lines
-			*/
-		IJ.log("drow DoubleLattice");
-		
-		for (int h = 0; h < 1; h++) {  //linesV for vertical lines
-			for (int v = 0; v < 1; v++) { //linesH for horizontal lines
 				
 				if ((h % coarseGridX == 0) && (v % coarseGridY == 0)) {
 					float centerX = 
@@ -241,16 +226,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 							(float) (ystart + ystartCoarse * tileHeight + v * tileHeight);
 					
 					// drawing curve for coarse grid
-					path.moveTo(centerX, centerY - rad);
-					
-					IJ.log("center " + centerX);
-					IJ.log("centerY " + centerY);
-					IJ.log("rad " + rad);
-					IJ.log("radkappa " + radkappa +"\n");
-					
-					path.curveTo(centerX - radkappa, centerY - rad, centerX - rad, centerY - radkappa, centerX - rad, centerY);
-					//path.curveTo(centerX - rad, centerY + radkappa, centerX - radkappa, centerY + rad, centerX, centerY + rad);
-					//path.curveTo(centerX + radkappa, centerY + rad, centerX + rad, centerY + radkappa, centerX + rad, centerY);
+					path.moveTo(centerX + rad * circleX[0], centerY - rad * circleY[0]);
+					for(int i = 0; i < nPoints; i++){
+						path.lineTo(centerX + rad * circleX[i], centerY - rad * circleY[i]);
+					}
 				}
 			}
 		}
@@ -425,7 +404,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 		showGrid(gridRoiArray);
 		
-		IJ.log("showGrid Done");
+		//IJ.log("showGrid Done");
 		return true;
 	}
 	
@@ -697,7 +676,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 		if(parameters != null){
 			for(String str : parameters)
-				gridHistoryWindow.append(str);
+				if(str != null)
+					gridHistoryWindow.append(str);
 			
 			//auto save the parameters into a file whose name is String fileName
 			TextPanel tp = gridHistoryWindow.getTextPanel();
