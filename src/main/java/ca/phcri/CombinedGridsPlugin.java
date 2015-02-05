@@ -52,7 +52,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private String radiochoice = radiobuttons[RANDOM];
 	private final static String[] applyChoices = 
 		{ "One Grid for All Slices", "Different Grids for Each Slice", 
-		"One Grid for Current Slice"};
+		"One Grid for the Current Slice"};
 	private final static int ONEforALL = 0, DIFFERENTforEACH = 1, CURRENT = 2;
 	private static String applyTo = applyChoices[DIFFERENTforEACH];
 	
