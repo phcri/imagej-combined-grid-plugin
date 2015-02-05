@@ -118,9 +118,12 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				ol.add(roi);
 			}
 			
+			
+			//just for debugging
 			Roi[] olElements = ol.toArray();
 			for (Roi roi : olElements)
 				IJ.log(type + " " + roi.getName() + ": " + roi.getTypeAsString() + " at slice " + roi.getPosition());
+			/////////////////////
 			
 			
 			imp.setOverlay(ol);
@@ -381,7 +384,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				
 				
 				ShapeRoi gridRoi = getGridRoi();
-				addGridOnSlice(gridRoi, i);
+				addGridOnArray(gridRoi, i);
 				saveGridParameters(i);
 			}
 		} else {
@@ -397,7 +400,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			if(applyChoices[ONEforALL].equals(applyTo)){
 				int totalSlices = imp.getStackSize();
 				for(int i = 1; i <= totalSlices; i++){
-					addGridOnSlice(gridRoi, i);
+					addGridOnArray(gridRoi, i);
 					saveGridParameters(i);
 				}
 
@@ -406,7 +409,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			
 			if(applyChoices[CURRENT].equals(applyTo)){
 				int currentSlice = imp.getCurrentSlice();
-				addGridOnSlice(gridRoi, currentSlice);
+				addGridOnArray(gridRoi, currentSlice);
 				saveGridParameters(currentSlice);
 			}
 		}
@@ -418,7 +421,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	}
 	
 	
-	void addGridOnSlice(ShapeRoi gridRoi, int sliceIndex){
+	void addGridOnArray(ShapeRoi gridRoi, int sliceIndex){
 		ShapeRoi sliceGridRoi = (ShapeRoi) gridRoi.clone();
 		sliceGridRoi.setName("grid" + sliceIndex);
 		sliceGridRoi.setPosition(sliceIndex);
@@ -426,19 +429,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		gridRoiArray[sliceIndex - 1] = sliceGridRoi;
 	}
 	
-	/*
-	void gridRoisListReset() {
-		gridRoisList = new ArrayList<Roi>();
-		Overlay ol = imp.getOverlay();
-		if(ol != null){
-			for(Roi roi : ol.toArray()){
-				String roiName = roi.getName();
-				if(roiName != null && roiName.startsWith("grid"))
-					gridRoisList.add(roi);
-				}
-		}
-	}
-	*/
 	
 	// if areaPerPoint is not too small, show an error
 	void minAreaCheck(){
