@@ -202,7 +202,16 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	//Drawing curve in this method is the potential problem.	
 	GeneralPath drawDoubleLattice() {
 		GeneralPath path = new GeneralPath();
-
+		
+		
+		IJ.log("xstart " + xstart);
+		IJ.log("ystart " + ystart);
+		IJ.log("xstartCoarse " + xstartCoarse);
+		IJ.log("ystartCoarse " + ystartCoarse);
+		IJ.log("tileWidth " + tileWidth);
+		IJ.log("tileHeight " + tileHeight);
+		
+		
 		float rad = 14;
 		float radkappa = (float) (rad * 0.5522847498); 
 		// ref https://www.java.net/node/660133
