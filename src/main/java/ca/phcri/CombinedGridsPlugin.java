@@ -75,8 +75,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private double pixelWidth = 1.0, pixelHeight = 1.0;
 	private String units;
 	private String err = "";
-	//private ArrayList<Roi> gridRoisList;
-	//private ArrayList<String> gridParametersList;
 	private Roi[] gridRoiArray;
 	private String[] gridParameterArray;
 	private int totalSlice;
@@ -117,8 +115,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					ol.add(roi);
 			
 			imp.setOverlay(ol);
-		
-			//IJ.log("Grid Overlaid");
+
 		}
 	}
 
@@ -204,7 +201,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 		
 		float rad = 14;
-		int paiDivision = 12;  //to divide seme-circle into segment
+		int paiDivision = 12;  //to divide seme-circle into segments
 		int nPoints = paiDivision/2 * 3 + 1;
 		
 		Double radSeg = Math.PI /paiDivision;
@@ -348,9 +345,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 		gridParameterArray = new String[totalSlice];
 		gridRoiArray = new Roi[totalSlice];
-		
-		//gridRoisListReset();
-		
+				
 		minAreaCheck();
 		enableFields();
 		setCoarseGrids();
@@ -404,7 +399,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 		showGrid(gridRoiArray);
 		
-		//IJ.log("showGrid Done");
 		return true;
 	}
 	
