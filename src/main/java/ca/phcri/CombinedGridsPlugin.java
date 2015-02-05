@@ -224,9 +224,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					
 					// drawing curve for coarse grid
 					path.moveTo(centerX + rad * circleX[0], centerY - rad * circleY[0]);
-					for(int i = 0; i < nPoints; i++){
+					for(int i = 0; i < nPoints; i++)
 						path.lineTo(centerX + rad * circleX[i], centerY - rad * circleY[i]);
-					}
 				}
 			}
 		}
@@ -253,8 +252,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 	GeneralPath drawHorizontalLines() {
 		GeneralPath path = new GeneralPath();
-
-//		
+		
 		for (int i = 0; i < linesH; i++) {
 			float yoff = (float) (ystart + i * tileHeight);
 			path.moveTo(0f, yoff);
@@ -313,7 +311,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			showGrid(null);
 		if (gd.wasOKed()) {
 			if ("".equals(err)) {
-				showGridParameters();
+				showHistory(gridParameterArray);
 				if (showGridSwitch && !gridSwitchExist()){
 					Grid_Switch gs = new Grid_Switch();
 					gs.gridSwitch();
@@ -365,7 +363,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					return true;
 				}
 				
-				
 				ShapeRoi gridRoi = getGridRoi();
 				addGridOnArray(gridRoi, i);
 				saveGridParameters(i);
@@ -386,8 +383,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					addGridOnArray(gridRoi, i);
 					saveGridParameters(i);
 				}
-
-
 			}
 			
 			if(applyChoices[CURRENT].equals(applyTo)){
@@ -623,10 +618,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		// Excel.
 		
 		gridParameterArray[sliceNumber - 1] = gridParameters;
-	}
-	
-	void showGridParameters(){
-		showHistory(gridParameterArray);
 	}
 	
 	
