@@ -78,6 +78,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private Roi[] gridRoiArray;
 	private String[] gridParameterArray;
 	private int totalSlices;
+	final static String historyWindowTitle = "Grid History";
+	final static String textfileName = "CombinedGridsHistory.txt";
 
 	@Override
 	public void run(String arg) {
@@ -637,28 +639,24 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	
 	
 	static void showHistory(String[] parameters) {
-		String windowTitle = "Grid History";
-			//ShowParameterWindow.java uses String "Grid History" without 
-			//referring to this windowTitle variable,
-			//so be careful to change the title this window. 
-		String fileName = "CombinedGridsHistory.txt";
 		
-		TextWindow gridHistoryWindow = (TextWindow) WindowManager.getWindow(windowTitle);
+		TextWindow gridHistoryWindow = 
+				(TextWindow) WindowManager.getWindow(historyWindowTitle);
 		
 		if (gridHistoryWindow == null) {
-			//make a new empty TextWindow with String windowTitle with headings
+			//make a new empty TextWindow with String historyWindowTitle with headings
 			gridHistoryWindow = new TextWindow(
-					windowTitle,
+					historyWindowTitle,
 					"Date \t Image \t Slice \t Grid Type \t Area per Point \t Unit "
 					+ "\t Ratio \t Color \t Location Setting "
 					+ "\t xstart \t ystart \t xstartCoarse \t ystartCoarse",
 					"", 1028, 250);
 			
-			//If a file whose name is String fileName exists in the plugin folder, 
+			//If a file whose name is String textfileName exists in the plugin folder, 
 			//read it into the list.
 			try {
 				BufferedReader br = new BufferedReader(
-						new FileReader(IJ.getDirectory("plugins") + fileName)
+						new FileReader(IJ.getDirectory("plugins") + textfileName)
 						);
 				boolean isHeadings = true;
 				while (true) {
@@ -682,9 +680,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				if(str != null)
 					gridHistoryWindow.append(df.format(date) + "\t" + str);
 			
-			//auto save the parameters into a file whose name is String fileName
+			//auto save the parameters into a file whose name is String textfileName
 			TextPanel tp = gridHistoryWindow.getTextPanel();
-			tp.saveAs(IJ.getDirectory("plugins") + fileName);	
+			tp.saveAs(IJ.getDirectory("plugins") + textfileName);	
 		}
 	}
 	
