@@ -611,18 +611,20 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			gridRatio = null;
 		}
 
-		DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Date date = new Date();
+		
 		
 		String sliceStr;
+		int index;
 		
 		if(sliceNumber == 0){
 			sliceStr = "All";
-			sliceNumber = 1; // to input parameters into gridParameterArray
-		} else
+			index = 0; // to input parameters into gridParameterArray
+		} else{
 			sliceStr = "" + sliceNumber;
+			index = sliceNumber - 1;
+		}
 		
-		String gridParameters = df.format(date) + "\t" + imp.getTitle() + "\t" + 
+		String gridParameters = imp.getTitle() + "\t" + 
 				sliceStr + "\t" + type + "\t" + areaPerPoint + "\t" + units + "^2" +
 				"\t" + singleQuart + gridRatio + "\t" + color + "\t" + radiochoice
 				+ "\t" + xStartOutput + "\t" + ystart + "\t"
@@ -630,7 +632,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		// singleQuart before gridRatio is to prevent conversion to date in
 		// Excel.
 		
-		gridParameterArray[sliceNumber - 1] = gridParameters;
+		gridParameterArray[index] = gridParameters;
 	}
 	
 	
@@ -673,9 +675,12 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 		
 		if(parameters != null){
+			DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			Date date = new Date();
+			
 			for(String str : parameters)
 				if(str != null)
-					gridHistoryWindow.append(str);
+					gridHistoryWindow.append(df.format(date) + "\t" + str);
 			
 			//auto save the parameters into a file whose name is String fileName
 			TextPanel tp = gridHistoryWindow.getTextPanel();
