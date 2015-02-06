@@ -63,21 +63,21 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static int[] parameterFieldsOff = { 10, 11, 12, 13, 14, 15, 16, 17 };
 	private final static int[] xstartField = { 10, 11 };
 	private final static int[] ystartField = { 12, 13 };
-	private static boolean showGridSwitch = true;
+	protected static boolean showGridSwitch = true;
 
 	private Random random = new Random(System.currentTimeMillis());
-	private ImagePlus imp;
-	private double tileWidth, tileHeight;
-	private int width, height;
-	private int xstart, ystart;
+	protected ImagePlus imp;
+	protected double tileWidth, tileHeight;
+	protected int width, height;
+	protected int xstart, ystart;
 	private int xstartCoarse, ystartCoarse, coarseGridX, coarseGridY;
-	private int linesV, linesH;
+	protected int linesV, linesH;
 	private double pixelWidth = 1.0, pixelHeight = 1.0;
-	private String units;
-	private String err = "";
-	private Roi[] gridRoiArray;
-	private String[] gridParameterArray;
-	private int totalSlices;
+	protected String units;
+	protected String err = "";
+	protected Roi[] gridRoiArray;
+	protected String[] gridParameterArray;
+	protected int totalSlices;
 	final static String historyWindowTitle = "Grid History";
 	final static String textfileName = "CombinedGridsHistory.txt";
 
@@ -359,6 +359,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		if(applyChoices[DIFFERENTforEACH].equals(applyTo)){
 			for (int i = 1; i <= totalSlices; i++){
 				calculateFirstGrid();
+				calculateNLines();
 				
 				if(gd.invalidNumber()) return true;
 				
@@ -373,6 +374,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			}
 		} else {
 			calculateFirstGrid();
+			calculateNLines();
 		
 			if (!"".equals(err) || gd.invalidNumber()) {
 				IJ.showStatus(err);
@@ -537,7 +539,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				}
 			} 
 		}
-		
+	}
+	
+	void calculateNLines() {	
 		// calculating number of vertical and horizontal lines in a selected image
 		linesV = (int) ((width  - xstart) / tileWidth) + 1;
 		linesH = (int) ((height - ystart) / tileHeight) + 1;
