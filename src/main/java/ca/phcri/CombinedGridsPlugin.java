@@ -39,13 +39,13 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		{ "Combined Point", "Double Lattice", "Lines", "Horizontal Lines", 
 		"Crosses", "Points" };
 	
-	private static String type = types[COMBINED];
-	private static double areaPerPoint;
+	protected static String type = types[COMBINED];
+	protected static double areaPerPoint;
 
 	private final static int ONE_TO_FOUR = 0, ONE_TO_NINE = 1, ONE_TO_SIXTEEN = 2, 
 			ONE_TO_TWENTYFIVE = 3, ONE_TO_THIRTYSIX = 4;
 	private final static String[] ratioChoices = { "1:4", "1:9", "1:16", "1:25", "1:36" };
-	private static String gridRatio = ratioChoices[ONE_TO_FOUR];
+	protected static String gridRatio = ratioChoices[ONE_TO_FOUR];
 	private final static String[] radiobuttons = 
 		{ "Random Offset", "Fixed Position", "Manual Input" };
 	private final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
@@ -70,9 +70,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	protected double tileWidth, tileHeight;
 	protected int width, height;
 	protected int xstart, ystart;
-	private int xstartCoarse, ystartCoarse, coarseGridX, coarseGridY;
+	protected int xstartCoarse, ystartCoarse, coarseGridX, coarseGridY;
 	protected int linesV, linesH;
-	private double pixelWidth = 1.0, pixelHeight = 1.0;
+	protected double pixelWidth = 1.0, pixelHeight = 1.0;
 	protected String units;
 	protected String err = "";
 	protected Roi[] gridRoiArray;
