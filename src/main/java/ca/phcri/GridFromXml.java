@@ -21,13 +21,13 @@ import ij.measure.Calibration;
 
 public class GridFromXml extends CombinedGridsPlugin {
 	int[] xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray, sliceNoArray;
-	private String imageName, gridDate;
+	private String imageName;
 	private Element gridNode;
 	
 	private String unitsXml;
 	private int totalGridNo;
 	String filePath;
-	private boolean goBack;
+	private boolean goBack = false;
 	
 	
 	@Override
@@ -37,9 +37,12 @@ public class GridFromXml extends CombinedGridsPlugin {
 		
 		xmlFileOpen();
 		if(filePath == null) return;
+		
 		xmlReader();
+		
 		imageCheck();
 		if(goBack) return;
+		
 		gridLayer();
 		
 		Grid_Switch gs = new Grid_Switch();
@@ -63,11 +66,11 @@ public class GridFromXml extends CombinedGridsPlugin {
 				NodeList gridNL = doc.getElementsByTagName("grid");
 				gridNode = (Element) gridNL.item(0);
 				
-				gridDate = gridNode.getAttribute("date");
+				gridNode.getAttribute("date");
 				imageName = getElementValueAsStr(gridNode, "image", 0);
 				type = getElementValueAsStr(gridNode, "type", 0);
-				areaPerPoint = getElementValueAsInteger(gridNode,  "app", 0);
-				unitsXml = getElementValueAsStr(gridNode, "units", 0);
+				areaPerPoint = getElementValueAsDouble(gridNode,  "app", 0);
+				unitsXml = getElementValueAsStr(gridNode, "unit", 0);
 				gridRatio = getElementValueAsStr(gridNode, "ratio", 0);
 				
 				NodeList sliceNL = gridNode.getElementsByTagName("slice");
@@ -81,7 +84,7 @@ public class GridFromXml extends CombinedGridsPlugin {
 				
 				for(int i = 0; i < sliceNL.getLength(); i++){
 					Element sliceNode = (Element) sliceNL.item(i);
-					String sliceNo = sliceNode.getAttribute("name");
+					String sliceNo = sliceNode.getAttribute("z");
 					if(!"All".equals(sliceNo))
 						sliceNoArray[i] = Integer.parseInt(sliceNo);
 					xstartArray[i] = getElementValueAsInteger(sliceNode, "xstart", 0);
@@ -113,12 +116,18 @@ public class GridFromXml extends CombinedGridsPlugin {
 		return Integer.parseInt(getElementValueAsStr(e, tag, index));
 	}
 	
+	double getElementValueAsDouble(Element e, String tag, int index){
+		return Double.parseDouble(getElementValueAsStr(e, tag, index));
+	}
+	
 	
 	void gridLayer(){		
 		gridRoiArray = new Roi[totalGridNo];
 		
 		setCoarseGrids();
 		calculateTile();
+		
+		locationChoice = "Manual Input";
 		
 		for(int i = 0; i < totalGridNo; i++){
 			xstart = xstartArray[i];
@@ -154,8 +163,10 @@ public class GridFromXml extends CombinedGridsPlugin {
 	}
 	
 	void imageCheck(){
-		if(!imp.getTitle().equals(imageName))
+		if(!imp.getTitle().equals(imageName) &&
+				!imp.getTitle().equals("Counter Window - " + imageName))
 			err += "The image name does not match with the current image\n";
+				
 		if(!units.equals(unitsXml))
 			err += "units of the image does not match with "
 					+ "the units of the current image\n";
@@ -163,12 +174,14 @@ public class GridFromXml extends CombinedGridsPlugin {
 		if(!"".equals(err)){
 			GenericDialog wd = new GenericDialog("Warning");
 			wd.addMessage(err);
-			wd.addMessage("Do you want to continue?");
+			wd.addMessage("Do you want to put grids anyway?");
+			wd.showDialog();
 			if(wd.wasOKed())
 				goBack = false;
 			else
 				goBack = true;
-		}
+		} else
+			goBack = false;
 	}
 	
 }

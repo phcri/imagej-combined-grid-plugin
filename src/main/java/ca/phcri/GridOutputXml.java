@@ -101,7 +101,7 @@ public class GridOutputXml {
 			
 			for(int i = 0; i < totalSlice; i++){
 				Element sliceEl = doc.createElement("slice");
-				sliceEl.setAttribute("slice", sliceNoArray[i]);
+				sliceEl.setAttribute("z", sliceNoArray[i]);
 				gridEl.appendChild(sliceEl);
 				
 				for(int j = 0; j < 4; j++){
@@ -124,7 +124,7 @@ public class GridOutputXml {
 	}
 	
 	
-	void save(){
+	boolean save(){
 		Transformer tf;
 		try {
 			tf = TransformerFactory.newInstance().newTransformer();
@@ -138,7 +138,7 @@ public class GridOutputXml {
 			String outputFileName = sd.getFileName();
 			
 			if(outputFileName == null)
-				return;
+				return false;
 			
 			StreamResult result = new StreamResult(new File(directory + outputFileName));
 			tf.transform(source, result);
@@ -154,7 +154,7 @@ public class GridOutputXml {
 			exc.printStackTrace();
 		}
 		
-		
+		return true;
 	}
 	
 }

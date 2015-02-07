@@ -49,7 +49,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static String[] radiobuttons = 
 		{ "Random Offset", "Fixed Position", "Manual Input" };
 	private final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
-	private String locationChoice = radiobuttons[RANDOM];
+	protected String locationChoice = radiobuttons[RANDOM];
 	private final static String[] applyChoices = 
 		{ "One Grid for All Slices", "Different Grids for Each Slice", 
 		"One Grid for the Current Slice"};
@@ -322,18 +322,27 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		if (gd.wasOKed()) {
 			if ("".equals(err)) {
 				date = new Date();
-				showHistory(gridParameterArray);
-				if (showGridSwitch && !gridSwitchExist()){
-					Grid_Switch gs = new Grid_Switch();
-					gs.gridSwitch();
-				}
+				
 				if(saveXml) {
 					GridOutputXml gox = 
 							new GridOutputXml(df.format(date), gridParameterArray);
-					gox.save();
+					boolean saved = gox.save();
+					if(!saved)
+						showGrid(null);
+					else{
+						showHistory(gridParameterArray);
+						if (showGridSwitch && !gridSwitchExist()){
+							Grid_Switch gs = new Grid_Switch();
+							gs.gridSwitch();
+						}	
+					}
+				} else{
+					showHistory(gridParameterArray);
+					if (showGridSwitch && !gridSwitchExist()){
+						Grid_Switch gs = new Grid_Switch();
+						gs.gridSwitch();
+					}	
 				} 
-				
-					
 			} else {
 				IJ.error("Grid", err);
 				showGrid(null);
