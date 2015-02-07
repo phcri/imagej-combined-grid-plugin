@@ -2,6 +2,7 @@ package ca.phcri;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,7 +23,6 @@ import ij.measure.Calibration;
 public class GridFromXml extends CombinedGridsPlugin {
 	int[] xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray, sliceNoArray;
 	private String imageName;
-	private Element gridNode;
 	
 	private String unitsXml;
 	private int totalGridNo;
@@ -34,11 +34,21 @@ public class GridFromXml extends CombinedGridsPlugin {
 	public void run(String arg) {
 		if (IJ.versionLessThan("1.47")) return;
 		imageInformation();
+		err = "";
 		
 		xmlFileOpen();
 		if(filePath == null) return;
+		if(!"".equals(err)){
+			IJ.error(err);
+			return;
+		}
 		
 		xmlReader();
+		
+		if(!"".equals(err)){
+			IJ.error(err);
+			return;
+		}
 		
 		imageCheck();
 		if(goBack) return;
@@ -47,7 +57,9 @@ public class GridFromXml extends CombinedGridsPlugin {
 		
 		Grid_Switch gs = new Grid_Switch();
 		gs.gridSwitch();
-		showHistory(null);
+		
+		date = new Date();
+		showHistory(gridParameterArray);
 	}
 	
 	void xmlReader(){
@@ -61,19 +73,21 @@ public class GridFromXml extends CombinedGridsPlugin {
 			
 			Document doc = builder.parse(new File(filePath));
 			NodeList combinedgridNL = doc.getElementsByTagName("CombinedGrid");
-			
-			if(combinedgridNL != null){
-				NodeList gridNL = doc.getElementsByTagName("grid");
-				gridNode = (Element) gridNL.item(0);
+			Element combinedgridEl = (Element) combinedgridNL.item(0);
+					
+			if(combinedgridEl == null){
+				err += "This file does not have information for grids";
+			}else{
+				NodeList gridNL = combinedgridEl.getElementsByTagName("grid");
+				Element gridEl = (Element) gridNL.item(0);
+				gridEl.getAttribute("date");
+				imageName = getElementValueAsStr(gridEl, "image", 0);
+				type = getElementValueAsStr(gridEl, "type", 0);
+				areaPerPoint = getElementValueAsDouble(gridEl,  "app", 0);
+				unitsXml = getElementValueAsStr(gridEl, "unit", 0);
+				gridRatio = getElementValueAsStr(gridEl, "ratio", 0);
 				
-				gridNode.getAttribute("date");
-				imageName = getElementValueAsStr(gridNode, "image", 0);
-				type = getElementValueAsStr(gridNode, "type", 0);
-				areaPerPoint = getElementValueAsDouble(gridNode,  "app", 0);
-				unitsXml = getElementValueAsStr(gridNode, "unit", 0);
-				gridRatio = getElementValueAsStr(gridNode, "ratio", 0);
-				
-				NodeList sliceNL = gridNode.getElementsByTagName("slice");
+				NodeList sliceNL = gridEl.getElementsByTagName("slice");
 				totalGridNo = sliceNL.getLength();
 				
 				sliceNoArray = new int[totalGridNo];
@@ -123,6 +137,7 @@ public class GridFromXml extends CombinedGridsPlugin {
 	
 	void gridLayer(){		
 		gridRoiArray = new Roi[totalGridNo];
+		gridParameterArray = new String[totalGridNo];
 		
 		setCoarseGrids();
 		calculateTile();
@@ -140,6 +155,7 @@ public class GridFromXml extends CombinedGridsPlugin {
 			
 			ShapeRoi gridRoi = getGridRoi();
 			addGridOnArray(gridRoi, sliceNo);
+			saveGridParameters(i);
 		}
 		
 		showGrid(gridRoiArray);
@@ -149,6 +165,9 @@ public class GridFromXml extends CombinedGridsPlugin {
 		OpenDialog.setDefaultDirectory(IJ.getDirectory("plugins"));
 		OpenDialog od = new OpenDialog("Select XML file containing grid data");
 		filePath = od.getPath();
+		
+		if(!filePath.endsWith("xml"))
+			err += "This is not an XML file";
 	}
 	
 	
