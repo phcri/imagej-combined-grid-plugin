@@ -51,9 +51,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
 	protected String locationChoice = radiobuttons[RANDOM];
 	private final static String[] applyChoices = 
-		{ "One Grid for All Slices", "Different Grids for Each Slice", 
-		"One Grid for the Current Slice"};
-	private final static int ONEforALL = 0, DIFFERENTforEACH = 1, CURRENT = 2;
+		{ "One Grid for the Current Slice", "One Grid for All Slices", 
+		"Different Grids for Each Slice", "Systematically Randomly", };
+	private final static int CURRENT = 0, ONEforALL = 1, DIFFERENTforEACH = 2;
+	private final static int SYSTEMATIC = 3;
 	private static String applyTo = applyChoices[DIFFERENTforEACH];
 	
 	private static Component[] components; 
@@ -63,6 +64,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static int[] parameterFieldsOff = { 10, 11, 12, 13, 14, 15, 16, 17 };
 	private final static int[] xstartField = { 10, 11 };
 	private final static int[] ystartField = { 12, 13 };
+	private final static int[] intervalField = { 20, 21 };
 	protected static boolean showGridSwitch = true;
 	protected static String gridHistoryHeadings = 
 			"Date \t Image \t Slice \t Grid Type \t Area per Point \t Unit "
@@ -83,6 +85,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	protected String[] gridParameterArray;
 	protected int totalSlices;
 	protected boolean saveXml;
+	private int interval = 2;
 	final static String historyWindowTitle = "Grid History";
 	final static String textfileName = "CombinedGridsHistory.txt";
 	protected static DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -107,6 +110,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 						element.getName().startsWith("grid"))
 							ol.remove(element);
 			}
+			imp.setOverlay(ol);
 		}
 	}
 	
@@ -305,9 +309,11 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		gd.addNumericField("xstartCoarse:", 0, 0);
 		gd.addNumericField("ystartCoarse:", 0, 0);
 		
-		if(imp.getStackSize() > 1)
+		if(totalSlices > 1){
 			gd.addRadioButtonGroup("The way to apply grid(s) to a Stack",
-					applyChoices, 3, 1, applyTo);
+					applyChoices, 4, 1, applyTo);
+			gd.addNumericField("on every", interval, 0, 6, " slices");
+		}
 		gd.addCheckbox("Save parameters as a xml file", true);
 		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
 		// to switch enable/disable for parameter input boxes
@@ -363,8 +369,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		xstartCoarse = (int) gd.getNextNumber();
 		ystartCoarse = (int) gd.getNextNumber();
 
-		if(imp.getStackSize() > 1)
+		if(totalSlices > 1){
 			applyTo = gd.getNextRadioButton();
+			interval = (int) gd.getNextNumber();
+		}
 		saveXml = gd.getNextBoolean();
 		showGridSwitch = gd.getNextBoolean();
 		
@@ -379,13 +387,11 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		setCoarseGrids();
 		calculateTile();
 		
-
+		
 		if(applyChoices[DIFFERENTforEACH].equals(applyTo)){
 			for (int i = 1; i <= totalSlices; i++){
 				calculateFirstGrid();
 				calculateNLines();
-				
-				if(gd.invalidNumber()) return true;
 				
 				if (!"".equals(err) || gd.invalidNumber()) {
 					IJ.showStatus(err);
@@ -396,6 +402,30 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				addGridOnArray(gridRoi, i);
 				saveGridParameters(i);
 			}
+			
+		} else if(applyChoices[SYSTEMATIC].equals(applyTo)){
+			if(interval > totalSlices){
+				err += "Interval for systematic random sampling \n"
+						+ "should be greater than the stack size";
+				IJ.showStatus(err);
+				return true;
+			}
+			int startSlice = random.nextInt(interval) + 1;
+			
+			for(int i = startSlice; i <= totalSlices; i += interval){
+				calculateFirstGrid();
+				calculateNLines();
+				
+				if (!"".equals(err) || gd.invalidNumber()) {
+					IJ.showStatus(err);
+					return true;
+				}
+				
+				ShapeRoi gridRoi = getGridRoi();
+				addGridOnArray(gridRoi, i);
+				saveGridParameters(i);
+			}
+			
 		} else {
 			calculateFirstGrid();
 			calculateNLines();
@@ -490,6 +520,13 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			
 		} else 
 			fieldEnabler(parameterFieldsOff, false);
+		
+		if(totalSlices > 1){
+			if (applyChoices[SYSTEMATIC].equals(applyTo))
+				fieldEnabler(intervalField, true);
+			else
+				fieldEnabler(intervalField, false);
+		}
 	}
 	
 	void fieldEnabler(int[] fields, boolean show){
