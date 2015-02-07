@@ -22,7 +22,7 @@ import ij.measure.Calibration;
 public class GridFromXml extends CombinedGridsPlugin {
 	int[] xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray, sliceNoArray;
 	private String imageName, gridDate;
-	private Element imageNode;
+	private Element gridNode;
 	
 	private String unitsXml;
 	private int totalGridNo;
@@ -52,27 +52,25 @@ public class GridFromXml extends CombinedGridsPlugin {
 			
 		try {
 			//load common parameters
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
+			DocumentBuilder builder = DocumentBuilderFactory
+											.newInstance()
+											.newDocumentBuilder();
 			
 			Document doc = builder.parse(new File(filePath));
+			NodeList combinedgridNL = doc.getElementsByTagName("CombinedGrid");
 			
-			NodeList imageNodeList = doc.getElementsByTagName("image");
-			
-			
-			imageNode = (Element) imageNodeList.item(0);
-			imageName = imageNode.getAttribute("name");
-			gridDate = imageNode.getAttribute("date");
-			
-			
-			NodeList combinedgridNL = imageNode.getElementsByTagName("combinedgrid");
 			if(combinedgridNL != null){
-				type = getElementValueAsStr(imageNode, "type", 0);
-				areaPerPoint = getElementValueAsInteger(imageNode,  "app", 0);
-				unitsXml = getElementValueAsStr(imageNode, "units", 0);
-				gridRatio = getElementValueAsStr(imageNode, "ratio", 0);
+				NodeList gridNL = doc.getElementsByTagName("grid");
+				gridNode = (Element) gridNL.item(0);
 				
-				NodeList sliceNL = imageNode.getElementsByTagName("slice");
+				gridDate = gridNode.getAttribute("date");
+				imageName = getElementValueAsStr(gridNode, "image", 0);
+				type = getElementValueAsStr(gridNode, "type", 0);
+				areaPerPoint = getElementValueAsInteger(gridNode,  "app", 0);
+				unitsXml = getElementValueAsStr(gridNode, "units", 0);
+				gridRatio = getElementValueAsStr(gridNode, "ratio", 0);
+				
+				NodeList sliceNL = gridNode.getElementsByTagName("slice");
 				totalGridNo = sliceNL.getLength();
 				
 				sliceNoArray = new int[totalGridNo];
@@ -88,11 +86,12 @@ public class GridFromXml extends CombinedGridsPlugin {
 						sliceNoArray[i] = Integer.parseInt(sliceNo);
 					xstartArray[i] = getElementValueAsInteger(sliceNode, "xstart", 0);
 					ystartArray[i] = getElementValueAsInteger(sliceNode, "ystart", 0);
-					xstartCoarseArray[i] = getElementValueAsInteger(sliceNode, "xstartCoarse", 0);
-					ystartCoarseArray[i] = getElementValueAsInteger(sliceNode, "ystartCoarse", 0);
+					xstartCoarseArray[i] = 
+							getElementValueAsInteger(sliceNode, "xstartCoarse", 0);
+					ystartCoarseArray[i] = 
+							getElementValueAsInteger(sliceNode, "ystartCoarse", 0);
 				}
 			}
-			
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 		} catch (SAXException e) {
@@ -102,7 +101,6 @@ public class GridFromXml extends CombinedGridsPlugin {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	
 	
@@ -159,7 +157,8 @@ public class GridFromXml extends CombinedGridsPlugin {
 		if(!imp.getTitle().equals(imageName))
 			err += "The image name does not match with the current image\n";
 		if(!units.equals(unitsXml))
-			err += "units of the image does not match with the units of the current image\n";
+			err += "units of the image does not match with "
+					+ "the units of the current image\n";
 		
 		if(!"".equals(err)){
 			GenericDialog wd = new GenericDialog("Warning");

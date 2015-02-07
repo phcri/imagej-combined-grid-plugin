@@ -49,7 +49,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static String[] radiobuttons = 
 		{ "Random Offset", "Fixed Position", "Manual Input" };
 	private final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
-	private String radiochoice = radiobuttons[RANDOM];
+	private String locationChoice = radiobuttons[RANDOM];
 	private final static String[] applyChoices = 
 		{ "One Grid for All Slices", "Different Grids for Each Slice", 
 		"One Grid for the Current Slice"};
@@ -64,6 +64,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static int[] xstartField = { 10, 11 };
 	private final static int[] ystartField = { 12, 13 };
 	protected static boolean showGridSwitch = true;
+	protected static String gridHistoryHeadings = 
+			"Date \t Image \t Slice \t Grid Type \t Area per Point \t Unit "
+					+ "\t Ratio \t Color \t Location Setting "
+					+ "\t xstart \t ystart \t xstartCoarse \t ystartCoarse";
 
 	private Random random = new Random(System.currentTimeMillis());
 	protected ImagePlus imp;
@@ -80,6 +84,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	protected int totalSlices;
 	final static String historyWindowTitle = "Grid History";
 	final static String textfileName = "CombinedGridsHistory.txt";
+	protected static DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	protected static Date date;
 
 	@Override
 	public void run(String arg) {
@@ -292,7 +298,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		gd.addNumericField("Area per Point:", areaPerPoint, places, 6, units + "^2");
 		gd.addChoice("Ratio:", ratioChoices, gridRatio);
 		gd.addChoice("Color:", colors, color);
-		gd.addRadioButtonGroup("Grid Location", radiobuttons, 3, 1, radiochoice);
+		gd.addRadioButtonGroup("Grid Location", radiobuttons, 3, 1, locationChoice);
 		gd.addNumericField("xstart:", 0, 0);
 		gd.addNumericField("ystart:", 0, 0);
 		gd.addNumericField("xstartCoarse:", 0, 0);
@@ -314,6 +320,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			showGrid(null);
 		if (gd.wasOKed()) {
 			if ("".equals(err)) {
+				date = new Date();
 				showHistory(gridParameterArray);
 				if (showGridSwitch && !gridSwitchExist()){
 					Grid_Switch gs = new Grid_Switch();
@@ -333,7 +340,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		areaPerPoint = gd.getNextNumber();
 		gridRatio = gd.getNextChoice();
 		color = gd.getNextChoice();
-		radiochoice = gd.getNextRadioButton();
+		locationChoice = gd.getNextRadioButton();
 		xstart = (int) gd.getNextNumber();
 		ystart = (int) gd.getNextNumber();
 		xstartCoarse = (int) gd.getNextNumber();
@@ -449,7 +456,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			fieldEnabler(ratioField, false);
 		
 		
-		if (radiochoice.equals(radiobuttons[MANUAL])) {
+		if (locationChoice.equals(radiobuttons[MANUAL])) {
 			fieldEnabler(ystartField, true);
 
 			if (type.equals(types[HLINES]))
@@ -504,18 +511,18 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	
 	// decide the first point(s) depending on the way to place a grid
 	void calculateFirstGrid(){
-		if (radiochoice.equals(radiobuttons[RANDOM])) {
+		if (locationChoice.equals(radiobuttons[RANDOM])) {
 			xstart = (int) (random.nextDouble() * tileWidth);
 			ystart = (int) (random.nextDouble() * tileHeight);
 					// 0 <= random.nextDouble() < 1
 			xstartCoarse = random.nextInt(coarseGridX);
 			ystartCoarse = random.nextInt(coarseGridY);
-		} else if (radiochoice.equals(radiobuttons[FIXED])) {
+		} else if (locationChoice.equals(radiobuttons[FIXED])) {
 			xstart = (int) (tileWidth / 2.0 + 0.5);
 			ystart = (int) (tileHeight / 2.0 + 0.5);
 			xstartCoarse = 0;
 			ystartCoarse = 0;
-		} else if (radiochoice.equals(radiobuttons[MANUAL])) {
+		} else if (locationChoice.equals(radiobuttons[MANUAL])) {
 
 			if (type.equals(types[HLINES])) {
 				xstart = 0; // just to prevent an error
@@ -616,8 +623,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			singleQuart = "";
 			gridRatio = null;
 		}
-
-		
 		
 		String sliceStr;
 		int index;
@@ -632,7 +637,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 		String gridParameters = imp.getTitle() + "\t" + 
 				sliceStr + "\t" + type + "\t" + areaPerPoint + "\t" + units + "^2" +
-				"\t" + singleQuart + gridRatio + "\t" + color + "\t" + radiochoice
+				"\t" + singleQuart + gridRatio + "\t" + color + "\t" + locationChoice
 				+ "\t" + xStartOutput + "\t" + ystart + "\t"
 				+ xStartCoarseOutput + "\t" + yStartCoarseOutput;
 		// singleQuart before gridRatio is to prevent conversion to date in
@@ -642,7 +647,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	}
 	
 	
-	static void showHistory(String[] parameters) {
+	
+	static void showHistory(String[] parameterArray) {
 		
 		TextWindow gridHistoryWindow = 
 				(TextWindow) WindowManager.getWindow(historyWindowTitle);
@@ -651,9 +657,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			//make a new empty TextWindow with String historyWindowTitle with headings
 			gridHistoryWindow = new TextWindow(
 					historyWindowTitle,
-					"Date \t Image \t Slice \t Grid Type \t Area per Point \t Unit "
-					+ "\t Ratio \t Color \t Location Setting "
-					+ "\t xstart \t ystart \t xstartCoarse \t ystartCoarse",
+					gridHistoryHeadings ,
 					"", 1028, 250);
 			
 			//If a file whose name is String textfileName exists in the plugin folder, 
@@ -676,11 +680,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			} catch (IOException e) {}
 		}
 		
-		if(parameters != null){
-			DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			Date date = new Date();
-			
-			for(String str : parameters)
+		if(parameterArray != null){
+			 for(String str : parameterArray)
 				if(str != null)
 					gridHistoryWindow.append(df.format(date) + "\t" + str);
 			
