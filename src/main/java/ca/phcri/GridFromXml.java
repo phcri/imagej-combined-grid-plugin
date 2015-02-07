@@ -13,6 +13,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import ij.IJ;
+import ij.gui.GenericDialog;
 import ij.gui.Roi;
 import ij.gui.ShapeRoi;
 import ij.io.OpenDialog;
@@ -31,17 +32,14 @@ public class GridFromXml extends CombinedGridsPlugin {
 	
 	@Override
 	public void run(String arg) {
-		if (IJ.versionLessThan("1.47")) 
-			return;
+		if (IJ.versionLessThan("1.47")) return;
 		imageInformation();
 		
 		xmlFileOpen();
-		if(filePath == null)
-			return;
+		if(filePath == null) return;
 		xmlReader();
 		imageCheck();
-		if(goBack)
-			return;//filename, stacksize and units
+		if(goBack) return;
 		gridLayer();
 		
 		Grid_Switch gs = new Grid_Switch();
@@ -158,7 +156,20 @@ public class GridFromXml extends CombinedGridsPlugin {
 	}
 	
 	void imageCheck(){
-		goBack = false;
+		if(!imp.getTitle().equals(imageName))
+			err += "The image name does not match with the current image\n";
+		if(!units.equals(unitsXml))
+			err += "units of the image does not match with the units of the current image\n";
+		
+		if(!"".equals(err)){
+			GenericDialog wd = new GenericDialog("Warning");
+			wd.addMessage(err);
+			wd.addMessage("Do you want to continue?");
+			if(wd.wasOKed())
+				goBack = false;
+			else
+				goBack = true;
+		}
 	}
 	
 }
