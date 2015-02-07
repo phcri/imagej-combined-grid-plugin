@@ -52,7 +52,7 @@ public class GridOutputXml {
 		ystartCoarseArray = new String[totalSlice];
 		
 		for(int i = 0; i < totalSlice; i++){
-			String[] parameters = parameterArray[i].split("\t");
+			String[] parameters = parameterList.get(i).split("\t");
 			savedDate = parameters[0];
 			imageName = parameters[1];
 			sliceNoArray[i] = parameters[2];
@@ -138,9 +138,10 @@ public class GridOutputXml {
 			tf = TransformerFactory.newInstance().newTransformer();
 			
 			SaveDialog sd = 
-					new SaveDialog("Save parameters as XML file", 
-							directory, 
-							"grid_" + imageName + ".xml");
+					new SaveDialog("Save parameters as XML file"
+							, directory
+							, "grid_" + imageName + ".xml"
+							, ".xml");
 			
 			directory = sd.getDirectory();
 			String outputFileName = sd.getFileName();
