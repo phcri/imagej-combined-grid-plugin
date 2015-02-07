@@ -82,6 +82,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	protected Roi[] gridRoiArray;
 	protected String[] gridParameterArray;
 	protected int totalSlices;
+	protected boolean saveXml;
 	final static String historyWindowTitle = "Grid History";
 	final static String textfileName = "CombinedGridsHistory.txt";
 	protected static DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -307,7 +308,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		if(imp.getStackSize() > 1)
 			gd.addRadioButtonGroup("The way to apply grid(s) to a Stack",
 					applyChoices, 3, 1, applyTo);
-		
+		gd.addCheckbox("Save parameters as a xml file", true);
 		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
 		// to switch enable/disable for parameter input boxes
 		components = gd.getComponents();
@@ -326,6 +327,13 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					Grid_Switch gs = new Grid_Switch();
 					gs.gridSwitch();
 				}
+				if(saveXml) {
+					GridOutputXml gox = 
+							new GridOutputXml(df.format(date), gridParameterArray);
+					gox.save();
+				} 
+				
+					
 			} else {
 				IJ.error("Grid", err);
 				showGrid(null);
@@ -348,7 +356,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 		if(imp.getStackSize() > 1)
 			applyTo = gd.getNextRadioButton();
-		
+		saveXml = gd.getNextBoolean();
 		showGridSwitch = gd.getNextBoolean();
 		
 		err = "";

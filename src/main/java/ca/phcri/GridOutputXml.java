@@ -4,6 +4,7 @@ package ca.phcri;
 import java.io.File;
 
 import ij.IJ;
+import ij.io.SaveDialog;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -20,13 +21,31 @@ import org.w3c.dom.Element;
 
 
 public class GridOutputXml {
-	String[] xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray, sliceNoArray;
-	String imageName, date, type, units, gridRatio, color, areaPerPoint, location;
+	String[] xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray;
+	String[] sliceNoArray;
+	static String imageName;
+	static String date;
+	String type;
+	String units;
+	String gridRatio;
+	String color;
+	String areaPerPoint;
+	String location;
+	static String directory = IJ.getDirectory("plugins");
+	DOMSource source;
 	
 	GridOutputXml(String date, String[] parameterArray){
+		GridOutputXml.date = date;
+		
+		int totalSlice = parameterArray.length;
+		sliceNoArray = new String[totalSlice];
+		xstartArray = new String[totalSlice];
+		ystartArray = new String[totalSlice];
+		xstartCoarseArray = new String[totalSlice];
+		ystartCoarseArray = new String[totalSlice];
+		
 		for(int i = 0; i < parameterArray.length; i++){
 			String[] parameters = parameterArray[i].split("\t");
-			
 			imageName = parameters[0];
 			sliceNoArray[i] = parameters[1];
 			type = parameters[2];
@@ -40,11 +59,13 @@ public class GridOutputXml {
 			xstartCoarseArray[i] = parameters[10];
 			ystartCoarseArray[i] = parameters[11];
 		}
-		
+				
 		String prefixCellCounter = "Counter Window - ";
 		if(imageName.startsWith(prefixCellCounter))
 			imageName = imageName.substring(17);
-			
+		
+		units = units.substring(0, units.indexOf("^"));
+		
 		if(!"null".equals(gridRatio))
 			gridRatio = gridRatio.substring(1);
 		
@@ -69,38 +90,59 @@ public class GridOutputXml {
 			
 			for(int i = 0; i < elementName.length; i++){
 				Element el = doc.createElement(elementName[i]);
-				el.setNodeValue(input[i]);
+				el.appendChild(doc.createTextNode(input[i]));
 				gridEl.appendChild(el);
 			}
 			
-			String[] startName = {"xstart", "ystart", "xstartCoarse", "ystartCoarse"};
-			String[][] startInput 
-			= {xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray};
+			String[] startName = 
+				{"xstart", "ystart", "xstartCoarse", "ystartCoarse"};
+			String[][] startInput = 
+				{xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray};
 			
-			for(int i = 0; i < sliceNoArray.length; i++){
+			for(int i = 0; i < totalSlice; i++){
 				Element sliceEl = doc.createElement("slice");
 				sliceEl.setAttribute("slice", sliceNoArray[i]);
-				doc.appendChild(sliceEl);
+				gridEl.appendChild(sliceEl);
 				
-				for(int j = 0; i < 4; i++){
+				for(int j = 0; j < 4; j++){
 					Element el = doc.createElement(startName[j]);
-					el.setNodeValue(startInput[j][i]);
+					el.appendChild(doc.createTextNode(startInput[j][i]));
 					sliceEl.appendChild(el);
 				}
 			}
 			
 			
-			Transformer tf = TransformerFactory.newInstance().newTransformer();
-			DOMSource source = new DOMSource(doc);
-			String outputFile = "grid_" +imageName + "_" + date + ".xml";
-			StreamResult result = 
-					new StreamResult(new File(IJ.getDirectory("plugins") + outputFile));
-			
-			tf.transform(source, result);
+			source = new DOMSource(doc);
 			
 		} catch (ParserConfigurationException exc) {
 			// TODO Auto-generated catch block
 			exc.printStackTrace();
+		} catch (TransformerFactoryConfigurationError exc) {
+			// TODO Auto-generated catch block
+			exc.printStackTrace();
+		}
+	}
+	
+	
+	void save(){
+		Transformer tf;
+		try {
+			tf = TransformerFactory.newInstance().newTransformer();
+			
+			SaveDialog sd = 
+					new SaveDialog("Save parameters as XML file", 
+							directory, 
+							"grid_" + imageName + ".xml");
+			
+			directory = sd.getDirectory();
+			String outputFileName = sd.getFileName();
+			
+			if(outputFileName == null)
+				return;
+			
+			StreamResult result = new StreamResult(new File(directory + outputFileName));
+			tf.transform(source, result);
+			
 		} catch (TransformerConfigurationException exc) {
 			// TODO Auto-generated catch block
 			exc.printStackTrace();
@@ -111,6 +153,8 @@ public class GridOutputXml {
 			// TODO Auto-generated catch block
 			exc.printStackTrace();
 		}
+		
+		
 	}
 	
 }
