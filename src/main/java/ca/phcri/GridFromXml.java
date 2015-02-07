@@ -72,9 +72,9 @@ public class GridFromXml extends CombinedGridsPlugin {
 											.newDocumentBuilder();
 			
 			Document doc = builder.parse(new File(filePath));
-			NodeList combinedgridNL = doc.getElementsByTagName("CombinedGrid");
+			NodeList combinedgridNL = doc.getElementsByTagName("CombinedGrids");
 			Element combinedgridEl = (Element) combinedgridNL.item(0);
-					
+			
 			if(combinedgridEl == null){
 				err += "This file does not have information for grids";
 			}else{
