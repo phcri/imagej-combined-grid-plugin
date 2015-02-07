@@ -2,8 +2,10 @@ package ca.phcri;
 
 
 import java.io.File;
+import java.util.ArrayList;
 
 import ij.IJ;
+import ij.gui.Roi;
 import ij.io.SaveDialog;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,7 +26,7 @@ public class GridOutputXml {
 	String[] xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray;
 	String[] sliceNoArray;
 	static String imageName;
-	static String date;
+	String savedDate;
 	String type;
 	String units;
 	String gridRatio;
@@ -34,30 +36,36 @@ public class GridOutputXml {
 	static String directory = IJ.getDirectory("plugins");
 	DOMSource source;
 	
-	GridOutputXml(String date, String[] parameterArray){
-		GridOutputXml.date = date;
+	GridOutputXml(String[] parameterArray){
+		ArrayList<String> parameterList = new ArrayList<String>();
 		
-		int totalSlice = parameterArray.length;
+		for(String str : parameterArray){
+			if(str != null)
+				parameterList.add(str);
+		}
+				
+		int totalSlice = parameterList.size();
 		sliceNoArray = new String[totalSlice];
 		xstartArray = new String[totalSlice];
 		ystartArray = new String[totalSlice];
 		xstartCoarseArray = new String[totalSlice];
 		ystartCoarseArray = new String[totalSlice];
 		
-		for(int i = 0; i < parameterArray.length; i++){
+		for(int i = 0; i < totalSlice; i++){
 			String[] parameters = parameterArray[i].split("\t");
-			imageName = parameters[0];
-			sliceNoArray[i] = parameters[1];
-			type = parameters[2];
-			areaPerPoint = parameters[3];
-			units = parameters[4];
-			gridRatio = parameters[5];
-			color = parameters[6];
-			location = parameters[7]; 
-			xstartArray[i] = parameters[8];
-			ystartArray[i] = parameters[9];
-			xstartCoarseArray[i] = parameters[10];
-			ystartCoarseArray[i] = parameters[11];
+			savedDate = parameters[0];
+			imageName = parameters[1];
+			sliceNoArray[i] = parameters[2];
+			type = parameters[3];
+			areaPerPoint = parameters[4];
+			units = parameters[5];
+			gridRatio = parameters[6];
+			color = parameters[7];
+			location = parameters[8]; 
+			xstartArray[i] = parameters[9];
+			ystartArray[i] = parameters[10];
+			xstartCoarseArray[i] = parameters[11];
+			ystartCoarseArray[i] = parameters[12];
 		}
 				
 		String prefixCellCounter = "Counter Window - ";
@@ -80,7 +88,7 @@ public class GridOutputXml {
 			doc.appendChild(combinedgridEl);
 			
 			Element gridEl = doc.createElement("grid");
-			gridEl.setAttribute("date", date);
+			gridEl.setAttribute("date", savedDate);
 			combinedgridEl.appendChild(gridEl);
 			
 			String[] elementName =

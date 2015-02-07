@@ -321,11 +321,11 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			showGrid(null);
 		if (gd.wasOKed()) {
 			if ("".equals(err)) {
-				date = new Date();
+				
 				
 				if(saveXml) {
 					GridOutputXml gox = 
-							new GridOutputXml(df.format(date), gridParameterArray);
+							new GridOutputXml(gridParameterArray);
 					boolean saved = gox.save();
 					if(!saved)
 						showGrid(null);
@@ -651,8 +651,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			sliceStr = "" + sliceNumber;
 			index = sliceNumber - 1;
 		}
+		date = new Date();
 		
-		String gridParameters = imp.getTitle() + "\t" + 
+		String gridParameters = df.format(date) + "\t" + imp.getTitle() + "\t" + 
 				sliceStr + "\t" + type + "\t" + areaPerPoint + "\t" + units + "^2" +
 				"\t" + singleQuart + gridRatio + "\t" + color + "\t" + locationChoice
 				+ "\t" + xStartOutput + "\t" + ystart + "\t"
@@ -700,7 +701,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		if(parameterArray != null){
 			 for(String str : parameterArray)
 				if(str != null)
-					gridHistoryWindow.append(df.format(date) + "\t" + str);
+					gridHistoryWindow.append(str);
 			
 			//auto save the parameters into a file whose name is String textfileName
 			TextPanel tp = gridHistoryWindow.getTextPanel();

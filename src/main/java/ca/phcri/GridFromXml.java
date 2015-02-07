@@ -2,7 +2,6 @@ package ca.phcri;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -57,8 +56,7 @@ public class GridFromXml extends CombinedGridsPlugin {
 		
 		Grid_Switch gs = new Grid_Switch();
 		gs.gridSwitch();
-		
-		date = new Date();
+
 		showHistory(gridParameterArray);
 	}
 	
@@ -137,7 +135,7 @@ public class GridFromXml extends CombinedGridsPlugin {
 	
 	void gridLayer(){		
 		gridRoiArray = new Roi[totalGridNo];
-		gridParameterArray = new String[totalGridNo];
+		gridParameterArray = new String[imp.getStackSize()];
 		
 		setCoarseGrids();
 		calculateTile();
@@ -155,7 +153,7 @@ public class GridFromXml extends CombinedGridsPlugin {
 			
 			ShapeRoi gridRoi = getGridRoi();
 			addGridOnArray(gridRoi, sliceNo);
-			saveGridParameters(i);
+			saveGridParameters(sliceNo);
 		}
 		
 		showGrid(gridRoiArray);
