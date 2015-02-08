@@ -10,6 +10,7 @@ import ij.io.SaveDialog;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -20,6 +21,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 
 public class GridOutputXml {
@@ -34,7 +36,7 @@ public class GridOutputXml {
 	String areaPerPoint;
 	String location;
 	static String directory = IJ.getDirectory("plugins");
-	DOMSource source;
+	Document doc;
 	
 	GridOutputXml(String[] parameterArray){
 		ArrayList<String> parameterList = new ArrayList<String>();
@@ -79,7 +81,7 @@ public class GridOutputXml {
 		
 		
 		try {
-			Document doc = DocumentBuilderFactory
+			doc = DocumentBuilderFactory
 											.newInstance()
 											.newDocumentBuilder()
 											.newDocument();
@@ -119,9 +121,6 @@ public class GridOutputXml {
 				}
 			}
 			
-			
-			source = new DOMSource(doc);
-			
 		} catch (ParserConfigurationException exc) {
 			// TODO Auto-generated catch block
 			exc.printStackTrace();
@@ -135,7 +134,10 @@ public class GridOutputXml {
 	boolean save(){
 		Transformer tf;
 		try {
+			DOMSource source = new DOMSource(doc);
+			
 			tf = TransformerFactory.newInstance().newTransformer();
+			tf.setOutputProperty(OutputKeys.INDENT, "yes");
 			
 			SaveDialog sd = 
 					new SaveDialog("Save parameters as XML file"
