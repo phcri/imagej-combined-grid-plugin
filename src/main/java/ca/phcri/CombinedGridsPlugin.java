@@ -28,34 +28,34 @@ import java.io.IOException;
 
 
 public class CombinedGridsPlugin implements PlugIn, DialogListener {
-	private final static String[] colors = 
+	protected final static String[] colors = 
 		{ "Red", "Green", "Blue", "Magenta", "Cyan", "Yellow", "Orange", 
 		"Black", "White" };
-	private static String color = "Blue";
+	protected static String color = "Blue";
 	
-	private final static int COMBINED = 0, DOUBLE_LATTICE = 1, LINES = 2,
+	protected final static int COMBINED = 0, DOUBLE_LATTICE = 1, LINES = 2,
 			HLINES = 3, CROSSES = 4, POINTS = 5;
-	private final static String[] types = 
+	protected final static String[] types = 
 		{ "Combined Point", "Double Lattice", "Lines", "Horizontal Lines", 
 		"Crosses", "Points" };
 	
 	protected static String type = types[COMBINED];
 	protected static double areaPerPoint;
 
-	private final static int ONE_TO_FOUR = 0, ONE_TO_NINE = 1, ONE_TO_SIXTEEN = 2, 
+	protected final static int ONE_TO_FOUR = 0, ONE_TO_NINE = 1, ONE_TO_SIXTEEN = 2, 
 			ONE_TO_TWENTYFIVE = 3, ONE_TO_THIRTYSIX = 4;
-	private final static String[] ratioChoices = { "1:4", "1:9", "1:16", "1:25", "1:36" };
+	protected final static String[] ratioChoices = { "1:4", "1:9", "1:16", "1:25", "1:36" };
 	protected static String gridRatio = ratioChoices[ONE_TO_FOUR];
-	private final static String[] radiobuttons = 
+	protected final static String[] radiobuttons = 
 		{ "Random Offset", "Fixed Position", "Manual Input" };
-	private final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
+	protected final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
 	protected String locationChoice = radiobuttons[RANDOM];
-	private final static String[] applyChoices = 
+	protected final static String[] applyChoices = 
 		{ "One Grid for the Current Slice", "One Grid for All Slices", 
 		"Different Grids for Each Slice", "Systematically Randomly", };
-	private final static int CURRENT = 0, ONEforALL = 1, DIFFERENTforEACH = 2;
-	private final static int SYSTEMATIC = 3;
-	private static String applyTo = applyChoices[DIFFERENTforEACH];
+	protected final static int CURRENT = 0, ONEforALL = 1, 
+			DIFFERENTforEACH = 2, SYSTEMATIC = 3;
+	protected static String applyTo = applyChoices[DIFFERENTforEACH];
 	
 	private static Component[] components; 
 	// this is to select components in the dialog box
@@ -71,7 +71,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					+ "\t Ratio \t Color \t Location Setting "
 					+ "\t xstart \t ystart \t xstartCoarse \t ystartCoarse";
 
-	private Random random = new Random(System.currentTimeMillis());
+	protected Random random = new Random(System.currentTimeMillis());
 	protected ImagePlus imp;
 	protected double tileWidth, tileHeight;
 	protected int width, height;
@@ -84,10 +84,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	protected Roi[] gridRoiArray;
 	protected String[] gridParameterArray;
 	protected int totalSlices;
-	protected boolean saveXml;
-	private int interval = 2;
-	final static String historyWindowTitle = "Grid History";
-	final static String textfileName = "CombinedGridsHistory.txt";
+	protected static boolean saveXml;
+	protected static int interval = 2;
+	protected static String historyWindowTitle = "Grid History";
+	protected static String textfileName = "CombinedGridsHistory.txt";
 	protected static DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	protected static Date date;
 
