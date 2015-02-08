@@ -125,7 +125,10 @@ public class GridFromXml extends CombinedGridsPlugin {
 	
 	
 	int getElementValueAsInteger(Element e, String tag, int index){
-		return Integer.parseInt(getElementValueAsStr(e, tag, index));
+		String str = getElementValueAsStr(e, tag, index);
+		if("null".equals(str))
+			return 0;
+		return Integer.parseInt(str);
 	}
 	
 	double getElementValueAsDouble(Element e, String tag, int index){
