@@ -327,28 +327,19 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			showGrid(null);
 		if (gd.wasOKed()) {
 			if ("".equals(err)) {
+				showHistory(gridParameterArray);
 				
+				if (showGridSwitch && !gridSwitchExist()){
+					Grid_Switch gs = new Grid_Switch();
+					gs.gridSwitch();		
+				}
 				
 				if(saveXml) {
 					GridOutputXml gox = 
 							new GridOutputXml(gridParameterArray);
-					boolean saved = gox.save();
-					if(!saved)
-						showGrid(null);
-					else{
-						showHistory(gridParameterArray);
-						if (showGridSwitch && !gridSwitchExist()){
-							Grid_Switch gs = new Grid_Switch();
-							gs.gridSwitch();
-						}	
-					}
-				} else{
-					showHistory(gridParameterArray);
-					if (showGridSwitch && !gridSwitchExist()){
-						Grid_Switch gs = new Grid_Switch();
-						gs.gridSwitch();
-					}	
-				} 
+					gox.save();
+				}
+				
 			} else {
 				IJ.error("Grid", err);
 				showGrid(null);
