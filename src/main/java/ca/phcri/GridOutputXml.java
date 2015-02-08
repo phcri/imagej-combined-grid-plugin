@@ -82,9 +82,9 @@ public class GridOutputXml {
 		
 		try {
 			doc = DocumentBuilderFactory
-											.newInstance()
-											.newDocumentBuilder()
-											.newDocument();
+					.newInstance()
+					.newDocumentBuilder()
+					.newDocument();
 			doc.setXmlStandalone(true);
 			Element combinedgridEl = doc.createElement("CombinedGrids");
 			doc.appendChild(combinedgridEl);

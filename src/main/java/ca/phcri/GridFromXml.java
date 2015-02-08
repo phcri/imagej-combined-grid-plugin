@@ -65,9 +65,8 @@ public class GridFromXml extends CombinedGridsPlugin {
 			
 		try {
 			//load common parameters
-			DocumentBuilder builder = DocumentBuilderFactory
-											.newInstance()
-											.newDocumentBuilder();
+			DocumentBuilder builder = 
+					DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			
 			Document doc = builder.parse(new File(filePath));
 			NodeList combinedgridNL = doc.getElementsByTagName("CombinedGrids");
