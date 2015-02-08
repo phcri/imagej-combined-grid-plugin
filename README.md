@@ -13,7 +13,16 @@ Authors; Daisuke Kinose<SUP>[1]</SUP> and Adrian Png<SUP>[2]</SUP><BR>
 <SUP>[2]</SUP> IT department, the Centre for Heart Lung Innovation in St. Paul's Hospital, University of British Columbia, Canada<BR>
 </p>
 <p>
-Released on February 5th, 2015
+Released on February 7th, 2015
+</p>
+
+<p>
+	<H2>Update on February 7th, 2015</H2>
+	<ol>
+		<li>Out paramters in an XML file</li>
+		<li>Input and Overlay Grids from an XML file</li>
+		<li>Systematic Random Sampling of slices in a stack to overlay grids</li>
+	</ol>
 </p>
 
 <p>

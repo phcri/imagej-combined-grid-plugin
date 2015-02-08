@@ -134,7 +134,7 @@ public class GridFromXml extends CombinedGridsPlugin {
 	
 	
 	void gridLayer(){		
-		gridRoiArray = new Roi[totalGridNo];
+		gridRoiArray = new Roi[imp.getStackSize()];
 		gridParameterArray = new String[imp.getStackSize()];
 		
 		setCoarseGrids();

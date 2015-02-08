@@ -64,7 +64,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	private final static int[] parameterFieldsOff = { 10, 11, 12, 13, 14, 15, 16, 17 };
 	private final static int[] xstartField = { 10, 11 };
 	private final static int[] ystartField = { 12, 13 };
-	private final static int[] intervalField = { 20, 21 };
+	private final static int[] intervalField = { 21 };
 	protected static boolean showGridSwitch = true;
 	protected static String gridHistoryHeadings = 
 			"Date \t Image \t Slice \t Grid Type \t Area per Point \t Unit "
@@ -406,10 +406,18 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		} else if(applyChoices[SYSTEMATIC].equals(applyTo)){
 			if(interval > totalSlices){
 				err += "Interval for systematic random sampling \n"
-						+ "should be greater than the stack size";
+						+ "should not be greater than the stack size";
 				IJ.showStatus(err);
 				return true;
 			}
+			
+			if(interval < 1){
+				err += "Interval for systematic random sampling \n"
+						+ "should be a positive integer";
+				IJ.showStatus(err);
+				return true;
+			}
+			
 			int startSlice = random.nextInt(interval) + 1;
 			
 			for(int i = startSlice; i <= totalSlices; i += interval){
