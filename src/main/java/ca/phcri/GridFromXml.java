@@ -21,12 +21,12 @@ import ij.measure.Calibration;
 
 public class GridFromXml extends CombinedGridsPlugin {
 	int[] xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray, sliceNoArray;
-	private String imageName;
+	String imageName;
 	
-	private String unitsXml;
-	private int totalGridNo;
+	String unitsXml;
+	int totalGridNo;
 	String filePath;
-	private boolean goBack = false;
+	boolean goBack = false;
 	
 	
 	@Override
@@ -81,8 +81,10 @@ public class GridFromXml extends CombinedGridsPlugin {
 				imageName = getElementValueAsStr(gridEl, "image", 0);
 				type = getElementValueAsStr(gridEl, "type", 0);
 				areaPerPoint = getElementValueAsDouble(gridEl,  "app", 0);
-				unitsXml = getElementValueAsStr(gridEl, "unit", 0);
 				gridRatio = getElementValueAsStr(gridEl, "ratio", 0);
+				unitsXml = getElementValueAsStr(gridEl, "unit", 0);
+				color = getElementValueAsStr(gridEl, "color", 0);
+				
 				
 				NodeList sliceNL = gridEl.getElementsByTagName("slice");
 				totalGridNo = sliceNL.getLength();

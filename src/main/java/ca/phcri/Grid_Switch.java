@@ -14,11 +14,11 @@ import ij.plugin.frame.PlugInFrame;
 
 
 public class Grid_Switch implements PlugIn, ActionListener, WindowListener {
-	private ImagePlus imp;
-	private boolean gridOn = false;
-	private Button b1;
-	private static Overlay ol;
-	private static Roi[] gridRois;
+	ImagePlus imp;
+	boolean gridOn = false;
+	Button b1;
+	static Overlay ol;
+	static Roi[] gridRois;
 	
 	@Override
 	public void run(String arg) {
