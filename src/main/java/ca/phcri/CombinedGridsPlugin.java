@@ -28,68 +28,68 @@ import java.io.IOException;
 
 
 public class CombinedGridsPlugin implements PlugIn, DialogListener {
-	protected final static String[] colors = 
+	final static String[] colors = 
 		{ "Red", "Green", "Blue", "Magenta", "Cyan", "Yellow", "Orange", 
 		"Black", "White" };
-	protected static String color = "Blue";
+	static String color = "Blue";
 	
-	protected final static int COMBINED = 0, DOUBLE_LATTICE = 1, LINES = 2,
+	final static int COMBINED = 0, DOUBLE_LATTICE = 1, LINES = 2,
 			HLINES = 3, CROSSES = 4, POINTS = 5;
-	protected final static String[] types = 
+	final static String[] types = 
 		{ "Combined Point", "Double Lattice", "Lines", "Horizontal Lines", 
 		"Crosses", "Points" };
 	
-	protected static String type = types[COMBINED];
-	protected static double areaPerPoint;
+	static String type = types[COMBINED];
+	static double areaPerPoint;
 
-	protected final static int ONE_TO_FOUR = 0, ONE_TO_NINE = 1, ONE_TO_SIXTEEN = 2, 
+	final static int ONE_TO_FOUR = 0, ONE_TO_NINE = 1, ONE_TO_SIXTEEN = 2, 
 			ONE_TO_TWENTYFIVE = 3, ONE_TO_THIRTYSIX = 4;
-	protected final static String[] ratioChoices = { "1:4", "1:9", "1:16", "1:25", "1:36" };
-	protected static String gridRatio = ratioChoices[ONE_TO_FOUR];
-	protected final static String[] radiobuttons = 
+	final static String[] ratioChoices = { "1:4", "1:9", "1:16", "1:25", "1:36" };
+	static String gridRatio = ratioChoices[ONE_TO_FOUR];
+	final static String[] radiobuttons = 
 		{ "Random Offset", "Fixed Position", "Manual Input" };
-	protected final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
-	protected String locationChoice = radiobuttons[RANDOM];
-	protected final static String[] applyChoices = 
+	final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
+	String locationChoice = radiobuttons[RANDOM];
+	final static String[] applyChoices = 
 		{ "One Grid for the Current Slice", "One Grid for All Slices", 
 		"Different Grids for Each Slice", "Systematically Randomly", };
-	protected final static int CURRENT = 0, ONEforALL = 1, 
+	final static int CURRENT = 0, ONEforALL = 1, 
 			DIFFERENTforEACH = 2, SYSTEMATIC = 3;
-	protected static String applyTo = applyChoices[DIFFERENTforEACH];
+	static String applyTo = applyChoices[DIFFERENTforEACH];
 	
-	private static Component[] components; 
+	static Component[] components; 
 	// this is to select components in the dialog box
-	private final static int[] ratioField = { 4, 5 };
-	private final static int[] combinedGridFields = { 14, 15, 16, 17 };
-	private final static int[] parameterFieldsOff = { 10, 11, 12, 13, 14, 15, 16, 17 };
-	private final static int[] xstartField = { 10, 11 };
-	private final static int[] ystartField = { 12, 13 };
-	private final static int[] intervalField = { 21 };
-	protected static boolean showGridSwitch = true;
-	protected static String gridHistoryHeadings = 
+	final static int[] ratioField = { 4, 5 };
+	final static int[] combinedGridFields = { 14, 15, 16, 17 };
+	final static int[] parameterFieldsOff = { 10, 11, 12, 13, 14, 15, 16, 17 };
+	final static int[] xstartField = { 10, 11 };
+	final static int[] ystartField = { 12, 13 };
+	final static int[] intervalField = { 21 };
+	static boolean showGridSwitch = true;
+	static String gridHistoryHeadings = 
 			"Date \t Image \t Slice \t Grid Type \t Area per Point \t Unit "
 					+ "\t Ratio \t Color \t Location Setting "
 					+ "\t xstart \t ystart \t xstartCoarse \t ystartCoarse";
 
-	protected Random random = new Random(System.currentTimeMillis());
-	protected ImagePlus imp;
-	protected double tileWidth, tileHeight;
-	protected int width, height;
-	protected int xstart, ystart;
-	protected int xstartCoarse, ystartCoarse, coarseGridX, coarseGridY;
-	protected int linesV, linesH;
-	protected double pixelWidth = 1.0, pixelHeight = 1.0;
-	protected String units;
-	protected String err = "";
-	protected Roi[] gridRoiArray;
-	protected String[] gridParameterArray;
-	protected int totalSlices;
-	protected static boolean saveXml;
-	protected static int interval = 2;
-	protected static String historyWindowTitle = "Grid History";
-	protected static String textfileName = "CombinedGridsHistory.txt";
-	protected static DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	protected static Date date;
+	Random random = new Random(System.currentTimeMillis());
+	ImagePlus imp;
+	double tileWidth, tileHeight;
+	int width, height;
+	int xstart, ystart;
+	int xstartCoarse, ystartCoarse, coarseGridX, coarseGridY;
+	int linesV, linesH;
+	double pixelWidth = 1.0, pixelHeight = 1.0;
+	String units;
+	String err = "";
+	Roi[] gridRoiArray;
+	String[] gridParameterArray;
+	int totalSlices;
+	static boolean saveXml;
+	static int interval = 2;
+	static String historyWindowTitle = "Grid History";
+	static String textfileName = "CombinedGridsHistory.txt";
+	static DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	static Date date;
 
 	@Override
 	public void run(String arg) {

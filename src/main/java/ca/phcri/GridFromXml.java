@@ -21,12 +21,12 @@ import ij.measure.Calibration;
 
 public class GridFromXml extends CombinedGridsPlugin {
 	int[] xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray, sliceNoArray;
-	private String imageName;
+	String imageName;
 	
-	private String unitsXml;
-	private int totalGridNo;
+	String unitsXml;
+	int totalGridNo;
 	String filePath;
-	private boolean goBack = false;
+	boolean goBack = false;
 	
 	
 	@Override
