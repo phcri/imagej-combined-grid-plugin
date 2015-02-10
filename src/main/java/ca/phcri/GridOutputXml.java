@@ -37,13 +37,13 @@ public class GridOutputXml {
 	String location;
 	static String directory = IJ.getDirectory("plugins");
 	Document doc;
-	private String marginLeft;
-	private String marginRight;
-	private String marginTop;
-	private String marginBottom;
-	private String prohibitedLineColor;
-	private String acceptanceLineColor;
-	private String acceptanceLineType;
+	String marginLeft;
+	String marginRight;
+	String marginTop;
+	String marginBottom;
+	String prohibitedLineColor;
+	String acceptanceLineColor;
+	String acceptanceLineType;
 	
 	GridOutputXml(String[] parameterArray){
 		ArrayList<String> parameterList = new ArrayList<String>();
@@ -75,13 +75,16 @@ public class GridOutputXml {
 			ystartArray[i] = parameters[10];
 			xstartCoarseArray[i] = parameters[11];
 			ystartCoarseArray[i] = parameters[12];
-			marginLeft = parameters[13];
-			marginRight = parameters[14];
-			marginTop = parameters[15];
-			marginBottom = parameters[16];
-			prohibitedLineColor = parameters[17];
-			acceptanceLineColor = parameters[18];
-			acceptanceLineType = parameters[19];
+			
+			if(parameters.length == 20){
+				marginLeft = parameters[13];
+				marginRight = parameters[14];
+				marginTop = parameters[15];
+				marginBottom = parameters[16];
+				prohibitedLineColor = parameters[17];
+				acceptanceLineColor = parameters[18];
+				acceptanceLineType = parameters[19];
+			}
 		}
 				
 		String prefixCellCounter = "Counter Window - ";
@@ -135,7 +138,8 @@ public class GridOutputXml {
 				}
 			}
 			
-			if(marginLeft != ""){
+			
+			if(marginLeft != null){
 				Element samplingFrameEl = doc.createElement("samplingFrame");
 				combinedgridEl.appendChild(samplingFrameEl);
 				
