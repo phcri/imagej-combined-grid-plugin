@@ -37,6 +37,13 @@ public class GridOutputXml {
 	String location;
 	static String directory = IJ.getDirectory("plugins");
 	Document doc;
+	private String marginLeft;
+	private String marginRight;
+	private String marginTop;
+	private String marginBottom;
+	private String prohibitedLineColor;
+	private String acceptanceLineColor;
+	private String acceptanceLineType;
 	
 	GridOutputXml(String[] parameterArray){
 		ArrayList<String> parameterList = new ArrayList<String>();
@@ -52,7 +59,7 @@ public class GridOutputXml {
 		ystartArray = new String[totalSlice];
 		xstartCoarseArray = new String[totalSlice];
 		ystartCoarseArray = new String[totalSlice];
-		
+			
 		for(int i = 0; i < totalSlice; i++){
 			String[] parameters = parameterList.get(i).split("\t");
 			savedDate = parameters[0];
@@ -68,6 +75,13 @@ public class GridOutputXml {
 			ystartArray[i] = parameters[10];
 			xstartCoarseArray[i] = parameters[11];
 			ystartCoarseArray[i] = parameters[12];
+			marginLeft = parameters[13];
+			marginRight = parameters[14];
+			marginTop = parameters[15];
+			marginBottom = parameters[16];
+			prohibitedLineColor = parameters[17];
+			acceptanceLineColor = parameters[18];
+			acceptanceLineType = parameters[19];
 		}
 				
 		String prefixCellCounter = "Counter Window - ";
@@ -93,14 +107,14 @@ public class GridOutputXml {
 			gridEl.setAttribute("date", savedDate);
 			combinedgridEl.appendChild(gridEl);
 			
-			String[] elementName =
+			String[] elementNameGridEl =
 				{"image", "type", "app", "ratio", "unit", "color", "location"};
-			String[] input =
+			String[] inputGridEl =
 				{imageName, type, areaPerPoint, gridRatio, units, color, location};
 			
-			for(int i = 0; i < elementName.length; i++){
-				Element el = doc.createElement(elementName[i]);
-				el.appendChild(doc.createTextNode(input[i]));
+			for(int i = 0; i < elementNameGridEl.length; i++){
+				Element el = doc.createElement(elementNameGridEl[i]);
+				el.appendChild(doc.createTextNode(inputGridEl[i]));
 				gridEl.appendChild(el);
 			}
 			
@@ -120,6 +134,24 @@ public class GridOutputXml {
 					sliceEl.appendChild(el);
 				}
 			}
+			
+			
+			Element samplingFrameEl = doc.createElement("samplingFrame");
+			combinedgridEl.appendChild(samplingFrameEl);
+			
+			String[] elementNameSamplingFrameEl = 
+				{"left", "right", "top", "bottom", "prohibitedColor", 
+					"acceptanceColor", "acceptanceType"};
+			String[] inputSamlingFrameEl =
+				{marginLeft, marginRight, marginTop, marginBottom, prohibitedLineColor,
+					acceptanceLineColor, acceptanceLineType};
+			
+			for(int i = 0; i < elementNameSamplingFrameEl.length; i++){
+				Element el = doc.createElement(elementNameSamplingFrameEl[i]);
+				el.appendChild(doc.createTextNode(inputSamlingFrameEl[i]));
+				samplingFrameEl.appendChild(el);
+			}
+			
 			
 		} catch (ParserConfigurationException exc) {
 			// TODO Auto-generated catch block
