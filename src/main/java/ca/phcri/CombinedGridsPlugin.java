@@ -324,33 +324,43 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 		if (gd.wasCanceled())
 			showGrid(null);
+		
+		
 		if (gd.wasOKed()) {
-			if ("".equals(err)) {
+			
+			if (!"".equals(err)) {
+				IJ.error("Grid", err);
+				showGrid(null);
 				
+			} else {
 				
 				if(saveXml) {
 					GridOutputXml gox = 
 							new GridOutputXml(gridParameterArray);
 					boolean saved = gox.save();
-					if(!saved)
-						showGrid(null);
-					else{
-						showHistory(gridParameterArray);
-						if (showGridSwitch && !gridSwitchExist()){
-							Grid_Switch gs = new Grid_Switch();
-							gs.gridSwitch();
-						}	
+					
+					if(!saved){
+						GenericDialog gdWantGrid = 
+								new GenericDialog("Do you want a grid?");
+						gdWantGrid.addMessage("Do you want to overlay a grid?");
+						gdWantGrid.enableYesNoCancel();
+						gdWantGrid.hideCancelButton();
+						gdWantGrid.showDialog();
+					
+						if(!gdWantGrid.wasOKed()){
+							showGrid(null);
+							return;
+						}
 					}
-				} else{
-					showHistory(gridParameterArray);
-					if (showGridSwitch && !gridSwitchExist()){
+				}
+				
+				showHistory(gridParameterArray);
+				
+				if (showGridSwitch && !gridSwitchExist()){
 						Grid_Switch gs = new Grid_Switch();
 						gs.gridSwitch();
-					}	
-				} 
-			} else {
-				IJ.error("Grid", err);
-				showGrid(null);
+				}
+				
 			}
 		}
 	}
