@@ -70,7 +70,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	static String gridHistoryHeadings = 
 			"Date \t Image \t Slice \t Grid Type \t Area per Point \t Unit "
 					+ "\t Ratio \t Color \t Location Setting "
-					+ "\t xstart \t ystart \t xstartCoarse \t ystartCoarse";
+					+ "\t xstart \t ystart \t xstartCoarse \t ystartCoarse "
+					+ "\t Left Margin \t Right Margin \t Top Margin \t Bottom Margin "
+					+ "\t prohibitedLineColor \t acceptanceLineColor"
+					+ " \t acceptanceLineType";
 
 	Random random = new Random(System.currentTimeMillis());
 	ImagePlus imp;
@@ -822,13 +825,27 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			sliceStr = "" + sliceNumber;
 			index = sliceNumber - 1;
 		}
+		
+		String frameParameters;
+		
+		if(samplingFrameOn){
+			frameParameters = marginLeft + "\t" + marginRight + "\t"  + marginTop +
+					"\t"  + marginBottom + "\t" + prohibitedLineColor  + "\t" +
+					acceptanceLineColor  + "\t" + acceptanceLineType;
+		
+		} else
+			frameParameters = "" + "\t" + "" + "\t"  + "" + "\t" + "" + "\t" + "" + "\t"
+					 + "" + "\t" + "";
+		
+		
 		date = new Date();
 		
 		String gridParameters = df.format(date) + "\t" + imp.getTitle() + "\t" + 
 				sliceStr + "\t" + type + "\t" + areaPerPoint + "\t" + units + "^2" +
 				"\t" + singleQuart + gridRatio + "\t" + color + "\t" + locationChoice
 				+ "\t" + xStartOutput + "\t" + ystart + "\t"
-				+ xStartCoarseOutput + "\t" + yStartCoarseOutput;
+				+ xStartCoarseOutput + "\t" + yStartCoarseOutput + "\t"
+				+ frameParameters;
 		// singleQuart before gridRatio is to prevent conversion to date in
 		// Excel.
 		
