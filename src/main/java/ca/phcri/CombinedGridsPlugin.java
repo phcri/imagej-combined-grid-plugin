@@ -32,6 +32,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		{ "Red", "Green", "Blue", "Magenta", "Cyan", "Yellow", "Orange", 
 		"Black", "White" };
 	static String color = "Blue";
+	static String acceptanceLineColor = "Green";
+	static String prohibitedLineColor = "Red";
 	
 	final static int COMBINED = 0, DOUBLE_LATTICE = 1, LINES = 2,
 			HLINES = 3, CROSSES = 4, POINTS = 5;
@@ -85,6 +87,15 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	int totalSlices;
 	boolean saveXml;
 	int interval = 2;
+	boolean samplingFrameOn = false;
+	double marginLeft;
+	double marginRight;
+	double marginTop;
+	double marginBottom;
+	String acceptanceLineType;
+	String[] lineTypes = {"Solid", "Dashed"};
+	int SOLID = 0, DASHED = 1;
+	
 	static String historyWindowTitle = "Grid History";
 	static String textfileName = "CombinedGridsHistory.txt";
 	static DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -313,8 +324,19 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					applyChoices, 4, 1, applyTo);
 			gd.addNumericField("on every", interval, 0, 6, " slices");
 		}
+		
+		gd.addCheckbox("Put sampling frame on the image", samplingFrameOn);
+		gd.addNumericField("Left", marginLeft, places, 6, units);
+		gd.addNumericField("Right", marginRight, places, 6, units);
+		gd.addNumericField("Top", marginTop, places, 6, units);
+		gd.addNumericField("Bottom", marginBottom, places, 6, units);
+		gd.addChoice("Prohibited Line Color:", colors, prohibitedLineColor);
+		gd.addChoice("Acceptance Line Color:", colors, acceptanceLineColor);
+		gd.addChoice("Acceptance Line Type:", lineTypes, acceptanceLineType);
+		
 		gd.addCheckbox("Save parameters as a xml file", true);
 		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
+		
 		// to switch enable/disable for parameter input boxes
 		components = gd.getComponents();
 		enableFields();
@@ -382,6 +404,16 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			applyTo = gd.getNextRadioButton();
 			interval = (int) gd.getNextNumber();
 		}
+		
+		samplingFrameOn = gd.getNextBoolean();
+		marginLeft = gd.getNextNumber();
+		marginRight = gd.getNextNumber();
+		marginTop = gd. getNextNumber();
+		marginBottom = gd.getNextNumber();
+		prohibitedLineColor = gd.getNextChoice();
+		acceptanceLineColor = gd.getNextChoice();
+		acceptanceLineType = gd.getNextChoice();
+		
 		saveXml = gd.getNextBoolean();
 		showGridSwitch = gd.getNextBoolean();
 		
@@ -468,10 +500,95 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 		showGrid(gridRoiArray);
 		
+		showSamplingFrame(samplingFrameOn);
+		
+		
 		return true;
 	}
 	
 	
+	void removeSamplingFrame(){
+		Overlay ol = imp.getOverlay();
+		
+		if(ol == null) return;
+		
+		Roi[] rois = ol.toArray();
+		for(Roi roi : rois){
+			if(roi != null && roi.getName() != null && 
+					roi.getName().startsWith("samplingFrame"))
+				ol.remove(roi);
+		}
+		
+		imp.setOverlay(ol);
+	}
+	
+	
+	void showSamplingFrame(boolean frameOn) {
+		removeSamplingFrame();
+		
+		if(frameOn){
+			Overlay ol = imp.getOverlay();
+			
+			if(ol == null)
+				ol = new Overlay();
+			
+			GeneralPath forbiddenPath = new GeneralPath();
+			forbiddenPath.moveTo(marginLeft, 0);
+			forbiddenPath.lineTo(marginLeft, height - marginBottom);
+			forbiddenPath.lineTo(width - marginRight, height - marginBottom);
+			forbiddenPath.lineTo(width - marginRight, height);
+			ShapeRoi prohibitedLine = new ShapeRoi(forbiddenPath);
+			prohibitedLine.setStrokeColor(getColor(prohibitedLineColor));
+			prohibitedLine.setName("samplingFrameProhibited");
+			
+			
+			GeneralPath acceptancePath = new GeneralPath();
+			
+			if(lineTypes[DASHED].equals(acceptanceLineType)){
+				int i = 0;
+				int lineSegment = 8;
+				int lineInterval = 14;
+				while (lineInterval * i < (width - marginLeft - marginRight)){
+					acceptancePath
+						.moveTo(marginLeft + lineInterval * i, 
+								marginTop);
+					acceptancePath
+						.lineTo(marginLeft + lineInterval * i + lineSegment, 
+								marginTop);
+					i++;
+				}
+				
+				i = 0;
+				while (lineInterval * i < (height - marginTop - marginBottom)){
+					acceptancePath
+						.moveTo(width - marginRight, 
+								marginTop + lineInterval * i);
+					acceptancePath
+						.lineTo(width - marginRight,
+								marginTop + lineInterval * i + lineSegment);
+					i++;
+				}
+			} else {
+				acceptancePath.moveTo(marginLeft, marginTop);
+				acceptancePath.lineTo(width - marginRight, marginTop);
+				acceptancePath.lineTo(width - marginRight, height - marginBottom);
+			}
+			
+			ShapeRoi acceptanceLine = new ShapeRoi(acceptancePath);
+			acceptanceLine.setStrokeColor(getColor(acceptanceLineColor));
+			acceptanceLine.setName("samplingFrameAcceptance");
+			
+			
+			
+			ol.add(prohibitedLine);
+			ol.add(acceptanceLine);
+			
+			imp.setOverlay(ol);
+		}
+		
+	}
+
+
 	void addGridOnArray(ShapeRoi gridRoi, int sliceIndex){
 		ShapeRoi sliceGridRoi = (ShapeRoi) gridRoi.clone();
 		
@@ -647,31 +764,31 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			path =  null;
 		
 		ShapeRoi roi = new ShapeRoi(path);
-		roi.setStrokeColor(getColor());
+		roi.setStrokeColor(getColor(color));
 		return roi;
 	}
 	
 	
 	
-	Color getColor() {
+	Color getColor(String requestedColor) {
 		Color c = Color.black;
-		if (color.equals(colors[0]))
+		if (requestedColor.equals(colors[0]))
 			c = Color.red;
-		else if (color.equals(colors[1]))
+		else if (requestedColor.equals(colors[1]))
 			c = Color.green;
-		else if (color.equals(colors[2]))
+		else if (requestedColor.equals(colors[2]))
 			c = Color.blue;
-		else if (color.equals(colors[3]))
+		else if (requestedColor.equals(colors[3]))
 			c = Color.magenta;
-		else if (color.equals(colors[4]))
+		else if (requestedColor.equals(colors[4]))
 			c = Color.cyan;
-		else if (color.equals(colors[5]))
+		else if (requestedColor.equals(colors[5]))
 			c = Color.yellow;
-		else if (color.equals(colors[6]))
+		else if (requestedColor.equals(colors[6]))
 			c = Color.orange;
-		else if (color.equals(colors[7]))
+		else if (requestedColor.equals(colors[7]))
 			c = Color.black;
-		else if (color.equals(colors[8]))
+		else if (requestedColor.equals(colors[8]))
 			c = Color.white;
 		return c;
 	}
