@@ -135,22 +135,25 @@ public class GridOutputXml {
 				}
 			}
 			
-			
-			Element samplingFrameEl = doc.createElement("samplingFrame");
-			combinedgridEl.appendChild(samplingFrameEl);
-			
-			String[] elementNameSamplingFrameEl = 
-				{"left", "right", "top", "bottom", "prohibitedColor", 
-					"acceptanceColor", "acceptanceType"};
-			String[] inputSamlingFrameEl =
-				{marginLeft, marginRight, marginTop, marginBottom, prohibitedLineColor,
-					acceptanceLineColor, acceptanceLineType};
-			
-			for(int i = 0; i < elementNameSamplingFrameEl.length; i++){
-				Element el = doc.createElement(elementNameSamplingFrameEl[i]);
-				el.appendChild(doc.createTextNode(inputSamlingFrameEl[i]));
-				samplingFrameEl.appendChild(el);
+			if(marginLeft != ""){
+				Element samplingFrameEl = doc.createElement("samplingFrame");
+				combinedgridEl.appendChild(samplingFrameEl);
+				
+				String[] elementNameSamplingFrameEl = 
+					{"left", "right", "top", "bottom", "prohibitedColor", 
+						"acceptanceColor", "acceptanceType"};
+				String[] inputSamlingFrameEl =
+					{marginLeft, marginRight, marginTop, marginBottom, prohibitedLineColor,
+						acceptanceLineColor, acceptanceLineType};
+				
+				for(int i = 0; i < elementNameSamplingFrameEl.length; i++){
+					Element el = doc.createElement(elementNameSamplingFrameEl[i]);
+					el.appendChild(doc.createTextNode(inputSamlingFrameEl[i]));
+					samplingFrameEl.appendChild(el);
+				}
+				
 			}
+			
 			
 			
 		} catch (ParserConfigurationException exc) {

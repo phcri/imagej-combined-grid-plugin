@@ -431,6 +431,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		setCoarseGrids();
 		calculateTile();
 		
+		showSamplingFrame(samplingFrameOn);
+		
 		
 		if(applyChoices[DIFFERENTforEACH].equals(applyTo)){
 			for (int i = 1; i <= totalSlices; i++){
@@ -503,7 +505,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 		showGrid(gridRoiArray);
 		
-		showSamplingFrame(samplingFrameOn);
+		
 		
 		
 		return true;
@@ -534,6 +536,11 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			
 			if(ol == null)
 				ol = new Overlay();
+			
+			if(marginLeft < 0 || marginRight < 0 || marginTop < 0 || marginBottom < 0){
+				err += "Parameter for Margins should be bositive";
+				return;
+			}
 			
 			GeneralPath forbiddenPath = new GeneralPath();
 			forbiddenPath.moveTo(marginLeft, 0);

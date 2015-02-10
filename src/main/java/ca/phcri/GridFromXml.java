@@ -52,6 +52,7 @@ public class GridFromXml extends CombinedGridsPlugin {
 		imageCheck();
 		if(goBack) return;
 		
+		showSamplingFrame(samplingFrameOn);
 		gridLayer();
 		
 		Grid_Switch gs = new Grid_Switch();
@@ -77,36 +78,58 @@ public class GridFromXml extends CombinedGridsPlugin {
 			}else{
 				NodeList gridNL = combinedgridEl.getElementsByTagName("grid");
 				Element gridEl = (Element) gridNL.item(0);
-				gridEl.getAttribute("date");
-				imageName = getElementValueAsStr(gridEl, "image", 0);
-				type = getElementValueAsStr(gridEl, "type", 0);
-				areaPerPoint = getElementValueAsDouble(gridEl,  "app", 0);
-				gridRatio = getElementValueAsStr(gridEl, "ratio", 0);
-				unitsXml = getElementValueAsStr(gridEl, "unit", 0);
-				color = getElementValueAsStr(gridEl, "color", 0);
 				
-				
-				NodeList sliceNL = gridEl.getElementsByTagName("slice");
-				totalGridNo = sliceNL.getLength();
-				
-				sliceNoArray = new int[totalGridNo];
-				xstartArray = new int[totalGridNo];
-				ystartArray = new int[totalGridNo];
-				xstartCoarseArray = new int[totalGridNo];
-				ystartCoarseArray = new int[totalGridNo];
-				
-				for(int i = 0; i < sliceNL.getLength(); i++){
-					Element sliceNode = (Element) sliceNL.item(i);
-					String sliceNo = sliceNode.getAttribute("z");
-					if(!"All".equals(sliceNo))
-						sliceNoArray[i] = Integer.parseInt(sliceNo);
-					xstartArray[i] = getElementValueAsInteger(sliceNode, "xstart", 0);
-					ystartArray[i] = getElementValueAsInteger(sliceNode, "ystart", 0);
-					xstartCoarseArray[i] = 
-							getElementValueAsInteger(sliceNode, "xstartCoarse", 0);
-					ystartCoarseArray[i] = 
-							getElementValueAsInteger(sliceNode, "ystartCoarse", 0);
+				if(gridEl != null){
+					gridEl.getAttribute("date");
+					imageName = getElementValueAsStr(gridEl, "image", 0);
+					type = getElementValueAsStr(gridEl, "type", 0);
+					areaPerPoint = getElementValueAsDouble(gridEl,  "app", 0);
+					gridRatio = getElementValueAsStr(gridEl, "ratio", 0);
+					unitsXml = getElementValueAsStr(gridEl, "unit", 0);
+					color = getElementValueAsStr(gridEl, "color", 0);
+					
+					
+					NodeList sliceNL = gridEl.getElementsByTagName("slice");
+					totalGridNo = sliceNL.getLength();
+					
+					sliceNoArray = new int[totalGridNo];
+					xstartArray = new int[totalGridNo];
+					ystartArray = new int[totalGridNo];
+					xstartCoarseArray = new int[totalGridNo];
+					ystartCoarseArray = new int[totalGridNo];
+					
+					for(int i = 0; i < sliceNL.getLength(); i++){
+						Element sliceNode = (Element) sliceNL.item(i);
+						String sliceNo = sliceNode.getAttribute("z");
+						if(!"All".equals(sliceNo))
+							sliceNoArray[i] = Integer.parseInt(sliceNo);
+						xstartArray[i] = getElementValueAsInteger(sliceNode, "xstart", 0);
+						ystartArray[i] = getElementValueAsInteger(sliceNode, "ystart", 0);
+						xstartCoarseArray[i] = 
+								getElementValueAsInteger(sliceNode, "xstartCoarse", 0);
+						ystartCoarseArray[i] = 
+								getElementValueAsInteger(sliceNode, "ystartCoarse", 0);
+					}
 				}
+				
+				
+				NodeList samplingFrameNL = combinedgridEl.getElementsByTagName("samplingFrame");
+				Element samplingFrameEl = (Element)  samplingFrameNL.item(0);
+				
+				if(samplingFrameEl == null){
+					samplingFrameOn = false;
+					
+				} else{
+					samplingFrameOn = true;
+					marginLeft = getElementValueAsDouble(samplingFrameEl, "left", 0);
+					marginRight = getElementValueAsDouble(samplingFrameEl, "right", 0);
+					marginTop = getElementValueAsDouble(samplingFrameEl, "top", 0);
+					marginBottom = getElementValueAsDouble(samplingFrameEl, "bottom", 0);
+					prohibitedLineColor = getElementValueAsStr(samplingFrameEl, "prohibitedColor", 0);
+					acceptanceLineColor = getElementValueAsStr(samplingFrameEl, "acceptanceColor", 0);
+					acceptanceLineType = getElementValueAsStr(samplingFrameEl, "acceptanceType", 0);
+				}
+				
 			}
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
@@ -127,7 +150,7 @@ public class GridFromXml extends CombinedGridsPlugin {
 	
 	int getElementValueAsInteger(Element e, String tag, int index){
 		String str = getElementValueAsStr(e, tag, index);
-		if("null".equals(str))
+		if("null".equals(str) || "".equals(str))
 			return 0;
 		return Integer.parseInt(str);
 	}
@@ -167,6 +190,9 @@ public class GridFromXml extends CombinedGridsPlugin {
 		OpenDialog.setDefaultDirectory(IJ.getDirectory("plugins"));
 		OpenDialog od = new OpenDialog("Select XML file containing grid data");
 		filePath = od.getPath();
+		
+		if(filePath == null)
+			return;
 		
 		if(!filePath.endsWith("xml"))
 			err += "This is not an XML file";
