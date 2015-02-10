@@ -66,6 +66,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	final static int[] xstartField = { 10, 11 };
 	final static int[] ystartField = { 12, 13 };
 	final static int[] intervalField = { 21 };
+	final static int[] samplingFrameFields = {23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
 	static boolean showGridSwitch = true;
 	static String gridHistoryHeadings = 
 			"Date \t Image \t Slice \t Grid Type \t Area per Point \t Unit "
@@ -671,6 +672,11 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			else
 				fieldEnabler(intervalField, false);
 		}
+		
+		if(samplingFrameOn)
+			fieldEnabler(samplingFrameFields, true);
+		else
+			fieldEnabler(samplingFrameFields, false);
 	}
 	
 	void fieldEnabler(int[] fields, boolean show){
