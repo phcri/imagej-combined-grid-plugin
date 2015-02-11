@@ -16,6 +16,7 @@ import ij.text.TextWindow;
 import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.geom.GeneralPath;
 import java.text.DateFormat;
@@ -66,7 +67,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	final static int[] xstartField = { 10, 11 };
 	final static int[] ystartField = { 12, 13 };
 	final static int[] intervalField = { 21 };
-	final static int[] samplingFrameFields = {23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
+	//final static int[] samplingFrameFields = 
+	//	{23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
 	static boolean showGridSwitch = true;
 	static String gridHistoryHeadings = 
 			"Date \t Image \t Slice \t Grid Type \t Area per Point \t Unit "
@@ -99,6 +101,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	String acceptanceLineType;
 	String[] lineTypes = {"Solid", "Dashed"};
 	int SOLID = 0, DASHED = 1;
+	genericFrame sf;
 	
 	static String historyWindowTitle = "Grid History";
 	static String textfileName = "CombinedGridsHistory.txt";
@@ -252,7 +255,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					// drawing curve for coarse grid
 					path.moveTo(centerX + rad * circleX[0], centerY - rad * circleY[0]);
 					for(int i = 0; i < nPoints; i++)
-						path.lineTo(centerX + rad * circleX[i], centerY - rad * circleY[i]);
+						path.lineTo(centerX + rad * circleX[i], 
+								centerY - rad * circleY[i]);
 				}
 			}
 		}
@@ -330,6 +334,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 		
 		gd.addCheckbox("Put sampling frame on the image", samplingFrameOn);
+		/*
 		gd.addNumericField("Left", marginLeft, places, 6, units);
 		gd.addNumericField("Right", marginRight, places, 6, units);
 		gd.addNumericField("Top", marginTop, places, 6, units);
@@ -337,7 +342,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		gd.addChoice("Prohibited Line Color:", colors, prohibitedLineColor);
 		gd.addChoice("Acceptance Line Color:", colors, acceptanceLineColor);
 		gd.addChoice("Acceptance Line Type:", lineTypes, acceptanceLineType);
-		
+		*/
 		gd.addCheckbox("Save parameters as a xml file", true);
 		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
 		
@@ -345,9 +350,19 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		components = gd.getComponents();
 		enableFields();
 		
+		sf = new genericFrame("Sampling Frame Parameters");
+		sf.addNumericField("Left", marginLeft, places, 6, units);
+		sf.addNumericField("Right", marginRight, places, 6, units);
+		sf.addNumericField("Top", marginTop, places, 6, units);
+		sf.addNumericField("Bottom", marginBottom, places, 6, units);
+		sf.addChoice("Prohibited Line Color:", colors, prohibitedLineColor);
+		sf.addChoice("Acceptance Line Color:", colors, acceptanceLineColor);
+		sf.addChoice("Acceptance Line Type:", lineTypes, acceptanceLineType);
+		
 		gd.addDialogListener(this);
 		gd.showDialog();
-
+		
+		
 		if (gd.wasCanceled())
 			showGrid(null);
 		
@@ -390,7 +405,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			}
 		}
 	}
-
+	
 	// event control for the dialog box
 	@Override
 	public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
@@ -410,6 +425,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 		
 		samplingFrameOn = gd.getNextBoolean();
+		/*
 		marginLeft = gd.getNextNumber();
 		marginRight = gd.getNextNumber();
 		marginTop = gd. getNextNumber();
@@ -417,7 +433,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		prohibitedLineColor = gd.getNextChoice();
 		acceptanceLineColor = gd.getNextChoice();
 		acceptanceLineType = gd.getNextChoice();
-		
+		*/
 		saveXml = gd.getNextBoolean();
 		showGridSwitch = gd.getNextBoolean();
 		
@@ -432,8 +448,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		setCoarseGrids();
 		calculateTile();
 		
-		showSamplingFrame(samplingFrameOn);
-		
+		//showSamplingFrame(samplingFrameOn);
+		sf.setVisible(samplingFrameOn);
 		
 		if(applyChoices[DIFFERENTforEACH].equals(applyTo)){
 			for (int i = 1; i <= totalSlices; i++){
@@ -672,11 +688,12 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			else
 				fieldEnabler(intervalField, false);
 		}
-		
+		/*
 		if(samplingFrameOn)
 			fieldEnabler(samplingFrameFields, true);
 		else
 			fieldEnabler(samplingFrameFields, false);
+		*/
 	}
 	
 	void fieldEnabler(int[] fields, boolean show){
