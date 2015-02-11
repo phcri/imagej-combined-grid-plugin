@@ -18,6 +18,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Frame;
+import java.awt.event.TextEvent;
 import java.awt.geom.GeneralPath;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -101,7 +102,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	String acceptanceLineType;
 	String[] lineTypes = {"Solid", "Dashed"};
 	int SOLID = 0, DASHED = 1;
-	genericFrame sf;
+	SamplingFrame sfd;
 	
 	static String historyWindowTitle = "Grid History";
 	static String textfileName = "CombinedGridsHistory.txt";
@@ -349,7 +350,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		// to switch enable/disable for parameter input boxes
 		components = gd.getComponents();
 		enableFields();
-		
+		/*
 		sf = new genericFrame("Sampling Frame Parameters");
 		sf.addNumericField("Left", marginLeft, places, 6, units);
 		sf.addNumericField("Right", marginRight, places, 6, units);
@@ -358,16 +359,41 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		sf.addChoice("Prohibited Line Color:", colors, prohibitedLineColor);
 		sf.addChoice("Acceptance Line Color:", colors, acceptanceLineColor);
 		sf.addChoice("Acceptance Line Type:", lineTypes, acceptanceLineType);
+		*/
+		/*
+		sfd = new GenericDialog("Sampling Frame Parameters");
+		sfd.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+		sfd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+		sfd.addMessage("Margins");
+		
+		
+		sfd.addNumericField("Left", marginLeft, places, 6, units);
+		sfd.addNumericField("Right", marginRight, places, 6, units);
+		sfd.addNumericField("Top", marginTop, places, 6, units);
+		sfd.addNumericField("Bottom", marginBottom, places, 6, units);
+		sfd.addChoice("Prohibited Line Color:", colors, prohibitedLineColor);
+		sfd.addChoice("Acceptance Line Color:", colors, acceptanceLineColor);
+		sfd.addChoice("Acceptance Line Type:", lineTypes, acceptanceLineType);
+		*/
+		
+		sfd = new SamplingFrame();
+		
+		gd.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+		gd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+		
 		
 		gd.addDialogListener(this);
+		gd.setResizable(false);
 		gd.showDialog();
 		
 		
-		if (gd.wasCanceled())
+		if (gd.wasCanceled()){
 			showGrid(null);
-		
+			sfd.dispose();
+		}
 		
 		if (gd.wasOKed()) {
+			sfd.dispose();
 			
 			if (!"".equals(err)) {
 				IJ.error("Grid", err);
@@ -406,6 +432,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 	}
 	
+	public void textValueChanged(TextEvent e){
+		
+	}
+
 	// event control for the dialog box
 	@Override
 	public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
@@ -426,13 +456,13 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 		samplingFrameOn = gd.getNextBoolean();
 		/*
-		marginLeft = gd.getNextNumber();
-		marginRight = gd.getNextNumber();
-		marginTop = gd. getNextNumber();
-		marginBottom = gd.getNextNumber();
-		prohibitedLineColor = gd.getNextChoice();
-		acceptanceLineColor = gd.getNextChoice();
-		acceptanceLineType = gd.getNextChoice();
+		marginLeft = sfd.getNextNumber();
+		marginRight = sfd.getNextNumber();
+		marginTop = sfd.getNextNumber();
+		marginBottom = sfd.getNextNumber();
+		prohibitedLineColor = sfd.getNextChoice();
+		acceptanceLineColor = sfd.getNextChoice();
+		acceptanceLineType = sfd.getNextChoice();
 		*/
 		saveXml = gd.getNextBoolean();
 		showGridSwitch = gd.getNextBoolean();
@@ -449,7 +479,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		calculateTile();
 		
 		//showSamplingFrame(samplingFrameOn);
-		sf.setVisible(samplingFrameOn);
+		sfd.showInputWindow(samplingFrameOn);
 		
 		if(applyChoices[DIFFERENTforEACH].equals(applyTo)){
 			for (int i = 1; i <= totalSlices; i++){

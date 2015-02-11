@@ -54,5 +54,5 @@
 			<url>http://maven.imagej.net/content/groups/public</url>
 		</repository>
 	</repositories>
-	<version>2.0.0</version>
+	<version>1.9.3test</version>
 </project>
