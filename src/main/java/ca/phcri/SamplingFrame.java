@@ -14,10 +14,30 @@ public class SamplingFrame extends CombinedGridsPlugin {
 	
 	@Override
 	public void run(String arg) {
-		
 		if (IJ.versionLessThan("1.47"))
 			return;
-		SamplingFrame sf = new SamplingFrame();
+		new SamplingFrame();
+		sfgd.showDialog();
+		
+		if(sfgd.wasCanceled()){
+			drawSamplingFrame(false);
+			return;
+		}
+		if(sfgd.wasOKed()){
+			if(!"".equals(err)){
+				IJ.error(err);
+				drawSamplingFrame(false);
+				return;
+			}
+			
+			String[] gridParameterArray = {df.format(date) + "\t" + "" + "\t" + 
+					"" + "\t" + "" + "\t" + "" + "\t" + units + "^2" +
+					"\t" + "" + "" + "\t" + "" + "\t" + ""
+					+ "\t" + "" + "\t" + "" + "\t"
+					+ "" + "\t" + "" + "\t"
+					+ getParameters()};
+			showHistory(gridParameterArray);
+		}
 		
 	}
 	
@@ -25,7 +45,7 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		this(true);
 	}
 	
-	SamplingFrame(boolean windowListenerOn){
+	SamplingFrame(boolean decorated){
 		imp = IJ.getImage();
 		width = imp.getWidth();
 		height = imp.getHeight();
@@ -46,7 +66,7 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		
 		
 		sfgd = new GenericDialog(frameName);
-		if(!windowListenerOn){
+		if(!decorated){
 			sfgd.setUndecorated(true);
 			sfgd.setInsets(0, 0, 0);
 			sfgd.addMessage(frameName);
