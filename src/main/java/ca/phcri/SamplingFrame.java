@@ -1,6 +1,7 @@
 package ca.phcri;
 
 import ij.IJ;
+import ij.gui.GUI;
 import ij.gui.GenericDialog;
 import ij.measure.Calibration;
 
@@ -44,7 +45,11 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		}
 		
 		sfgd = new GenericDialog("Sampling Frame");
-		sfgd.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+		if(!windowListenerOn){
+			sfgd.removeWindowListener(sfgd);
+			sfgd.setUndecorated(true);
+		}
+		sfgd.setModalExclusionType(Dialog.ModalExclusionType.TOOLKIT_EXCLUDE);
 		sfgd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
 		
 		sfgd.setInsets(0, 5, 0);
@@ -66,8 +71,7 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		sfgd.pack();
 		sfgd.setResizable(false);
 		
-		if(!windowListenerOn)
-			sfgd.removeWindowListener(sfgd);
+		
 	}
 	
 	
@@ -107,6 +111,11 @@ public class SamplingFrame extends CombinedGridsPlugin {
 				"\t"  + marginBottom + "\t" + prohibitedLineColor  + "\t" +
 				acceptanceLineColor  + "\t" + acceptanceLineType;
 		return frameParameters;
+	}
+
+	@Override
+	void setLocation(int x, int y) {
+		sfgd.setLocation(x, y);
 	}
 	
 	

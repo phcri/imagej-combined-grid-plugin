@@ -19,8 +19,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Frame;
-import java.awt.Window;
-import java.awt.event.TextEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.geom.GeneralPath;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,7 +31,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 
-public class CombinedGridsPlugin implements PlugIn, DialogListener {
+public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentListener {
 	final static String[] colors = 
 		{ "Red", "Green", "Blue", "Magenta", "Cyan", "Yellow", "Orange", 
 		"Black", "White" };
@@ -103,7 +103,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	String[] lineTypes = {"Solid", "Dashed"};
 	int SOLID = 0, DASHED = 1;
 	SamplingFrame sfd;
-	private Checkbox samplingFrameCheckbox;
+	Checkbox samplingFrameCheckbox;
+	GenericDialog gd;
 	
 	static String historyWindowTitle = "Grid History";
 	static String textfileName = "CombinedGridsHistory.txt";
@@ -320,7 +321,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		sfd = new SamplingFrame(false);
 		
 		// get values in a dialog box
-		GenericDialog gd = new GenericDialog("Grid...");
+		gd = new GenericDialog("Grid...");
 		gd.addChoice("Grid Type:", types, type);
 		gd.addNumericField("Area per Point:", areaPerPoint, places, 6, units + "^2");
 		gd.addChoice("Ratio:", ratioChoices, gridRatio);
@@ -349,13 +350,15 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		samplingFrameCheckbox = (Checkbox) gd.getCheckboxes().firstElement();	
 		
 		
-		gd.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+		gd.setModalExclusionType(Dialog.ModalExclusionType.TOOLKIT_EXCLUDE);
 		gd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
 		
 		gd.addDialogListener(this);
+		gd.addComponentListener(this);
 		gd.setResizable(false);
-		gd.showDialog();
 		
+		gd.showDialog();
+		IJ.log("next line of gd.showDialog()");
 		
 		if (gd.wasCanceled()){
 			sfd.dispose();
@@ -409,6 +412,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 	}
 	
+	
+	
 
 	// event control for the dialog box
 	@Override
@@ -441,6 +446,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			return true;
 		//when samplingFrame is disposed, actionPerformed is triggered 
 		//by samplingFrameCheckbox
+		
 		
 		
 		
@@ -928,5 +934,43 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					return true;
 		}
 		return false;
+	}
+	
+	
+	void setLocation(int x, int y){
+		gd.setLocation(x, y);
+	}
+	
+	@Override
+	public void componentResized(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+	@Override
+	public void componentMoved(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		int parentX = gd.getLocation().x;
+		int parentY = gd.getLocation().y;
+		int parentWidth = gd.getWidth();
+		int parentHeight = gd.getHeight();
+		int childHeight = sfd.sfgd.getHeight();
+		
+		sfd.setLocation(parentX + parentWidth, parentY + parentHeight - childHeight);
+	}
+	
+	
+	@Override
+	public void componentShown(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+	@Override
+	public void componentHidden(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
