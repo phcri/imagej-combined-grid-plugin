@@ -1,7 +1,6 @@
 package ca.phcri;
 
 import ij.IJ;
-import ij.gui.GUI;
 import ij.gui.GenericDialog;
 import ij.measure.Calibration;
 
@@ -11,7 +10,7 @@ import java.awt.Dialog;
 
 public class SamplingFrame extends CombinedGridsPlugin {
 	GenericDialog sfgd;
-	
+	String frameName = "Sampling Frame";
 	
 	@Override
 	public void run(String arg) {
@@ -44,20 +43,24 @@ public class SamplingFrame extends CombinedGridsPlugin {
 			places = 0;
 		}
 		
-		sfgd = new GenericDialog("Sampling Frame");
-		if(!windowListenerOn){
-			sfgd.removeWindowListener(sfgd);
-			sfgd.setUndecorated(true);
-		}
-		sfgd.setModalExclusionType(Dialog.ModalExclusionType.TOOLKIT_EXCLUDE);
-		sfgd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
 		
-		sfgd.setInsets(0, 5, 0);
+		
+		sfgd = new GenericDialog(frameName);
+		if(!windowListenerOn){
+			sfgd.setUndecorated(true);
+			sfgd.setInsets(0, 0, 0);
+			sfgd.addMessage(frameName);
+			sfgd.setInsets(10, 5, 0);
+		} else{
+			sfgd.setInsets(0, 5, 0);
+		}
+		
 		sfgd.addMessage("Margins");
-		sfgd.addNumericField("Left", marginLeft, places, 6, units);
-		sfgd.addNumericField("Right", marginRight, places, 6, units);
 		sfgd.addNumericField("Top", marginTop, places, 6, units);
 		sfgd.addNumericField("Bottom", marginBottom, places, 6, units);
+		sfgd.addNumericField("Left", marginLeft, places, 6, units);
+		sfgd.addNumericField("Right", marginRight, places, 6, units);
+		
 		
 		sfgd.setInsets(10, 5, 0);
 		sfgd.addMessage("Prohibited Line");
@@ -67,10 +70,12 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		sfgd.addMessage("Acceptance Line");
 		sfgd.addChoice("Color:", colors, acceptanceLineColor);
 		sfgd.addChoice("Type:", lineTypes, acceptanceLineType);
+		
 		sfgd.addDialogListener(this);
+		sfgd.setModalExclusionType(Dialog.ModalExclusionType.TOOLKIT_EXCLUDE);
+		sfgd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
 		sfgd.pack();
 		sfgd.setResizable(false);
-		
 		
 	}
 	
@@ -78,10 +83,11 @@ public class SamplingFrame extends CombinedGridsPlugin {
 	// event control for the dialog box
 	@Override
 	public boolean dialogItemChanged(GenericDialog sfgd, AWTEvent e) {
-		marginLeft = sfgd.getNextNumber();
-		marginRight = sfgd.getNextNumber();
 		marginTop = sfgd. getNextNumber();
 		marginBottom = sfgd.getNextNumber();
+		marginLeft = sfgd.getNextNumber();
+		marginRight = sfgd.getNextNumber();
+		
 		prohibitedLineColor = sfgd.getNextChoice();
 		acceptanceLineColor = sfgd.getNextChoice();
 		acceptanceLineType = sfgd.getNextChoice();

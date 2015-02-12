@@ -52,9 +52,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 			ONE_TO_TWENTYFIVE = 3, ONE_TO_THIRTYSIX = 4;
 	final static String[] ratioChoices = { "1:4", "1:9", "1:16", "1:25", "1:36" };
 	static String gridRatio = ratioChoices[ONE_TO_FOUR];
-	final static String[] radiobuttons = 
+	final String[] radiobuttons = 
 		{ "Random Offset", "Fixed Position", "Manual Input" };
-	final static int RANDOM = 0, FIXED = 1, MANUAL = 2;
+	final int RANDOM = 0, FIXED = 1, MANUAL = 2;
 	String locationChoice = radiobuttons[RANDOM];
 	final static String[] applyChoices = 
 		{ "One Grid for the Current Slice", "One Grid for All Slices", 
@@ -62,14 +62,14 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 	final static int CURRENT = 0, ONEforALL = 1, DIFFERENTforEACH = 2, SYSTEMATIC = 3;
 	static String applyTo = applyChoices[DIFFERENTforEACH];
 	
-	static Component[] components; 
+	Component[] components; 
 	// this is to select components in the dialog box
-	final static int[] ratioField = { 4, 5 };
-	final static int[] combinedGridFields = { 14, 15, 16, 17 };
-	final static int[] parameterFieldsOff = { 10, 11, 12, 13, 14, 15, 16, 17 };
-	final static int[] xstartField = { 10, 11 };
-	final static int[] ystartField = { 12, 13 };
-	final static int[] intervalField = { 21 };
+	private final static int[] ratioField = { 4, 5 };
+	private final static int[] combinedGridFields = { 14, 15, 16, 17 };
+	private final static int[] parameterFieldsOff = { 10, 11, 12, 13, 14, 15, 16, 17 };
+	private final static int[] xstartField = { 10, 11 };
+	private final static int[] ystartField = { 12, 13 };
+	private final static int[] intervalField = { 21 };
 	static boolean showGridSwitch = true;
 	static String gridHistoryHeadings = 
 			"Date \t Image \t Slice \t Grid Type \t Area per Point \t Unit "
@@ -99,17 +99,17 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 	double marginRight;
 	double marginTop;
 	double marginBottom;
-	String acceptanceLineType;
 	String[] lineTypes = {"Solid", "Dashed"};
 	int SOLID = 0, DASHED = 1;
+	String acceptanceLineType = lineTypes[SOLID];
 	SamplingFrame sfd;
 	Checkbox samplingFrameCheckbox;
 	GenericDialog gd;
 	
-	static String historyWindowTitle = "Grid History";
-	static String textfileName = "CombinedGridsHistory.txt";
-	static DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	static Date date;
+	final static String historyWindowTitle = "Grid History";
+	final static String textfileName = "CombinedGridsHistory.txt";
+	DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	Date date;
 
 	@Override
 	public void run(String arg) {
@@ -346,9 +346,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		components = gd.getComponents();
 		enableFields();
 		
-		
 		samplingFrameCheckbox = (Checkbox) gd.getCheckboxes().firstElement();	
-		
 		
 		gd.setModalExclusionType(Dialog.ModalExclusionType.TOOLKIT_EXCLUDE);
 		gd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
@@ -358,7 +356,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		gd.setResizable(false);
 		
 		gd.showDialog();
-		IJ.log("next line of gd.showDialog()");
 		
 		if (gd.wasCanceled()){
 			sfd.dispose();
@@ -440,13 +437,13 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		err = "";
 		IJ.showStatus(err);
 		
-		sfd.showInputWindow(samplingFrameOn);
 		
-		if(e != null && e.getSource().equals(samplingFrameCheckbox))
+		if(e != null && e.getSource().equals(samplingFrameCheckbox)){
+			sfd.showInputWindow(samplingFrameOn);
 			return true;
 		//when samplingFrame is disposed, actionPerformed is triggered 
 		//by samplingFrameCheckbox
-		
+		}
 		
 		
 		
@@ -957,7 +954,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		int parentHeight = gd.getHeight();
 		int childHeight = sfd.sfgd.getHeight();
 		
-		sfd.setLocation(parentX + parentWidth, parentY + parentHeight - childHeight);
+		sfd.setLocation(parentX + parentWidth, 
+				parentY + parentHeight - childHeight - 36);
 	}
 	
 	
