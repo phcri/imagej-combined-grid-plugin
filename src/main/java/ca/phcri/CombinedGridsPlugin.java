@@ -317,7 +317,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 		totalSlices = imp.getStackSize();
 		
-		sfd = new SamplingFrame();
+		sfd = new SamplingFrame(false);
 		
 		// get values in a dialog box
 		GenericDialog gd = new GenericDialog("Grid...");
@@ -367,14 +367,13 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 		
 		if (gd.wasOKed()) {
-			if (!"".equals(err)) {
+			sfd.dispose();
+			if (!"".equals(err)) { 	
 				IJ.error("Grid", err);
-				sfd.dispose();
-				removeSamplingFrame();
 				
+				removeSamplingFrame();
 				showGrid(null);
 			} else {
-				sfd.dispose();
 				
 				
 				if(saveXml) {
@@ -433,19 +432,17 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		saveXml = gd.getNextBoolean();
 		showGridSwitch = gd.getNextBoolean();
 		
-		
+		err = "";
+		IJ.showStatus(err);
 		
 		sfd.showInputWindow(samplingFrameOn);
 		
-		if(e != null && "java.awt.Checkbox".equals(e.getSource().getClass().getName())){
-			Checkbox cb = (Checkbox) e.getSource();
-			if("Put sampling frame on the image".equals(cb.getLabel()))
-				return true;
-		}
+		if(e != null && e.getSource().equals(samplingFrameCheckbox))
+			return true;
+		//when samplingFrame is disposed, actionPerformed is triggered 
+		//by samplingFrameCheckbox
 		
 		
-		err = "";
-		IJ.showStatus(err);
 		
 		gridParameterArray = new String[totalSlices];
 		gridRoiArray = new Roi[totalSlices];
@@ -455,6 +452,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		setCoarseGrids();
 		calculateTile();
 		
+		err += sfd.err;
 		
 		
 		if(applyChoices[DIFFERENTforEACH].equals(applyTo)){
@@ -559,7 +557,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				ol = new Overlay();
 			
 			if(marginLeft < 0 || marginRight < 0 || marginTop < 0 || marginBottom < 0){
-				err += "Parameter for Margins should be bositive";
+				err += "Parameter for Margins should not be negative\n";
 				return;
 			}
 			

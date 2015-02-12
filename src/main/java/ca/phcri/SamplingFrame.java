@@ -9,7 +9,7 @@ import java.awt.Dialog;
 
 
 public class SamplingFrame extends CombinedGridsPlugin {
-	GenericDialog sfd;
+	GenericDialog sfgd;
 	
 	
 	@Override
@@ -21,9 +21,11 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		
 	}
 	
-	
-	
 	SamplingFrame(){
+		this(true);
+	}
+	
+	SamplingFrame(boolean windowListenerOn){
 		imp = IJ.getImage();
 		width = imp.getWidth();
 		height = imp.getHeight();
@@ -41,66 +43,64 @@ public class SamplingFrame extends CombinedGridsPlugin {
 			places = 0;
 		}
 		
-		sfd = new GenericDialog("Sampling Frame");
-		sfd.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
-		sfd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+		sfgd = new GenericDialog("Sampling Frame");
+		sfgd.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+		sfgd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
 		
-		sfd.setInsets(0, 5, 0);
-		sfd.addMessage("Margins");
-		sfd.addNumericField("Left", marginLeft, places, 6, units);
-		sfd.addNumericField("Right", marginRight, places, 6, units);
-		sfd.addNumericField("Top", marginTop, places, 6, units);
-		sfd.addNumericField("Bottom", marginBottom, places, 6, units);
+		sfgd.setInsets(0, 5, 0);
+		sfgd.addMessage("Margins");
+		sfgd.addNumericField("Left", marginLeft, places, 6, units);
+		sfgd.addNumericField("Right", marginRight, places, 6, units);
+		sfgd.addNumericField("Top", marginTop, places, 6, units);
+		sfgd.addNumericField("Bottom", marginBottom, places, 6, units);
 		
-		sfd.setInsets(10, 5, 0);
-		sfd.addMessage("Prohibited Line");
-		sfd.addChoice("Color:", colors, prohibitedLineColor);
+		sfgd.setInsets(10, 5, 0);
+		sfgd.addMessage("Prohibited Line");
+		sfgd.addChoice("Color:", colors, prohibitedLineColor);
 		
-		sfd.setInsets(10, 5, 0);
-		sfd.addMessage("Acceptance Line");
-		sfd.addChoice("Color:", colors, acceptanceLineColor);
-		sfd.addChoice("Type:", lineTypes, acceptanceLineType);
-		sfd.addDialogListener(this);
-		sfd.pack();
-		sfd.setResizable(false);
-		sfd.removeWindowListener(sfd);
+		sfgd.setInsets(10, 5, 0);
+		sfgd.addMessage("Acceptance Line");
+		sfgd.addChoice("Color:", colors, acceptanceLineColor);
+		sfgd.addChoice("Type:", lineTypes, acceptanceLineType);
+		sfgd.addDialogListener(this);
+		sfgd.pack();
+		sfgd.setResizable(false);
+		
+		if(!windowListenerOn)
+			sfgd.removeWindowListener(sfgd);
 	}
 	
 	
 	// event control for the dialog box
 	@Override
-	public boolean dialogItemChanged(GenericDialog sfd, AWTEvent e) {
-		marginLeft = sfd.getNextNumber();
-		marginRight = sfd.getNextNumber();
-		marginTop = sfd. getNextNumber();
-		marginBottom = sfd.getNextNumber();
-		prohibitedLineColor = sfd.getNextChoice();
-		acceptanceLineColor = sfd.getNextChoice();
-		acceptanceLineType = sfd.getNextChoice();
+	public boolean dialogItemChanged(GenericDialog sfgd, AWTEvent e) {
+		marginLeft = sfgd.getNextNumber();
+		marginRight = sfgd.getNextNumber();
+		marginTop = sfgd. getNextNumber();
+		marginBottom = sfgd.getNextNumber();
+		prohibitedLineColor = sfgd.getNextChoice();
+		acceptanceLineColor = sfgd.getNextChoice();
+		acceptanceLineType = sfgd.getNextChoice();
 		
 		err = "";
-		IJ.showStatus(err);
-
-		drawSamplingFrame(true);
 		
+		drawSamplingFrame(true);
 		return true;
 	}
 	
 	
 	void showInputWindow(boolean frameOn){
+		err = "";
 		drawSamplingFrame(frameOn);
-		sfd.setVisible(frameOn);
+		sfgd.setVisible(frameOn);
 	}
 	
 	
 	
 	void dispose(){
-		sfd.dispose();
+		sfgd.dispose();
 	}
 	
-	boolean isVisible(){
-		return sfd.isVisible();
-	}
 
 	String getParameters() {
 		String frameParameters = marginLeft + "\t" + marginRight + "\t"  + marginTop +
