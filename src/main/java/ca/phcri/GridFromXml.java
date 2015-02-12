@@ -52,7 +52,7 @@ public class GridFromXml extends CombinedGridsPlugin {
 		imageCheck();
 		if(goBack) return;
 		
-		showSamplingFrame(samplingFrameOn);
+		drawSamplingFrame(samplingFrameOn);
 		gridLayer();
 		
 		Grid_Switch gs = new Grid_Switch();

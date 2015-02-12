@@ -14,10 +14,12 @@ import ij.text.TextPanel;
 import ij.text.TextWindow;
 
 import java.awt.AWTEvent;
+import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.TextEvent;
 import java.awt.geom.GeneralPath;
 import java.text.DateFormat;
@@ -68,8 +70,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	final static int[] xstartField = { 10, 11 };
 	final static int[] ystartField = { 12, 13 };
 	final static int[] intervalField = { 21 };
-	//final static int[] samplingFrameFields = 
-	//	{23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
 	static boolean showGridSwitch = true;
 	static String gridHistoryHeadings = 
 			"Date \t Image \t Slice \t Grid Type \t Area per Point \t Unit "
@@ -103,6 +103,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	String[] lineTypes = {"Solid", "Dashed"};
 	int SOLID = 0, DASHED = 1;
 	SamplingFrame sfd;
+	private Checkbox samplingFrameCheckbox;
 	
 	static String historyWindowTitle = "Grid History";
 	static String textfileName = "CombinedGridsHistory.txt";
@@ -316,6 +317,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 		totalSlices = imp.getStackSize();
 		
+		sfd = new SamplingFrame();
+		
 		// get values in a dialog box
 		GenericDialog gd = new GenericDialog("Grid...");
 		gd.addChoice("Grid Type:", types, type);
@@ -335,52 +338,19 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 		
 		gd.addCheckbox("Put sampling frame on the image", samplingFrameOn);
-		/*
-		gd.addNumericField("Left", marginLeft, places, 6, units);
-		gd.addNumericField("Right", marginRight, places, 6, units);
-		gd.addNumericField("Top", marginTop, places, 6, units);
-		gd.addNumericField("Bottom", marginBottom, places, 6, units);
-		gd.addChoice("Prohibited Line Color:", colors, prohibitedLineColor);
-		gd.addChoice("Acceptance Line Color:", colors, acceptanceLineColor);
-		gd.addChoice("Acceptance Line Type:", lineTypes, acceptanceLineType);
-		*/
 		gd.addCheckbox("Save parameters as a xml file", true);
 		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
 		
 		// to switch enable/disable for parameter input boxes
 		components = gd.getComponents();
 		enableFields();
-		/*
-		sf = new genericFrame("Sampling Frame Parameters");
-		sf.addNumericField("Left", marginLeft, places, 6, units);
-		sf.addNumericField("Right", marginRight, places, 6, units);
-		sf.addNumericField("Top", marginTop, places, 6, units);
-		sf.addNumericField("Bottom", marginBottom, places, 6, units);
-		sf.addChoice("Prohibited Line Color:", colors, prohibitedLineColor);
-		sf.addChoice("Acceptance Line Color:", colors, acceptanceLineColor);
-		sf.addChoice("Acceptance Line Type:", lineTypes, acceptanceLineType);
-		*/
-		/*
-		sfd = new GenericDialog("Sampling Frame Parameters");
-		sfd.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
-		sfd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-		sfd.addMessage("Margins");
 		
 		
-		sfd.addNumericField("Left", marginLeft, places, 6, units);
-		sfd.addNumericField("Right", marginRight, places, 6, units);
-		sfd.addNumericField("Top", marginTop, places, 6, units);
-		sfd.addNumericField("Bottom", marginBottom, places, 6, units);
-		sfd.addChoice("Prohibited Line Color:", colors, prohibitedLineColor);
-		sfd.addChoice("Acceptance Line Color:", colors, acceptanceLineColor);
-		sfd.addChoice("Acceptance Line Type:", lineTypes, acceptanceLineType);
-		*/
+		samplingFrameCheckbox = (Checkbox) gd.getCheckboxes().firstElement();	
 		
-		sfd = new SamplingFrame();
 		
 		gd.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
 		gd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-		
 		
 		gd.addDialogListener(this);
 		gd.setResizable(false);
@@ -388,18 +358,24 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 		
 		if (gd.wasCanceled()){
-			showGrid(null);
 			sfd.dispose();
+			removeSamplingFrame();
+			
+			showGrid(null);
 		}
+			
+		
 		
 		if (gd.wasOKed()) {
-			sfd.dispose();
-			
 			if (!"".equals(err)) {
 				IJ.error("Grid", err);
-				showGrid(null);
+				sfd.dispose();
+				removeSamplingFrame();
 				
+				showGrid(null);
 			} else {
+				sfd.dispose();
+				
 				
 				if(saveXml) {
 					GridOutputXml gox = 
@@ -416,6 +392,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 					
 						if(!gdWantGrid.wasOKed()){
 							showGrid(null);
+							removeSamplingFrame();
 							return;
 						}
 					}
@@ -430,11 +407,9 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 				
 			}
 		}
+
 	}
 	
-	public void textValueChanged(TextEvent e){
-		
-	}
 
 	// event control for the dialog box
 	@Override
@@ -455,17 +430,19 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		}
 		
 		samplingFrameOn = gd.getNextBoolean();
-		/*
-		marginLeft = sfd.getNextNumber();
-		marginRight = sfd.getNextNumber();
-		marginTop = sfd.getNextNumber();
-		marginBottom = sfd.getNextNumber();
-		prohibitedLineColor = sfd.getNextChoice();
-		acceptanceLineColor = sfd.getNextChoice();
-		acceptanceLineType = sfd.getNextChoice();
-		*/
 		saveXml = gd.getNextBoolean();
 		showGridSwitch = gd.getNextBoolean();
+		
+		
+		
+		sfd.showInputWindow(samplingFrameOn);
+		
+		if(e != null && "java.awt.Checkbox".equals(e.getSource().getClass().getName())){
+			Checkbox cb = (Checkbox) e.getSource();
+			if("Put sampling frame on the image".equals(cb.getLabel()))
+				return true;
+		}
+		
 		
 		err = "";
 		IJ.showStatus(err);
@@ -478,8 +455,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		setCoarseGrids();
 		calculateTile();
 		
-		//showSamplingFrame(samplingFrameOn);
-		sfd.showInputWindow(samplingFrameOn);
+		
 		
 		if(applyChoices[DIFFERENTforEACH].equals(applyTo)){
 			for (int i = 1; i <= totalSlices; i++){
@@ -552,14 +528,12 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 
 		showGrid(gridRoiArray);
 		
-		
-		
-		
 		return true;
 	}
 	
 	
-	void removeSamplingFrame(){
+	static void removeSamplingFrame(){
+		ImagePlus imp = IJ.getImage();
 		Overlay ol = imp.getOverlay();
 		
 		if(ol == null) return;
@@ -575,7 +549,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 	}
 	
 	
-	void showSamplingFrame(boolean frameOn) {
+	void drawSamplingFrame(boolean frameOn) {
 		removeSamplingFrame();
 		
 		if(frameOn){
@@ -718,12 +692,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 			else
 				fieldEnabler(intervalField, false);
 		}
-		/*
-		if(samplingFrameOn)
-			fieldEnabler(samplingFrameFields, true);
-		else
-			fieldEnabler(samplingFrameFields, false);
-		*/
+		
 	}
 	
 	void fieldEnabler(int[] fields, boolean show){
@@ -888,15 +857,11 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener {
 		
 		String frameParameters;
 		
-		if(samplingFrameOn){
-			frameParameters = marginLeft + "\t" + marginRight + "\t"  + marginTop +
-					"\t"  + marginBottom + "\t" + prohibitedLineColor  + "\t" +
-					acceptanceLineColor  + "\t" + acceptanceLineType;
-		
-		} else
+		if(samplingFrameOn)
+			frameParameters = sfd.getParameters();
+		else
 			frameParameters = "" + "\t" + "" + "\t"  + "" + "\t" + "" + "\t" + "" + "\t"
 					 + "" + "\t" + "";
-		
 		
 		date = new Date();
 		
