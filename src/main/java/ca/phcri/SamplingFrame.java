@@ -139,6 +139,22 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		
 	}
 	
+	void setParameters(double marginTop, double marginBottom, 
+			double marginLeft, double marginRight,
+			String prohibitedLineColor, String acceptanceLineColor, String acceptanceLinetype
+			){
+		this.marginTop = marginTop;
+		this.marginBottom = marginBottom;
+		this.marginLeft = marginLeft;
+		this.marginRight = marginRight;
+		this.prohibitedLineColor = prohibitedLineColor;
+		this.acceptanceLineColor = acceptanceLineColor;
+		this.acceptanceLineColor = acceptanceLineColor;
+		imp = IJ.getImage();
+		width = imp.getWidth();
+		height = imp.getHeight();
+	}
+	
 	
 	// event control for the dialog box
 	@Override
@@ -196,6 +212,7 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		removeSamplingFrame();
 		
 		if(frameOn){
+			
 			Overlay ol = imp.getOverlay();
 			
 			if(ol == null)

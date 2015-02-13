@@ -2,6 +2,7 @@ package ca.phcri;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -19,7 +20,7 @@ import ij.gui.ShapeRoi;
 import ij.io.OpenDialog;
 import ij.measure.Calibration;
 
-public class GridFromXml extends SamplingFrame {
+public class GridFromXml extends CombinedGridsPlugin {
 	int[] xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray, sliceNoArray;
 	String imageName;
 	String imageNameSF;
@@ -56,14 +57,28 @@ public class GridFromXml extends SamplingFrame {
 		imageCheck();
 		if(goBack) return;
 		
-		drawSamplingFrame(samplingFrameOn);
+		if(samplingFrameOn){
+			sfd = new SamplingFrame();
+			sfd.setParameters(marginTop, marginBottom, marginLeft, marginRight,
+					prohibitedLineColor, acceptanceLineColor, acceptanceLineType);
+			sfd.drawSamplingFrame(samplingFrameOn);
+		}
 		
 		if(gridExist){
 			gridLayer();
 			Grid_Switch gs = new Grid_Switch();
 			gs.gridSwitch();
+			
 		} else if(samplingFrameOn){
-			//the way to create gridParameterArray without grid parameters
+			date = new Date();
+			
+			gridParameterArray = new String[1];
+			gridParameterArray[0] = df.format(date) + "\t" + imp.getTitle() + "\t" + 
+					"" + "\t" + "" + "\t" + "" + "\t" + units +
+					"\t" + "" + "" + "\t" + "" + "\t" + ""
+					+ "\t" + "" + "\t" + "" + "\t"
+					+ "" + "\t" + "" + "\t"
+					+ sfd.getParameters();
 		}
 		
 		showHistory(gridParameterArray);
@@ -86,7 +101,7 @@ public class GridFromXml extends SamplingFrame {
 				err += "This file is not compatible with the CombinedGridsPlugin";
 				
 			} else {
-				NodeList combinedgridNL = pluginEl.getElementsByTagName("CombinedGrids");
+				NodeList combinedgridNL = pluginEl.getElementsByTagName("combinedGrids");
 				Element combinedgridEl = (Element) combinedgridNL.item(0);
 				
 				if(combinedgridEl == null){
@@ -95,10 +110,10 @@ public class GridFromXml extends SamplingFrame {
 				}else{
 					NodeList imageNL = combinedgridEl.getElementsByTagName("image");
 					Element imageEl = (Element) imageNL.item(0);
-					imageName = getElementValueAsStr(imageEl, "image", 0);
+					imageName = getElementValueAsStr(imageEl, "title", 0);
 					unitsXml = getElementValueAsStr(imageEl, "unit", 0);
 					
-					NodeList gridNL = combinedgridEl.getElementsByTagName("grid");
+					NodeList gridNL = combinedgridEl.getElementsByTagName("grids");
 					Element gridEl = (Element) gridNL.item(0);
 					
 					if(gridEl == null){
@@ -113,7 +128,7 @@ public class GridFromXml extends SamplingFrame {
 						color = getElementValueAsStr(gridEl, "color", 0);
 						
 						
-						NodeList sliceNL = gridEl.getElementsByTagName("slice");
+						NodeList sliceNL = gridEl.getElementsByTagName("grid");
 						totalGridNo = sliceNL.getLength();
 						
 						sliceNoArray = new int[totalGridNo];
@@ -124,7 +139,7 @@ public class GridFromXml extends SamplingFrame {
 						
 						for(int i = 0; i < sliceNL.getLength(); i++){
 							Element sliceNode = (Element) sliceNL.item(i);
-							String sliceNo = sliceNode.getAttribute("z");
+							String sliceNo = getElementValueAsStr(sliceNode, "sliceNo", 0);
 							if(!"All".equals(sliceNo))
 								sliceNoArray[i] = Integer.parseInt(sliceNo);
 							xstartArray[i] = 
@@ -149,10 +164,6 @@ public class GridFromXml extends SamplingFrame {
 						
 					} else{
 						samplingFrameOn = true;
-						imageNameSF = 
-								getElementValueAsStr(samplingFrameEl, "image", 0);
-						unitsXmlSF = 
-								getElementValueAsStr(samplingFrameEl, "unit", 0);
 						marginLeft = 
 								getElementValueAsDouble(samplingFrameEl, "left", 0);
 						marginRight = 
@@ -254,15 +265,12 @@ public class GridFromXml extends SamplingFrame {
 	
 	void imageCheck(){
 		String currentImageName = imp.getTitle();
-		if((!currentImageName.equals(imageName) &&
-				!currentImageName.equals("Counter Window - " + imageName)) 
-				||
-				(!currentImageName.equalsIgnoreCase(imageNameSF) &&
-						!currentImageName.equals("Counter Window - " + imageNameSF))
+		if(!currentImageName.equals(imageName) &&
+				!currentImageName.equals("Counter Window - " + imageName)
 				)
 			err += "The image name does not match with the current image\n";
 				
-		if(!units.equals(unitsXml) || !units.equals(unitsXmlSF))
+		if(!units.equals(unitsXml))
 			err += "units of the image does not match with "
 					+ "the units of the current image\n";
 		

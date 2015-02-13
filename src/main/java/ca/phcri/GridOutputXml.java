@@ -100,19 +100,19 @@ public class GridOutputXml {
 					.newDocument();
 			doc.setXmlStandalone(true);
 			pluginEl = doc.createElement("imagejCombinedGridsPlugin");
-			doc.appendChild(combinedgridEl);
-			combinedgridEl = doc.createElement("combinedGrid");
-			combinedgridEl.setAttribute("date", savedDate);
+			doc.appendChild(pluginEl);
+			combinedgridEl = doc.createElement("combinedGrids");
 			pluginEl.appendChild(combinedgridEl);
+			
+			Element dateEl = doc.createElement("date");
+			addElementWithText(doc, dateEl, "datetime", savedDate);
+			combinedgridEl.appendChild(dateEl);
 			
 			Element imageEl = doc.createElement("image");
 			String[] elementNameImageEl = {"title", "unit"};
 			String[] inputImageEl = {imageName, units};
-			for(int i = 0; i < elementNameImageEl.length; i++){
-				Element el = doc.createElement(elementNameImageEl[i]);
-				el.appendChild(doc.createTextNode(inputImageEl[i]));
-				imageEl.appendChild(el);
-			}
+			addElementWithText(doc, imageEl, elementNameImageEl, inputImageEl);
+			combinedgridEl.appendChild(imageEl);
 			//add image as an individual node and put image name in it
 			
 		} catch (ParserConfigurationException exc) {
@@ -132,31 +132,26 @@ public class GridOutputXml {
 				gridRatio = gridRatio.substring(1);
 			
 			try {
-				Element gridEl = doc.createElement("grid");
+				Element gridEl = doc.createElement("grids");
 				combinedgridEl.appendChild(gridEl);
 				
 				String[] elementNameGridEl =
-					{"image", "type", "app", "ratio", "unit", "color", "location"};
+					{"type", "app", "ratio","color", "location"};
 				String[] inputGridEl =
-					{imageName, type, areaPerPoint, gridRatio, units, color, location};
+					{type, areaPerPoint, gridRatio, color, location};
+				addElementWithText(doc, gridEl, elementNameGridEl, inputGridEl);
 				
-				for(int i = 0; i < elementNameGridEl.length; i++){
-					Element el = doc.createElement(elementNameGridEl[i]);
-					el.appendChild(doc.createTextNode(inputGridEl[i]));
-					gridEl.appendChild(el);
-				}
 				
 				String[] startName = 
-					{"xstart", "ystart", "xstartCoarse", "ystartCoarse"};
+					{"sliceNo", "xstart", "ystart", "xstartCoarse", "ystartCoarse"};
 				String[][] startInput = 
-					{xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray};
+					{sliceNoArray, xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray};
 				
 				for(int i = 0; i < totalSlice; i++){
-					Element sliceEl = doc.createElement("slice");
-					sliceEl.setAttribute("z", sliceNoArray[i]);
+					Element sliceEl = doc.createElement("grid");
 					gridEl.appendChild(sliceEl);
 					
-					for(int j = 0; j < 4; j++){
+					for(int j = 0; j < startName.length; j++){
 						Element el = doc.createElement(startName[j]);
 						el.appendChild(doc.createTextNode(startInput[j][i]));
 						sliceEl.appendChild(el);
@@ -175,19 +170,14 @@ public class GridOutputXml {
 				Element samplingFrameEl = doc.createElement("samplingFrame");
 				combinedgridEl.appendChild(samplingFrameEl);
 				
-				
 				String[] elementNameSamplingFrameEl = 
-					{"image", "units", "left", "right", "top", "bottom", 
+					{"left", "right", "top", "bottom", 
 						"prohibitedColor", "acceptanceColor", "acceptanceType"};
 				String[] inputSamlingFrameEl =
-					{imageName, units, marginLeft, marginRight, marginTop, marginBottom, 
+					{marginLeft, marginRight, marginTop, marginBottom, 
 						prohibitedLineColor, acceptanceLineColor, acceptanceLineType};
 				
-				for(int i = 0; i < elementNameSamplingFrameEl.length; i++){
-					Element el = doc.createElement(elementNameSamplingFrameEl[i]);
-					el.appendChild(doc.createTextNode(inputSamlingFrameEl[i]));
-					samplingFrameEl.appendChild(el);
-				}
+				addElementWithText(doc, samplingFrameEl, elementNameSamplingFrameEl, inputSamlingFrameEl);
 		
 			} catch (TransformerFactoryConfigurationError exc) {
 				// TODO Auto-generated catch block
@@ -197,6 +187,20 @@ public class GridOutputXml {
 		
 	}
 	
+	
+	void addElementWithText(Document root, Element parent, String childTag, String childText){
+		String[] tags = {childTag};
+		String[] texts = {childText};
+		addElementWithText(root, parent, tags, texts);
+	}
+	
+	void addElementWithText(Document root, Element parent, String[] childTags, String[] childTexts){
+		for(int i = 0; i < childTags.length; i++){
+			Element child = root.createElement(childTags[i]);
+			child.appendChild(root.createTextNode(childTexts[i]));
+			parent.appendChild(child);
+		}
+	}
 	
 	boolean save(){
 		Transformer tf;
