@@ -773,6 +773,12 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 			index = sliceNumber - 1;
 		}
 		
+		String frameParameters;
+		
+		if(samplingFrameOn)
+			frameParameters = sfd.getParameters();
+		else
+		frameParameters = "" + "\t" + "" + "\t"  + "" + "\t" + "" + "\t" + "" + "\t" + "" + "\t" + "";
 		
 		date = new Date();
 		
@@ -780,7 +786,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 				sliceStr + "\t" + type + "\t" + areaPerPoint + "\t" + units +
 				"\t" + singleQuart + gridRatio + "\t" + color + "\t" + locationChoice
 				+ "\t" + xStartOutput + "\t" + ystart + "\t"
-				+ xStartCoarseOutput + "\t" + yStartCoarseOutput;
+				+ xStartCoarseOutput + "\t" + yStartCoarseOutput + "\t"
+				+ frameParameters;
 		// singleQuart before gridRatio is to prevent conversion to date in
 		// Excel.
 		
