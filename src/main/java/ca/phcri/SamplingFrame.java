@@ -6,23 +6,28 @@ import ij.measure.Calibration;
 
 import java.awt.AWTEvent;
 import java.awt.Dialog;
+import java.util.Date;
 
 
 public class SamplingFrame extends CombinedGridsPlugin {
 	GenericDialog sfgd;
 	String frameName = "Sampling Frame";
+	static boolean asIindividualFrame; 
 	
 	@Override
 	public void run(String arg) {
 		if (IJ.versionLessThan("1.47"))
 			return;
-		new SamplingFrame();
+		
+		setAsIndividual(true);
+		makeUnvisibleDialog();
 		sfgd.showDialog();
 		
 		if(sfgd.wasCanceled()){
 			drawSamplingFrame(false);
 			return;
 		}
+		
 		if(sfgd.wasOKed()){
 			if(!"".equals(err)){
 				IJ.error(err);
@@ -30,22 +35,50 @@ public class SamplingFrame extends CombinedGridsPlugin {
 				return;
 			}
 			
-			String[] gridParameterArray = {df.format(date) + "\t" + "" + "\t" + 
-					"" + "\t" + "" + "\t" + "" + "\t" + units + "^2" +
+			date = new Date();
+			
+			String[] gridParameterArray = {df.format(date) + "\t" + imp.getTitle() + "\t" + 
+					"" + "\t" + "" + "\t" + "" + "\t" + units +
 					"\t" + "" + "" + "\t" + "" + "\t" + ""
 					+ "\t" + "" + "\t" + "" + "\t"
 					+ "" + "\t" + "" + "\t"
 					+ getParameters()};
+			
+			
+			if(asIindividualFrame && saveXml) {
+				GridOutputXml gox = 
+						new GridOutputXml(gridParameterArray);
+				boolean saved = gox.save();
+				
+				if(!saved){
+					GenericDialog gdWantGrid = 
+							new GenericDialog("Do you want a Sampling Frame?");
+					gdWantGrid.addMessage("Do you want to overlay a Sampling Frame?");
+					gdWantGrid.enableYesNoCancel();
+					gdWantGrid.hideCancelButton();
+					gdWantGrid.showDialog();
+				
+					if(!gdWantGrid.wasOKed()){
+						removeSamplingFrame();
+						return;
+					}
+					
+				}
+				
+			}
+			
 			showHistory(gridParameterArray);
 		}
 		
 	}
 	
-	SamplingFrame(){
-		this(true);
+	
+	
+	void setAsIndividual(boolean indivudial){
+		asIindividualFrame = indivudial;
 	}
 	
-	SamplingFrame(boolean decorated){
+	void makeUnvisibleDialog(){
 		imp = IJ.getImage();
 		width = imp.getWidth();
 		height = imp.getHeight();
@@ -62,11 +95,10 @@ public class SamplingFrame extends CombinedGridsPlugin {
 			units = "pixels";
 			places = 0;
 		}
-		
-		
+				
 		
 		sfgd = new GenericDialog(frameName);
-		if(!decorated){
+		if(!asIindividualFrame){
 			sfgd.setUndecorated(true);
 			sfgd.setInsets(0, 0, 0);
 			sfgd.addMessage(frameName);
@@ -91,6 +123,9 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		sfgd.addChoice("Color:", colors, acceptanceLineColor);
 		sfgd.addChoice("Type:", lineTypes, acceptanceLineType);
 		
+		if(asIindividualFrame)
+			sfgd.addCheckbox("Save parameters as a xml file", saveXml);
+		
 		sfgd.addDialogListener(this);
 		sfgd.setModalExclusionType(Dialog.ModalExclusionType.TOOLKIT_EXCLUDE);
 		sfgd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
@@ -112,9 +147,14 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		acceptanceLineColor = sfgd.getNextChoice();
 		acceptanceLineType = sfgd.getNextChoice();
 		
+		if(asIindividualFrame)
+			saveXml = sfgd.getNextBoolean();
+		
 		err = "";
 		
 		drawSamplingFrame(true);
+		IJ.showStatus(err);
+		
 		return true;
 	}
 	

@@ -5,7 +5,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import ij.IJ;
-import ij.gui.Roi;
 import ij.io.SaveDialog;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -21,7 +20,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 
 public class GridOutputXml {
@@ -91,7 +89,7 @@ public class GridOutputXml {
 		if(imageName.startsWith(prefixCellCounter))
 			imageName = imageName.substring(17);
 		
-		units = units.substring(0, units.indexOf("^"));
+		//units = units.substring(0, units.indexOf("^"));
 		
 		if(!"null".equals(gridRatio))
 			gridRatio = gridRatio.substring(1);

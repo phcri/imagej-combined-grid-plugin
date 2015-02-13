@@ -72,7 +72,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 	private final static int[] intervalField = { 21 };
 	static boolean showGridSwitch = true;
 	static String gridHistoryHeadings = 
-			"Date \t Image \t Slice \t Grid Type \t Area per Point \t Unit "
+			"Date \t Image \t Slice \t Grid Type \t Area per Point (Unit^2) \t Unit "
 					+ "\t Ratio \t Color \t Location Setting "
 					+ "\t xstart \t ystart \t xstartCoarse \t ystartCoarse "
 					+ "\t Left Margin \t Right Margin \t Top Margin \t Bottom Margin "
@@ -92,7 +92,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 	Roi[] gridRoiArray;
 	String[] gridParameterArray;
 	int totalSlices;
-	boolean saveXml;
+	static boolean saveXml = true;
 	int interval = 2;
 	boolean samplingFrameOn = false;
 	double marginLeft;
@@ -318,7 +318,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		
 		totalSlices = imp.getStackSize();
 		
-		sfd = new SamplingFrame(false);
+		sfd = new SamplingFrame();
+		sfd.setAsIndividual(false);
+		sfd.makeUnvisibleDialog();
+		
 		
 		// get values in a dialog box
 		gd = new GenericDialog("Grid...");
@@ -339,7 +342,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		}
 		
 		gd.addCheckbox("Put sampling frame on the image", samplingFrameOn);
-		gd.addCheckbox("Save parameters as a xml file", true);
+		gd.addCheckbox("Save parameters as a xml file", saveXml);
 		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
 		
 		// to switch enable/disable for parameter input boxes
@@ -561,6 +564,16 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 			
 			if(marginLeft < 0 || marginRight < 0 || marginTop < 0 || marginBottom < 0){
 				err += "Parameter for Margins should not be negative\n";
+				return;
+			}
+			
+			if(marginLeft + marginRight >= width){
+				err += "Left and/or Right margins are too large\n";
+				return;
+			}
+			
+			if(marginTop + marginBottom >= height){
+				err += "Top and/or Bottom margins are too large\n";
 				return;
 			}
 			
@@ -867,7 +880,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		date = new Date();
 		
 		String gridParameters = df.format(date) + "\t" + imp.getTitle() + "\t" + 
-				sliceStr + "\t" + type + "\t" + areaPerPoint + "\t" + units + "^2" +
+				sliceStr + "\t" + type + "\t" + areaPerPoint + "\t" + units +
 				"\t" + singleQuart + gridRatio + "\t" + color + "\t" + locationChoice
 				+ "\t" + xStartOutput + "\t" + ystart + "\t"
 				+ xStartCoarseOutput + "\t" + yStartCoarseOutput + "\t"
