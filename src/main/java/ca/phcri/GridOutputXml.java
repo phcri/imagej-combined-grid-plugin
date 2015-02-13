@@ -35,6 +35,7 @@ public class GridOutputXml {
 	String location;
 	static String directory = IJ.getDirectory("plugins");
 	Document doc;
+	Element combinedgridEl;
 	String marginLeft;
 	String marginRight;
 	String marginTop;
@@ -91,9 +92,6 @@ public class GridOutputXml {
 		
 		//units = units.substring(0, units.indexOf("^"));
 		
-		if(!"null".equals(gridRatio))
-			gridRatio = gridRatio.substring(1);
-		
 		
 		try {
 			doc = DocumentBuilderFactory
@@ -101,45 +99,73 @@ public class GridOutputXml {
 					.newDocumentBuilder()
 					.newDocument();
 			doc.setXmlStandalone(true);
-			Element combinedgridEl = doc.createElement("CombinedGrids");
+			combinedgridEl = doc.createElement("CombinedGrids");
+			combinedgridEl.setAttribute("date", savedDate);
+			combinedgridEl.setAttribute("image", imageName);
 			doc.appendChild(combinedgridEl);
 			
-			Element gridEl = doc.createElement("grid");
-			gridEl.setAttribute("date", savedDate);
-			combinedgridEl.appendChild(gridEl);
+			//add image as an individual node and put image name in it
 			
-			String[] elementNameGridEl =
-				{"image", "type", "app", "ratio", "unit", "color", "location"};
-			String[] inputGridEl =
-				{imageName, type, areaPerPoint, gridRatio, units, color, location};
+		} catch (ParserConfigurationException exc) {
+			// TODO Auto-generated catch block
+			exc.printStackTrace();
+		} catch (TransformerFactoryConfigurationError exc) {
+			// TODO Auto-generated catch block
+			exc.printStackTrace();
+		}
+		
+		
+		//making a "grid" node
+		if(!"".equals(type)){
+			if(!"null".equals(gridRatio))
+				gridRatio = gridRatio.substring(1);
 			
-			for(int i = 0; i < elementNameGridEl.length; i++){
-				Element el = doc.createElement(elementNameGridEl[i]);
-				el.appendChild(doc.createTextNode(inputGridEl[i]));
-				gridEl.appendChild(el);
-			}
-			
-			String[] startName = 
-				{"xstart", "ystart", "xstartCoarse", "ystartCoarse"};
-			String[][] startInput = 
-				{xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray};
-			
-			for(int i = 0; i < totalSlice; i++){
-				Element sliceEl = doc.createElement("slice");
-				sliceEl.setAttribute("z", sliceNoArray[i]);
-				gridEl.appendChild(sliceEl);
+			try {
+				Element gridEl = doc.createElement("grid");
+				gridEl.setAttribute("date", savedDate);
+				combinedgridEl.appendChild(gridEl);
 				
-				for(int j = 0; j < 4; j++){
-					Element el = doc.createElement(startName[j]);
-					el.appendChild(doc.createTextNode(startInput[j][i]));
-					sliceEl.appendChild(el);
+				String[] elementNameGridEl =
+					{"image", "type", "app", "ratio", "unit", "color", "location"};
+				String[] inputGridEl =
+					{imageName, type, areaPerPoint, gridRatio, units, color, location};
+				
+				for(int i = 0; i < elementNameGridEl.length; i++){
+					Element el = doc.createElement(elementNameGridEl[i]);
+					el.appendChild(doc.createTextNode(inputGridEl[i]));
+					gridEl.appendChild(el);
 				}
+				
+				String[] startName = 
+					{"xstart", "ystart", "xstartCoarse", "ystartCoarse"};
+				String[][] startInput = 
+					{xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray};
+				
+				for(int i = 0; i < totalSlice; i++){
+					Element sliceEl = doc.createElement("slice");
+					sliceEl.setAttribute("z", sliceNoArray[i]);
+					gridEl.appendChild(sliceEl);
+					
+					for(int j = 0; j < 4; j++){
+						Element el = doc.createElement(startName[j]);
+						el.appendChild(doc.createTextNode(startInput[j][i]));
+						sliceEl.appendChild(el);
+					}
+				}
+				
+			} catch (TransformerFactoryConfigurationError exc) {
+				// TODO Auto-generated catch block
+				exc.printStackTrace();
 			}
-			
-			
-			if(marginLeft != null){
+		}
+		
+		//making a "samplingFrame" node
+		if(marginLeft != null){
+			try{
 				Element samplingFrameEl = doc.createElement("samplingFrame");
+				samplingFrameEl.setAttribute("date", savedDate);
 				combinedgridEl.appendChild(samplingFrameEl);
+				
 				
 				String[] elementNameSamplingFrameEl = 
 					{"left", "right", "top", "bottom", "prohibitedColor", 
@@ -153,18 +179,14 @@ public class GridOutputXml {
 					el.appendChild(doc.createTextNode(inputSamlingFrameEl[i]));
 					samplingFrameEl.appendChild(el);
 				}
-				
+			
+		
+			} catch (TransformerFactoryConfigurationError exc) {
+				// TODO Auto-generated catch block
+				exc.printStackTrace();
 			}
-			
-			
-			
-		} catch (ParserConfigurationException exc) {
-			// TODO Auto-generated catch block
-			exc.printStackTrace();
-		} catch (TransformerFactoryConfigurationError exc) {
-			// TODO Auto-generated catch block
-			exc.printStackTrace();
 		}
+		
 	}
 	
 	
