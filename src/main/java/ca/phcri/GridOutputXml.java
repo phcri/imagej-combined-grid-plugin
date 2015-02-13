@@ -35,7 +35,7 @@ public class GridOutputXml {
 	String location;
 	static String directory = IJ.getDirectory("plugins");
 	Document doc;
-	Element combinedgridEl;
+	Element pluginEl, combinedgridEl;
 	String marginLeft;
 	String marginRight;
 	String marginTop;
@@ -99,9 +99,20 @@ public class GridOutputXml {
 					.newDocumentBuilder()
 					.newDocument();
 			doc.setXmlStandalone(true);
-			combinedgridEl = doc.createElement("CombinedGrids");
+			pluginEl = doc.createElement("imagejCombinedGridsPlugin");
 			doc.appendChild(combinedgridEl);
+			combinedgridEl = doc.createElement("combinedGrid");
+			combinedgridEl.setAttribute("date", savedDate);
+			pluginEl.appendChild(combinedgridEl);
 			
+			Element imageEl = doc.createElement("image");
+			String[] elementNameImageEl = {"title", "unit"};
+			String[] inputImageEl = {imageName, units};
+			for(int i = 0; i < elementNameImageEl.length; i++){
+				Element el = doc.createElement(elementNameImageEl[i]);
+				el.appendChild(doc.createTextNode(inputImageEl[i]));
+				imageEl.appendChild(el);
+			}
 			//add image as an individual node and put image name in it
 			
 		} catch (ParserConfigurationException exc) {
@@ -113,6 +124,8 @@ public class GridOutputXml {
 		}
 		
 		
+		
+		
 		//making a "grid" node
 		if(!"".equals(type)){
 			if(!"null".equals(gridRatio))
@@ -120,7 +133,6 @@ public class GridOutputXml {
 			
 			try {
 				Element gridEl = doc.createElement("grid");
-				gridEl.setAttribute("date", savedDate);
 				combinedgridEl.appendChild(gridEl);
 				
 				String[] elementNameGridEl =
@@ -161,7 +173,6 @@ public class GridOutputXml {
 		if(marginLeft != null){
 			try{
 				Element samplingFrameEl = doc.createElement("samplingFrame");
-				samplingFrameEl.setAttribute("date", savedDate);
 				combinedgridEl.appendChild(samplingFrameEl);
 				
 				

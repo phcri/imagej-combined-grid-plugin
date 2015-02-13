@@ -22,11 +22,15 @@ import ij.measure.Calibration;
 public class GridFromXml extends SamplingFrame {
 	int[] xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray, sliceNoArray;
 	String imageName;
+	String imageNameSF;
 	
 	String unitsXml;
+	String unitsXmlSF;
 	int totalGridNo;
 	String filePath;
 	boolean goBack = false;
+	boolean gridExist;
+	
 	
 	
 	@Override
@@ -53,11 +57,15 @@ public class GridFromXml extends SamplingFrame {
 		if(goBack) return;
 		
 		drawSamplingFrame(samplingFrameOn);
-		gridLayer();
 		
-		Grid_Switch gs = new Grid_Switch();
-		gs.gridSwitch();
-
+		if(gridExist){
+			gridLayer();
+			Grid_Switch gs = new Grid_Switch();
+			gs.gridSwitch();
+		} else if(samplingFrameOn){
+			//the way to create gridParameterArray without grid parameters
+		}
+		
 		showHistory(gridParameterArray);
 	}
 	
@@ -70,77 +78,98 @@ public class GridFromXml extends SamplingFrame {
 					DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			
 			Document doc = builder.parse(new File(filePath));
-			NodeList combinedgridNL = doc.getElementsByTagName("CombinedGrids");
-			Element combinedgridEl = (Element) combinedgridNL.item(0);
+			NodeList pluginNL = 
+					doc.getElementsByTagName("imagejCombinedGridsPlugin");
+			Element pluginEl = (Element) pluginNL.item(0);
 			
-			if(combinedgridEl == null){
-				err += "This file does not have information for grids";
-			}else{
-				NodeList gridNL = combinedgridEl.getElementsByTagName("grid");
-				Element gridEl = (Element) gridNL.item(0);
+			if(pluginEl == null){
+				err += "This file is not compatible with the CombinedGridsPlugin";
 				
-				if(gridEl != null){
-					gridEl.getAttribute("date");
-					imageName = getElementValueAsStr(gridEl, "image", 0);
-					type = getElementValueAsStr(gridEl, "type", 0);
-					areaPerPoint = getElementValueAsDouble(gridEl,  "app", 0);
-					gridRatio = getElementValueAsStr(gridEl, "ratio", 0);
-					unitsXml = getElementValueAsStr(gridEl, "unit", 0);
-					color = getElementValueAsStr(gridEl, "color", 0);
+			} else {
+				NodeList combinedgridNL = pluginEl.getElementsByTagName("CombinedGrids");
+				Element combinedgridEl = (Element) combinedgridNL.item(0);
+				
+				if(combinedgridEl == null){
+					err += "This file does not have grid information";
 					
+				}else{
+					NodeList imageNL = combinedgridEl.getElementsByTagName("image");
+					Element imageEl = (Element) imageNL.item(0);
+					imageName = getElementValueAsStr(imageEl, "image", 0);
+					unitsXml = getElementValueAsStr(imageEl, "unit", 0);
 					
-					NodeList sliceNL = gridEl.getElementsByTagName("slice");
-					totalGridNo = sliceNL.getLength();
+					NodeList gridNL = combinedgridEl.getElementsByTagName("grid");
+					Element gridEl = (Element) gridNL.item(0);
 					
-					sliceNoArray = new int[totalGridNo];
-					xstartArray = new int[totalGridNo];
-					ystartArray = new int[totalGridNo];
-					xstartCoarseArray = new int[totalGridNo];
-					ystartCoarseArray = new int[totalGridNo];
-					
-					for(int i = 0; i < sliceNL.getLength(); i++){
-						Element sliceNode = (Element) sliceNL.item(i);
-						String sliceNo = sliceNode.getAttribute("z");
-						if(!"All".equals(sliceNo))
-							sliceNoArray[i] = Integer.parseInt(sliceNo);
-						xstartArray[i] = 
-								getElementValueAsInteger(sliceNode, "xstart", 0);
-						ystartArray[i] = 
-								getElementValueAsInteger(sliceNode, "ystart", 0);
-						xstartCoarseArray[i] = 
-								getElementValueAsInteger(sliceNode, "xstartCoarse", 0);
-						ystartCoarseArray[i] = 
-								getElementValueAsInteger(sliceNode, "ystartCoarse", 0);
+					if(gridEl == null){
+						gridExist = false;
+						
+					}else{
+						gridExist = true;
+						type = getElementValueAsStr(gridEl, "type", 0);
+						areaPerPoint = getElementValueAsDouble(gridEl,  "app", 0);
+						gridRatio = getElementValueAsStr(gridEl, "ratio", 0);
+						
+						color = getElementValueAsStr(gridEl, "color", 0);
+						
+						
+						NodeList sliceNL = gridEl.getElementsByTagName("slice");
+						totalGridNo = sliceNL.getLength();
+						
+						sliceNoArray = new int[totalGridNo];
+						xstartArray = new int[totalGridNo];
+						ystartArray = new int[totalGridNo];
+						xstartCoarseArray = new int[totalGridNo];
+						ystartCoarseArray = new int[totalGridNo];
+						
+						for(int i = 0; i < sliceNL.getLength(); i++){
+							Element sliceNode = (Element) sliceNL.item(i);
+							String sliceNo = sliceNode.getAttribute("z");
+							if(!"All".equals(sliceNo))
+								sliceNoArray[i] = Integer.parseInt(sliceNo);
+							xstartArray[i] = 
+									getElementValueAsInteger(sliceNode, "xstart", 0);
+							ystartArray[i] = 
+									getElementValueAsInteger(sliceNode, "ystart", 0);
+							xstartCoarseArray[i] = 
+									getElementValueAsInteger(sliceNode, "xstartCoarse", 0);
+							ystartCoarseArray[i] = 
+									getElementValueAsInteger(sliceNode, "ystartCoarse", 0);
+						}
 					}
-				}
-				
-				
-				NodeList samplingFrameNL = 
-						combinedgridEl.getElementsByTagName("samplingFrame");
-				Element samplingFrameEl = 
-						(Element)  samplingFrameNL.item(0);
-				
-				if(samplingFrameEl == null){
-					samplingFrameOn = false;
 					
-				} else{
-					samplingFrameOn = true;
-					marginLeft = 
-							getElementValueAsDouble(samplingFrameEl, "left", 0);
-					marginRight = 
-							getElementValueAsDouble(samplingFrameEl, "right", 0);
-					marginTop = 
-							getElementValueAsDouble(samplingFrameEl, "top", 0);
-					marginBottom = 
-							getElementValueAsDouble(samplingFrameEl, "bottom", 0);
-					prohibitedLineColor = 
-							getElementValueAsStr(samplingFrameEl, "prohibitedColor", 0);
-					acceptanceLineColor = 
-							getElementValueAsStr(samplingFrameEl, "acceptanceColor", 0);
-					acceptanceLineType = 
-							getElementValueAsStr(samplingFrameEl, "acceptanceType", 0);
+					
+					NodeList samplingFrameNL = 
+							combinedgridEl.getElementsByTagName("samplingFrame");
+					Element samplingFrameEl = 
+							(Element)  samplingFrameNL.item(0);
+					
+					if(samplingFrameEl == null){
+						samplingFrameOn = false;
+						
+					} else{
+						samplingFrameOn = true;
+						imageNameSF = 
+								getElementValueAsStr(samplingFrameEl, "image", 0);
+						unitsXmlSF = 
+								getElementValueAsStr(samplingFrameEl, "unit", 0);
+						marginLeft = 
+								getElementValueAsDouble(samplingFrameEl, "left", 0);
+						marginRight = 
+								getElementValueAsDouble(samplingFrameEl, "right", 0);
+						marginTop = 
+								getElementValueAsDouble(samplingFrameEl, "top", 0);
+						marginBottom = 
+								getElementValueAsDouble(samplingFrameEl, "bottom", 0);
+						prohibitedLineColor = 
+								getElementValueAsStr(samplingFrameEl, "prohibitedColor", 0);
+						acceptanceLineColor = 
+								getElementValueAsStr(samplingFrameEl, "acceptanceColor", 0);
+						acceptanceLineType = 
+								getElementValueAsStr(samplingFrameEl, "acceptanceType", 0);
+					}
+					
 				}
-				
 			}
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
@@ -151,7 +180,9 @@ public class GridFromXml extends SamplingFrame {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+			
 	}
+			
 	
 	
 	String getElementValueAsStr(Element e, String tag, int index){
@@ -197,6 +228,7 @@ public class GridFromXml extends SamplingFrame {
 		showGrid(gridRoiArray);
 	}
 	
+	
 	void xmlFileOpen(){
 		OpenDialog.setDefaultDirectory(IJ.getDirectory("plugins"));
 		OpenDialog od = new OpenDialog("Select XML file containing grid data");
@@ -221,11 +253,16 @@ public class GridFromXml extends SamplingFrame {
 	}
 	
 	void imageCheck(){
-		if(!imp.getTitle().equals(imageName) &&
-				!imp.getTitle().equals("Counter Window - " + imageName))
+		String currentImageName = imp.getTitle();
+		if((!currentImageName.equals(imageName) &&
+				!currentImageName.equals("Counter Window - " + imageName)) 
+				||
+				(!currentImageName.equalsIgnoreCase(imageNameSF) &&
+						!currentImageName.equals("Counter Window - " + imageNameSF))
+				)
 			err += "The image name does not match with the current image\n";
 				
-		if(!units.equals(unitsXml))
+		if(!units.equals(unitsXml) || !units.equals(unitsXmlSF))
 			err += "units of the image does not match with "
 					+ "the units of the current image\n";
 		
