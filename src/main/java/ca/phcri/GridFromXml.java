@@ -19,7 +19,7 @@ import ij.gui.ShapeRoi;
 import ij.io.OpenDialog;
 import ij.measure.Calibration;
 
-public class GridFromXml extends CombinedGridsPlugin {
+public class GridFromXml extends SamplingFrame {
 	int[] xstartArray, ystartArray, xstartCoarseArray, ystartCoarseArray, sliceNoArray;
 	String imageName;
 	
@@ -103,8 +103,10 @@ public class GridFromXml extends CombinedGridsPlugin {
 						String sliceNo = sliceNode.getAttribute("z");
 						if(!"All".equals(sliceNo))
 							sliceNoArray[i] = Integer.parseInt(sliceNo);
-						xstartArray[i] = getElementValueAsInteger(sliceNode, "xstart", 0);
-						ystartArray[i] = getElementValueAsInteger(sliceNode, "ystart", 0);
+						xstartArray[i] = 
+								getElementValueAsInteger(sliceNode, "xstart", 0);
+						ystartArray[i] = 
+								getElementValueAsInteger(sliceNode, "ystart", 0);
 						xstartCoarseArray[i] = 
 								getElementValueAsInteger(sliceNode, "xstartCoarse", 0);
 						ystartCoarseArray[i] = 
@@ -113,21 +115,30 @@ public class GridFromXml extends CombinedGridsPlugin {
 				}
 				
 				
-				NodeList samplingFrameNL = combinedgridEl.getElementsByTagName("samplingFrame");
-				Element samplingFrameEl = (Element)  samplingFrameNL.item(0);
+				NodeList samplingFrameNL = 
+						combinedgridEl.getElementsByTagName("samplingFrame");
+				Element samplingFrameEl = 
+						(Element)  samplingFrameNL.item(0);
 				
 				if(samplingFrameEl == null){
 					samplingFrameOn = false;
 					
 				} else{
 					samplingFrameOn = true;
-					marginLeft = getElementValueAsDouble(samplingFrameEl, "left", 0);
-					marginRight = getElementValueAsDouble(samplingFrameEl, "right", 0);
-					marginTop = getElementValueAsDouble(samplingFrameEl, "top", 0);
-					marginBottom = getElementValueAsDouble(samplingFrameEl, "bottom", 0);
-					prohibitedLineColor = getElementValueAsStr(samplingFrameEl, "prohibitedColor", 0);
-					acceptanceLineColor = getElementValueAsStr(samplingFrameEl, "acceptanceColor", 0);
-					acceptanceLineType = getElementValueAsStr(samplingFrameEl, "acceptanceType", 0);
+					marginLeft = 
+							getElementValueAsDouble(samplingFrameEl, "left", 0);
+					marginRight = 
+							getElementValueAsDouble(samplingFrameEl, "right", 0);
+					marginTop = 
+							getElementValueAsDouble(samplingFrameEl, "top", 0);
+					marginBottom = 
+							getElementValueAsDouble(samplingFrameEl, "bottom", 0);
+					prohibitedLineColor = 
+							getElementValueAsStr(samplingFrameEl, "prohibitedColor", 0);
+					acceptanceLineColor = 
+							getElementValueAsStr(samplingFrameEl, "acceptanceColor", 0);
+					acceptanceLineType = 
+							getElementValueAsStr(samplingFrameEl, "acceptanceType", 0);
 				}
 				
 			}

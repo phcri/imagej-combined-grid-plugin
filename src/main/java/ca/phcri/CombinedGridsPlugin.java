@@ -362,7 +362,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		
 		if (gd.wasCanceled()){
 			sfd.dispose();
-			removeSamplingFrame();
+			SamplingFrame.removeSamplingFrame();
 			
 			showGrid(null);
 		}
@@ -374,7 +374,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 			if (!"".equals(err)) { 	
 				IJ.error("Grid", err);
 				
-				removeSamplingFrame();
+				SamplingFrame.removeSamplingFrame();
 				showGrid(null);
 			} else {
 				
@@ -394,7 +394,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 					
 						if(!gdWantGrid.wasOKed()){
 							showGrid(null);
-							removeSamplingFrame();
+							SamplingFrame.removeSamplingFrame();
 							return;
 						}
 					}
@@ -536,102 +536,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 	}
 	
 	
-	static void removeSamplingFrame(){
-		ImagePlus imp = IJ.getImage();
-		Overlay ol = imp.getOverlay();
-		
-		if(ol == null) return;
-		
-		Roi[] rois = ol.toArray();
-		for(Roi roi : rois){
-			if(roi != null && roi.getName() != null && 
-					roi.getName().startsWith("samplingFrame"))
-				ol.remove(roi);
-		}
-		
-		imp.setOverlay(ol);
-	}
 	
-	
-	void drawSamplingFrame(boolean frameOn) {
-		removeSamplingFrame();
-		
-		if(frameOn){
-			Overlay ol = imp.getOverlay();
-			
-			if(ol == null)
-				ol = new Overlay();
-			
-			if(marginLeft < 0 || marginRight < 0 || marginTop < 0 || marginBottom < 0){
-				err += "Parameter for Margins should not be negative\n";
-				return;
-			}
-			
-			if(marginLeft + marginRight >= width){
-				err += "Left and/or Right margins are too large\n";
-				return;
-			}
-			
-			if(marginTop + marginBottom >= height){
-				err += "Top and/or Bottom margins are too large\n";
-				return;
-			}
-			
-			GeneralPath forbiddenPath = new GeneralPath();
-			forbiddenPath.moveTo(marginLeft, 0);
-			forbiddenPath.lineTo(marginLeft, height - marginBottom);
-			forbiddenPath.lineTo(width - marginRight, height - marginBottom);
-			forbiddenPath.lineTo(width - marginRight, height);
-			ShapeRoi prohibitedLine = new ShapeRoi(forbiddenPath);
-			prohibitedLine.setStrokeColor(getColor(prohibitedLineColor));
-			prohibitedLine.setName("samplingFrameProhibited");
-			
-			
-			GeneralPath acceptancePath = new GeneralPath();
-			
-			if(lineTypes[DASHED].equals(acceptanceLineType)){
-				int i = 0;
-				int lineSegment = 8;
-				int lineInterval = 14;
-				while (lineInterval * i < (width - marginLeft - marginRight)){
-					acceptancePath
-						.moveTo(marginLeft + lineInterval * i, 
-								marginTop);
-					acceptancePath
-						.lineTo(marginLeft + lineInterval * i + lineSegment, 
-								marginTop);
-					i++;
-				}
-				
-				i = 0;
-				while (lineInterval * i < (height - marginTop - marginBottom)){
-					acceptancePath
-						.moveTo(width - marginRight, 
-								marginTop + lineInterval * i);
-					acceptancePath
-						.lineTo(width - marginRight,
-								marginTop + lineInterval * i + lineSegment);
-					i++;
-				}
-			} else {
-				acceptancePath.moveTo(marginLeft, marginTop);
-				acceptancePath.lineTo(width - marginRight, marginTop);
-				acceptancePath.lineTo(width - marginRight, height - marginBottom);
-			}
-			
-			ShapeRoi acceptanceLine = new ShapeRoi(acceptancePath);
-			acceptanceLine.setStrokeColor(getColor(acceptanceLineColor));
-			acceptanceLine.setName("samplingFrameAcceptance");
-			
-			
-			
-			ol.add(prohibitedLine);
-			ol.add(acceptanceLine);
-			
-			imp.setOverlay(ol);
-		}
-		
-	}
 
 
 	void addGridOnArray(ShapeRoi gridRoi, int sliceIndex){
