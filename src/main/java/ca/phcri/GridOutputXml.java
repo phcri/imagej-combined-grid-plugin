@@ -100,8 +100,6 @@ public class GridOutputXml {
 					.newDocument();
 			doc.setXmlStandalone(true);
 			combinedgridEl = doc.createElement("CombinedGrids");
-			combinedgridEl.setAttribute("date", savedDate);
-			combinedgridEl.setAttribute("image", imageName);
 			doc.appendChild(combinedgridEl);
 			
 			//add image as an individual node and put image name in it
@@ -168,18 +166,17 @@ public class GridOutputXml {
 				
 				
 				String[] elementNameSamplingFrameEl = 
-					{"left", "right", "top", "bottom", "prohibitedColor", 
-						"acceptanceColor", "acceptanceType"};
+					{"image", "units", "left", "right", "top", "bottom", 
+						"prohibitedColor", "acceptanceColor", "acceptanceType"};
 				String[] inputSamlingFrameEl =
-					{marginLeft, marginRight, marginTop, marginBottom, prohibitedLineColor,
-						acceptanceLineColor, acceptanceLineType};
+					{imageName, units, marginLeft, marginRight, marginTop, marginBottom, 
+						prohibitedLineColor, acceptanceLineColor, acceptanceLineType};
 				
 				for(int i = 0; i < elementNameSamplingFrameEl.length; i++){
 					Element el = doc.createElement(elementNameSamplingFrameEl[i]);
 					el.appendChild(doc.createTextNode(inputSamlingFrameEl[i]));
 					samplingFrameEl.appendChild(el);
 				}
-			
 		
 			} catch (TransformerFactoryConfigurationError exc) {
 				// TODO Auto-generated catch block
