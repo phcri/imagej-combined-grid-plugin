@@ -165,13 +165,13 @@ public class GridFromXml extends CombinedGridsPlugin {
 					} else{
 						samplingFrameOn = true;
 						marginLeft = 
-								getElementValueAsDouble(samplingFrameEl, "left", 0);
+								getElementValueAsInteger(samplingFrameEl, "left", 0);
 						marginRight = 
-								getElementValueAsDouble(samplingFrameEl, "right", 0);
+								getElementValueAsInteger(samplingFrameEl, "right", 0);
 						marginTop = 
-								getElementValueAsDouble(samplingFrameEl, "top", 0);
+								getElementValueAsInteger(samplingFrameEl, "top", 0);
 						marginBottom = 
-								getElementValueAsDouble(samplingFrameEl, "bottom", 0);
+								getElementValueAsInteger(samplingFrameEl, "bottom", 0);
 						prohibitedLineColor = 
 								getElementValueAsStr(samplingFrameEl, "prohibitedColor", 0);
 						acceptanceLineColor = 

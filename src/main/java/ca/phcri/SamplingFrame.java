@@ -88,17 +88,10 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		width = imp.getWidth();
 		height = imp.getHeight();
 		Calibration cal = imp.getCalibration();
-		int places;
 		if (cal.scaled()) {
-			pixelWidth = cal.pixelWidth;
-			pixelHeight = cal.pixelHeight;
 			units = cal.getUnits();
-			places = 2;
 		} else {
-			pixelWidth = 1.0;
-			pixelHeight = 1.0;
 			units = "pixels";
-			places = 0;
 		}
 				
 		
@@ -112,11 +105,11 @@ public class SamplingFrame extends CombinedGridsPlugin {
 			sfgd.setInsets(0, 5, 0);
 		}
 		
-		sfgd.addMessage("Margins");
-		sfgd.addNumericField("Top", marginTop, places, 6, units);
-		sfgd.addNumericField("Bottom", marginBottom, places, 6, units);
-		sfgd.addNumericField("Left", marginLeft, places, 6, units);
-		sfgd.addNumericField("Right", marginRight, places, 6, units);
+		sfgd.addMessage("Margins (pixels)");
+		sfgd.addNumericField("Top", marginTop, 0);
+		sfgd.addNumericField("Bottom", marginBottom, 0);
+		sfgd.addNumericField("Left", marginLeft, 0);
+		sfgd.addNumericField("Right", marginRight, 0);
 		
 		
 		sfgd.setInsets(10, 5, 0);
@@ -139,8 +132,8 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		
 	}
 	
-	void setParameters(double marginTop, double marginBottom, 
-			double marginLeft, double marginRight,
+	void setParameters(int marginTop, int marginBottom, 
+			int marginLeft, int marginRight,
 			String prohibitedLineColor, String acceptanceLineColor, String acceptanceLinetype
 			){
 		this.marginTop = marginTop;
@@ -159,10 +152,10 @@ public class SamplingFrame extends CombinedGridsPlugin {
 	// event control for the dialog box
 	@Override
 	public boolean dialogItemChanged(GenericDialog sfgd, AWTEvent e) {
-		marginTop = sfgd. getNextNumber();
-		marginBottom = sfgd.getNextNumber();
-		marginLeft = sfgd.getNextNumber();
-		marginRight = sfgd.getNextNumber();
+		marginTop = (int) sfgd. getNextNumber();
+		marginBottom = (int) sfgd.getNextNumber();
+		marginLeft = (int) sfgd.getNextNumber();
+		marginRight = (int) sfgd.getNextNumber();
 		
 		prohibitedLineColor = sfgd.getNextChoice();
 		acceptanceLineColor = sfgd.getNextChoice();
