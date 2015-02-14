@@ -42,11 +42,8 @@ public class SamplingFrame extends CombinedGridsPlugin {
 			
 			date = new Date();
 			
-			String[] gridParameterArray = {df.format(date) + "\t" + imp.getTitle() + "\t" + 
-					"" + "\t" + "" + "\t" + "" + "\t" + units +
-					"\t" + "" + "" + "\t" + "" + "\t" + ""
-					+ "\t" + "" + "\t" + "" + "\t"
-					+ "" + "\t" + "" + "\t"
+			String[] gridParameterArray = {df.format(date) + "\t" + imp.getTitle() + 
+					"\t\t\t\t\t\t\t\t\t\t\t\t"
 					+ getParameters()};
 			
 			
@@ -87,13 +84,7 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		imp = IJ.getImage();
 		width = imp.getWidth();
 		height = imp.getHeight();
-		Calibration cal = imp.getCalibration();
-		if (cal.scaled()) {
-			units = cal.getUnits();
-		} else {
-			units = "pixels";
-		}
-				
+		
 		
 		sfgd = new GenericDialog(frameName);
 		if(!asIindividualFrame){

@@ -72,7 +72,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 	private final static int[] intervalField = { 21 };
 	static boolean showGridSwitch = true;
 	static String gridHistoryHeadings = 
-			"Date \t Image \t Slice \t Grid Type \t Area per Point (Unit^2) \t Unit "
+			"Date \t Image \t Slice \t Grid Type \t Area per Point \t Units "
 					+ "\t Ratio \t Color \t Location Setting "
 					+ "\t xstart \t ystart \t xstartCoarse \t ystartCoarse "
 					+ "\t Left Margin \t Right Margin \t Top Margin \t Bottom Margin "
@@ -783,7 +783,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		date = new Date();
 		
 		String gridParameters = df.format(date) + "\t" + imp.getTitle() + "\t" + 
-				sliceStr + "\t" + type + "\t" + areaPerPoint + "\t" + units +
+				sliceStr + "\t" + type + "\t" + areaPerPoint + "\t" + units + "^2" +
 				"\t" + singleQuart + gridRatio + "\t" + color + "\t" + locationChoice
 				+ "\t" + xStartOutput + "\t" + ystart + "\t"
 				+ xStartCoarseOutput + "\t" + yStartCoarseOutput + "\t"

@@ -73,11 +73,8 @@ public class GridFromXml extends CombinedGridsPlugin {
 			date = new Date();
 			
 			gridParameterArray = new String[1];
-			gridParameterArray[0] = df.format(date) + "\t" + imp.getTitle() + "\t" + 
-					"" + "\t" + "" + "\t" + "" + "\t" + units +
-					"\t" + "" + "" + "\t" + "" + "\t" + ""
-					+ "\t" + "" + "\t" + "" + "\t"
-					+ "" + "\t" + "" + "\t"
+			gridParameterArray[0] = df.format(date) + "\t" + imp.getTitle() 
+					+ "\t\t\t\t\t\t\t\t\t\t\t\t"
 					+ sfd.getParameters();
 		}
 		
@@ -111,7 +108,6 @@ public class GridFromXml extends CombinedGridsPlugin {
 					NodeList imageNL = combinedgridEl.getElementsByTagName("image");
 					Element imageEl = (Element) imageNL.item(0);
 					imageName = getElementValueAsStr(imageEl, "title", 0);
-					unitsXml = getElementValueAsStr(imageEl, "unit", 0);
 					
 					NodeList gridNL = combinedgridEl.getElementsByTagName("grids");
 					Element gridEl = (Element) gridNL.item(0);
@@ -123,6 +119,8 @@ public class GridFromXml extends CombinedGridsPlugin {
 						gridExist = true;
 						type = getElementValueAsStr(gridEl, "type", 0);
 						areaPerPoint = getElementValueAsDouble(gridEl,  "app", 0);
+						unitsXml = getElementValueAsStr(gridEl, "units", 0);
+						unitsXml = unitsXml.substring(0, unitsXml.indexOf("^"));
 						gridRatio = getElementValueAsStr(gridEl, "ratio", 0);
 						
 						color = getElementValueAsStr(gridEl, "color", 0);
@@ -270,7 +268,7 @@ public class GridFromXml extends CombinedGridsPlugin {
 				)
 			err += "The image name does not match with the current image\n";
 				
-		if(!units.equals(unitsXml))
+		if(unitsXml != null && !units.equals(unitsXml))
 			err += "units of the image does not match with "
 					+ "the units of the current image\n";
 		

@@ -90,7 +90,6 @@ public class GridOutputXml {
 		if(imageName.startsWith(prefixCellCounter))
 			imageName = imageName.substring(17);
 		
-		//units = units.substring(0, units.indexOf("^"));
 		
 		
 		try {
@@ -109,9 +108,7 @@ public class GridOutputXml {
 			combinedgridEl.appendChild(dateEl);
 			
 			Element imageEl = doc.createElement("image");
-			String[] elementNameImageEl = {"title", "unit"};
-			String[] inputImageEl = {imageName, units};
-			addElementWithText(doc, imageEl, elementNameImageEl, inputImageEl);
+			addElementWithText(doc, imageEl, "title", imageName);
 			combinedgridEl.appendChild(imageEl);
 			//add image as an individual node and put image name in it
 			
@@ -136,9 +133,9 @@ public class GridOutputXml {
 				combinedgridEl.appendChild(gridEl);
 				
 				String[] elementNameGridEl =
-					{"type", "app", "ratio","color", "location"};
+					{"type", "app", "units", "ratio","color", "location"};
 				String[] inputGridEl =
-					{type, areaPerPoint, gridRatio, color, location};
+					{type, areaPerPoint, units, gridRatio, color, location};
 				addElementWithText(doc, gridEl, elementNameGridEl, inputGridEl);
 				
 				
