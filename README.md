@@ -19,7 +19,7 @@ Released on February 7th, 2015
 <p>
 	<H2>Update on February 7th, 2015</H2>
 	<ol>
-		<li>Out paramters in an XML file</li>
+		<li>Output paramters in an XML file</li>
 		<li>Input and Overlay Grids from an XML file</li>
 		<li>Systematic Random Sampling of slices in a stack to overlay grids</li>
 	</ol>

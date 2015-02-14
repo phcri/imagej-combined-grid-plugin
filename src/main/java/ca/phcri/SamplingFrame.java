@@ -280,7 +280,6 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		return frameParameters;
 	}
 
-	@Override
 	void setLocation(int x, int y) {
 		sfgd.setLocation(x, y);
 	}

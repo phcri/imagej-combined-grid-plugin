@@ -342,7 +342,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		}
 		
 		gd.addCheckbox("Put sampling frame on the image", samplingFrameOn);
-		gd.addCheckbox("Save parameters as a xml file", saveXml);
+		gd.addCheckbox("Save parameters as an xml file", saveXml);
 		gd.addCheckbox("Show a Grid Switch if none exists", showGridSwitch);
 		
 		// to switch enable/disable for parameter input boxes
@@ -849,10 +849,6 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		return false;
 	}
 	
-	
-	void setLocation(int x, int y){
-		gd.setLocation(x, y);
-	}
 	
 	@Override
 	public void componentResized(ComponentEvent e) {
