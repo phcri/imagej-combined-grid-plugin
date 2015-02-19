@@ -186,8 +186,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 
 	GeneralPath drawCombined() {
 		GeneralPath path = new GeneralPath();
-		float arm = 5;
-		float pointSizeCoarse = 10;
+		float arm = 20;
+		float pointSizeCoarse = 40;
 		float armCoarse = pointSizeCoarse / 2;
 
 		for (int h = 0; h < linesV; h++) {
