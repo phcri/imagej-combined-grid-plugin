@@ -21,6 +21,8 @@ import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.geom.GeneralPath;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -186,8 +188,8 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 
 	GeneralPath drawCombined() {
 		GeneralPath path = new GeneralPath();
-		float arm = 20;
-		float pointSizeCoarse = 40;
+		float arm = 5;
+		float pointSizeCoarse = 10;
 		float armCoarse = pointSizeCoarse / 2;
 
 		for (int h = 0; h < linesV; h++) {
@@ -323,6 +325,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		sfd.makeUnvisibleDialog();
 		
 		
+		
+		
+		
+		
 		// get values in a dialog box
 		gd = new GenericDialog("Grid...");
 		gd.addChoice("Grid Type:", types, type);
@@ -357,6 +363,15 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		gd.addDialogListener(this);
 		gd.addComponentListener(this);
 		gd.setResizable(false);
+		
+		
+		sfd.sfgd.removeKeyListener(sfd.sfgd);
+		sfd.sfgd.addKeyListener(gd);
+		
+		for(Component c : sfd.sfgd.getComponents()){
+			c.removeKeyListener(sfd.sfgd);
+			c.addKeyListener(gd);
+		}
 		
 		gd.showDialog();
 		
