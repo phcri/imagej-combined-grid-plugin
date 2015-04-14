@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ca.phcri</groupId>
-	<artifactId>CombinedGrids</artifactId>
+	<artifactId>CombinedGrids_</artifactId>
 	<name>ImageJ Combined Grid Plugin</name>
 	<url>https://github.com/phcri/imagej-combined-grid-plugin/</url>
 	<organization>
@@ -54,5 +54,5 @@
 			<url>http://maven.imagej.net/content/groups/public</url>
 		</repository>
 	</repositories>
-	<version>1.9.3</version>
+	<version>1.9.4</version>
 </project>

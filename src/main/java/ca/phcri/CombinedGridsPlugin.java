@@ -21,8 +21,6 @@ import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.geom.GeneralPath;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
