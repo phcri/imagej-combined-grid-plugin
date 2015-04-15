@@ -284,5 +284,10 @@ public class SamplingFrame extends CombinedGridsPlugin {
 		sfgd.setLocation(x, y);
 	}
 	
-	
+	public void setMargin(int left, int right, int top, int bottom){
+		marginLeft = left;
+		marginRight = right;
+		marginTop = top;
+		marginBottom = bottom;
+	}
 }

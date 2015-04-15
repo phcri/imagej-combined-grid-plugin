@@ -95,10 +95,7 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 	static boolean saveXml = true;
 	int interval = 2;
 	boolean samplingFrameOn = false;
-	int marginLeft;
-	int marginRight;
-	int marginTop;
-	int marginBottom;
+	static int marginLeft, marginRight, marginTop, marginBottom;
 	String[] lineTypes = {"Solid", "Dashed"};
 	int SOLID = 0, DASHED = 1;
 	String acceptanceLineType = lineTypes[SOLID];
