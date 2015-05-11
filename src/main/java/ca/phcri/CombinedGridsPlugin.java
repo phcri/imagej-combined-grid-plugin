@@ -49,8 +49,10 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 	static double areaPerPoint;
 
 	final static int ONE_TO_FOUR = 0, ONE_TO_NINE = 1, ONE_TO_SIXTEEN = 2, 
-			ONE_TO_TWENTYFIVE = 3, ONE_TO_THIRTYSIX = 4;
-	final static String[] ratioChoices = { "1:4", "1:9", "1:16", "1:25", "1:36" };
+			ONE_TO_TWENTYFIVE = 3, ONE_TO_THIRTYSIX = 4, ONE_TO_FORTY_NINE = 5,
+			ONE_TO_HUNDRED = 6, ONE_TO_ONENINETYSIX = 7;
+	final static String[] ratioChoices = 
+		{ "1:4", "1:9", "1:16", "1:25", "1:36", "1:49", "1:100", "1:196" };
 	static String gridRatio = ratioChoices[ONE_TO_FOUR];
 	final String[] radiobuttons = 
 		{ "Random Offset", "Fixed Position", "Manual Input" };
@@ -646,6 +648,15 @@ public class CombinedGridsPlugin implements PlugIn, DialogListener, ComponentLis
 		} else if (gridRatio.equals(ratioChoices[ONE_TO_THIRTYSIX])) {
 			coarseGridX = 6;
 			coarseGridY = 6;
+		} else if (gridRatio.equals(ratioChoices[ONE_TO_FORTY_NINE])) {
+			coarseGridX = 7;
+			coarseGridY = 7;
+		} else if (gridRatio.equals(ratioChoices[ONE_TO_HUNDRED])) {
+			coarseGridX = 10;
+			coarseGridY = 10;
+		} else if (gridRatio.equals(ratioChoices[ONE_TO_ONENINETYSIX])) {
+			coarseGridX = 14;
+			coarseGridY = 14;
 		}
 	}
 	
